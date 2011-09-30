@@ -1,5 +1,5 @@
-#ifndef __PTO_UI_H
-#define __PTO_UI_H
+#ifndef __CLIT_UI_H
+#define __CLIT_UI_H
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>

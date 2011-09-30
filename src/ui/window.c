@@ -52,15 +52,15 @@ int ui_window_init(ui_widget_t** widget)
 	gtk_menu_shell_append(GTK_MENU_SHELL(ui_menu_bar), ui_root_item);
 
 	ui_widget->widget = ui_window;
-	return PTO_OK;
+	return CLIT_OK;
 }
 
 int ui_window_destroy(ui_widget_t* widget)
 {
 	if(!widget->widget)
-		return PTO_EINVALID;
+		return CLIT_EINVALID;
 	ui_widget_free(widget);
-	return PTO_OK;
+	return CLIT_OK;
 }
 
 int ui_window_event(ui_widget_t* widget, unsigned long event)
@@ -73,5 +73,5 @@ int ui_window_event(ui_widget_t* widget, unsigned long event)
 		gtk_widget_hide(widget->widget);
 		break;
 	}
-	return PTO_OK;
+	return CLIT_OK;
 }

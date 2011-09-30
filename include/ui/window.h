@@ -1,5 +1,5 @@
-#ifndef __PTO_UI_WINDOW_H
-#define __PTO_UI_WINDOW_H
+#ifndef __CLIT_UI_WINDOW_H
+#define __CLIT_UI_WINDOW_H
 
 #include <ui/ui.h>
 

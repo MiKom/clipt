@@ -10,8 +10,8 @@ int main(int argc, char** argv)
 
 	gtk_init(&argc, &argv);
 	
-	ui_window = ui_widget_init(NULL, "Obrazator", 400, 300);
-	if(ui_window_init(&ui_window) != PTO_OK) {
+	ui_window = ui_widget_init(NULL, "CLIT: OpenCL Image Toolkit", 400, 300);
+	if(ui_window_init(&ui_window) != CLIT_OK) {
 		fprintf(stderr, "%s: Unable to initialize GUI", argv[0]);
 		return 1;
 	}
