@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include <config.h>
-#include <core.h>
+#include <system.h>
 #include <ui/ui.h>
 #include <ui/window.h>
 
