@@ -1,0 +1,35 @@
+OpenCL Image Toolkit - Ideas draftbook
+
+* Node chain
+  - Everything is a node
+  - Every node is connected to 0/1 input nodes and 0/1 output nodes (a pipeline)
+  - Nodes with 0 inputs (only first node) upload data from disk to VRAM
+  - Nodes with 0 outputs (only last node) download data from VRAM to disk
+  - One can specify subrange of active nodes (via "breakpoints" or "pipeline-stop" points)
+    - Only one breakpoint can be set as "current" at a time
+    - At everu recomputation pipeline is restarted at current breakpoint and continues
+      to next breakpoint or pipeline end.
+    - At each breakpoint a render event is triggered (can be explicitly disabled).
+    - Example: (|1| denotes breakpoint, |!1| denotes breakpoint with disabled rendering)
+      Import (load file) -> |!1| -> Desaturate -> Blur -> |2| -> Export (save file)
+      1. At first Import node is processed, it loads file from disk then #1 is reached.
+      2. #1 is made current so pipeline continue from #1 to #2 at each recomputation
+         (at this point user tweaks parameters and works with the program)
+      3. When save to disk is desired #2 is made current and export proceedes.
+  - Node data exchange: arbitrary number of PBOs and one special "register PBO"
+    - Two main PBOs (input and output PBO)
+      - Swapped as pipeline progresses (one node output becomes next node input)
+    - Dynamic number of auxiliary PBOs
+      - Sequentially allocated on-demand when pipeline is modified
+        Example: user adds new node, that node needs special buffer, a buffer of
+                 next free ID is given to that buffer.
+      - Deallocated and marked as free on node removal.
+      - Example of aux buffer: histogram data
+    - Special register PBO
+      - 65536 ints, 65536 floats for reading/writing simple values
+      - Standard locations for common data by known index values (via #defines)
+      - Can be used to pass arguments from one node to the next
+    - Explicit data conversion nodes
+      - For example: RGB <-> float or image dimension change
+      - Very costly as involved PBOs need to be reinitialized - should be avoided!
+      - Best practice: Place between breakpoints so it's a one time operation.
