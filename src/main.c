@@ -66,6 +66,12 @@ static int parse_config(const gchar* filename, const gchar* group,
 		}
 	}
 
+	i=0;
+	while(rcfile_keys[i]) {
+		strcpy(rcfile_keys[i+2], rcfile_keys[i+1]);
+		i += 3;
+	}
+
 	keyfile = g_key_file_new();
 	if(!g_key_file_load_from_file(keyfile, config_file, G_KEY_FILE_NONE, &error)) {
 		g_warning("Configuration parse error: %s", error->message);
@@ -85,8 +91,6 @@ static int parse_config(const gchar* filename, const gchar* group,
 		value = g_key_file_get_string(keyfile, group, rcfile_keys[i], NULL);
 		if(value)
 			strncpy(rcfile_keys[i+2], value, PATH_MAX);
-		else
-			strcpy(rcfile_keys[i+2], rcfile_keys[i+1]);
 		i += 3;
 	}
 	
