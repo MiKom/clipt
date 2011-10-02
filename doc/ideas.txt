@@ -1,45 +1,45 @@
 OpenCL Image Toolkit - Ideas draftbook
 
 * Node chain
-  - Everything is a node
-  - Every node is connected to 0/1 input nodes and 0/1 output nodes (a pipeline)
-  - Nodes with 0 inputs (only first node) upload data from disk to VRAM
-  - Nodes with 0 outputs (only last node) download data from VRAM to disk
-  - One can specify segments of active nodes (via "breakpoints" or "pipeline-stop" points)
-    - Only one breakpoint can be set as "current" at a time
-    - At every recomputation pipeline is restarted at current breakpoint and continues
-      to next breakpoint or pipeline end.
-    - At each breakpoint a render event is triggered (can be explicitly disabled).
-    - Example: (|1| denotes breakpoint, |!1| denotes breakpoint with disabled rendering)
-      Import (load file) -> |!1| -> Desaturate -> Blur -> |2| -> Export (save file)
-      1. At first Import node is processed, it loads file from disk then #1 is reached.
-      2. #1 is made current so pipeline continues from #1 to #2 at each recomputation
-         (at this point user tweaks parameters and works with the program)
-      3. When save to disk is desired #2 is made current and export proceedes.
+  - Every filter is a node.
+  - Every node is connected to 0/1 input nodes and 0/1 output nodes (a pipeline).
+  - Node with 0 inputs (only first node) holds source image.
+    - Interfaces with importer for getting image data.
+    - Defines initial data format for the pipeline (RGB8 or RGB32F).
+    - Special case of data cache node (always marked as "clean") - see below.
+  - Node with 0 outputs (only last node) is the blitter node (triggers render event).
+    - Interfaces with exporter to write image data to disk (when requested).
+    - Can upscale/downscale source image before saving or blitting
+      (with configurable scale algorithm).
+  - Nodes can be arbitrarily enabled/disabled by the user. Disabled nodes are skipped
+    by pipeline recomputation.
+    - Source (first) and blitter (last) nodes cannot be disabled (obviously).
   - Node data exchange: arbitrary number of PBOs and one special "register PBO"
-    - Two main PBOs (input and output PBO)
-      - Swapped as pipeline progresses (one node output becomes next node input)
+    - Two primary PBOs (default input and default output PBO)
+      - Swapped as pipeline progresses (one node output becomes next node input).
+      - Some nodes can use one of their auxiliary PBOs as output buffer.
+        Example: downscale node can output to its aux PBO of smaller size, compared
+                 to default output PBO.
+        Advantage: primary PBOs reinitialization (due to size change back and forth)
+                   at each pipeline recomputation is avoided.
     - Dynamic number of auxiliary PBOs
-      - Sequentially allocated on-demand when pipeline is modified
+      - Sequentially allocated on-demand when pipeline is modified.
         Example: user adds new node, that node needs special buffer, a buffer of
                  next free ID is given to that node.
       - Deallocated and marked as free on node removal.
       - Example of aux buffer: histogram data
     - Special register PBO
-      - 65536 ints, 65536 floats for reading/writing simple values
-      - Standard locations for common data by known index values (via #defines)
-      - Can be used to pass arguments from one node to the next
+      - 65536 ints, 65536 floats for reading/writing simple values.
+      - Standard locations for common data by known index values (via #defines).
+      - Can be used to pass arguments from one node to the next.
     - Explicit data conversion nodes
-      - For example: RGB <-> float or image dimension change
+      - For example: RGB <-> float or image dimension change.
       - Very costly as involved PBOs need to be reinitialized - should be avoided!
-      - Best practice: Place between breakpoints so it's a one time operation.
-  - Rendering
-    - Only single PBO at a time can be marked as "renderable".
-    - At each render event renderable PBO is blitted to OpenGL
-      (via glDrawPixels - no fancy "texture on a quad" approach)
-    - Default renderable PBO is the output PBO of last finished node.
-    - Certain nodes can set renderable flag on their aux PBOs
-      Example: downscale node can output to its aux PBO of smaller size, compared
-      to main output PBO, and set it renderable just before render event.
-      Advantage: primary PBOs reinitialization (due to size change back and forth)
-      at each recomputation is avoided.
+    - Explicit data cache nodes
+      - Hold pipeline result "so far".
+      - Any parameter change in processing node marks any subsequent cache nodes "dirty".
+      - Recomputation starts at first clean cache node and regenerates all
+        dirty cache nodes along the way.
+      - What caching policy?
+        - VRAM is very limited.
+        - Automatic or user-controlled?
