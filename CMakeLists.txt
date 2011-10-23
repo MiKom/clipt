@@ -1,10 +1,12 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(CLIT)
 SET(CMAKE_C_FLAGS "-ggdb -fPIC -pipe -Wall")
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/plugins)
 
 FIND_PACKAGE(PkgConfig)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+
+ADD_SUBDIRECTORY(plugins)
 
 ADD_EXECUTABLE(clit src/main.c src/core.c src/system.c src/ui/common.c src/ui/window.c)
 

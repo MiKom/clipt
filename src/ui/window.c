@@ -26,7 +26,7 @@ int ui_window_init(ui_widget_t** widget)
 	
 	ui_menu = gtk_menu_new();
 	
-		/* Open menu item */
+        /* Open menu item */
 	ui_menu_items = gtk_menu_item_new_with_mnemonic("_Open");
 	gtk_menu_shell_append(GTK_MENU_SHELL(ui_menu), ui_menu_items);
 	gtk_widget_show(ui_menu_items);
