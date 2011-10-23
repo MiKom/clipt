@@ -11,7 +11,8 @@ static GtkWidget* ui_menu;
 static GtkWidget* ui_root_item;
 static GtkWidget* ui_menu_items;
 
-int ui_window_init(ui_widget_t** widget)
+sys_result_t
+ui_window_init(ui_widget_t** widget)
 {
 	ui_widget_t* ui_widget = ui_widget_defaults(*widget, "Application Window", 400, 300);
 	GtkWidget*   ui_window = ui_widget->widget;
