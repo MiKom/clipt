@@ -1,9 +1,11 @@
 #include <config.h>
 #include <system.h>
 #include <core.h>
+#include <render.h>
 
 #include <ui/window.h>
 
+// SUBSYSTEM: ui
 static sys_result_t
 core_ui_start(ui_widget_t** ui)
 {
@@ -26,16 +28,37 @@ core_ui_stop(ui_widget_t* ui)
     return CLIT_OK;
 }
 
+// SUBSYSTEM: render
+static sys_result_t
+core_render_start(void)
+{
+    // do shit here
+    g_message("Subsystem [RENDER]: Started");
+    return CLIT_OK;
+}
+
+static sys_result_t
+core_render_stop(void)
+{
+    // and here
+    g_message("Subsystem [RENDER]: Stopped");
+    return CLIT_OK;
+}
+
+// Main
 int core_main(void)
 {
 	sys_config_t* sys_config = sys_get_config();
-    ui_widget_t* ui;
+    ui_widget_t*  ui;
 	
 	if(core_ui_start(&ui) != CLIT_OK)
+        return CLIT_ERROR;
+    if(core_render_start() != CLIT_OK)
         return CLIT_ERROR;
 
 	gtk_main();
 
+    core_render_stop();
     core_ui_stop(ui);
 	return CLIT_OK;
 }
