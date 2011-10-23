@@ -2,6 +2,7 @@
 
 #include <config.h>
 #include <system.h>
+#include <render.h>
 #include <ui/ui.h>
 #include <ui/window.h>
 
@@ -10,8 +11,12 @@ static GtkWidget* ui_menu_bar;
 static GtkWidget* ui_submenu;
 static GtkWidget* ui_root_item;
 static GtkWidget* ui_menu_items;
+static ui_widget_t* ui_drawing_area;
+
+static GLXContext* glctx;
 
 void ui_add_item_to_menu(GtkWidget* menubar, gchar* menu_name, GtkWidget* item);
+void ui_drawing_area_init(GtkWidget* widget, gpointer data);
 
 sys_result_t
 ui_window_init(ui_widget_t** widget)
@@ -73,6 +78,15 @@ ui_window_init(ui_widget_t** widget)
         ui_menu_items = gtk_menu_item_new_with_mnemonic("About");
         ui_add_item_to_menu(ui_menu_bar, "_Help", ui_menu_items);
 
+//Drawing area
+        ui_drawing_area = ui_widget_init(NULL, "Drawing area", 100, 100);
+        ui_drawing_area->widget = gtk_drawing_area_new();
+
+        gtk_box_pack_end(GTK_BOX(ui_vbox), ui_drawing_area->widget, TRUE, TRUE, 0);
+        g_signal_connect(ui_drawing_area->widget, "realize",
+                         G_CALLBACK(ui_drawing_area_init), ui_drawing_area);
+        gtk_widget_show(ui_drawing_area->widget);
+
         ui_widget->widget = ui_window;
 	return CLIT_OK;
 }
@@ -81,7 +95,7 @@ int ui_window_destroy(ui_widget_t* widget)
 {
 	if(!widget->widget)
 		return CLIT_EINVALID;
-	ui_widget_free(widget);
+        ui_widget_free(widget);
 	return CLIT_OK;
 }
 
@@ -114,3 +128,10 @@ void ui_add_item_to_menu(GtkWidget* menubar, gchar* menu_name, GtkWidget* menu_i
     g_list_free(menus);
 }
 
+
+void ui_drawing_area_init(GtkWidget* widget, gpointer data){
+        Window xwin;
+        ui_widget_t* drawing_area = (ui_widget_t*)data;
+        ui_widget_getnative(drawing_area, &xwin);
+        render_context_init(xwin, glctx);
+}
