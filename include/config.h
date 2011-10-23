@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <limits.h>
 #include <glib.h>
+#include <GL/glew.h>
+#include <GL/glxew.h>
 
 #define CLIT_VERSION_MAJOR 0
 #define CLIT_VERSION_MINOR 1
