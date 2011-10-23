@@ -45,6 +45,36 @@ core_render_stop(void)
     return CLIT_OK;
 }
 
+// SUBSYSTEM: device
+static sys_result_t
+core_device_start(void)
+{
+    g_message("Subsystem [DEVICE]: Started");
+    return CLIT_OK;
+}
+
+static sys_result_t
+core_device_stop(void)
+{
+    g_message("Subsystem [DEVICE]: Stopped");
+    return CLIT_OK;
+}
+
+// SUBSYSTEM: plugin
+static sys_result_t
+core_plugin_start(void)
+{
+    g_message("Subsystem [PLUGIN]: Started");
+    return CLIT_OK;
+}
+
+static sys_result_t
+core_plugin_stop(void)
+{
+    g_message("Subsystem [PLUGIN]: Stopped");
+    return CLIT_OK;
+}
+
 // Main
 int core_main(void)
 {
@@ -55,9 +85,15 @@ int core_main(void)
         return CLIT_ERROR;
     if(core_render_start() != CLIT_OK)
         return CLIT_ERROR;
+    if(core_device_start() != CLIT_OK)
+        return CLIT_ERROR;
+    if(core_plugin_start() != CLIT_OK)
+        return CLIT_ERROR;
 
 	gtk_main();
 
+    core_plugin_stop();
+    core_device_stop();
     core_render_stop();
     core_ui_stop(ui);
 	return CLIT_OK;
