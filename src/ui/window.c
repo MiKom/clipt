@@ -13,7 +13,7 @@ static GtkWidget* ui_root_item;
 static GtkWidget* ui_menu_items;
 static ui_widget_t* ui_drawing_area;
 
-static GLXContext* glctx;
+static GLXContext glctx;
 
 void ui_add_item_to_menu(GtkWidget* menubar, gchar* menu_name, GtkWidget* item);
 void ui_drawing_area_init(GtkWidget* widget, gpointer data);
@@ -133,5 +133,5 @@ void ui_drawing_area_init(GtkWidget* widget, gpointer data){
         Window xwin;
         ui_widget_t* drawing_area = (ui_widget_t*)data;
         ui_widget_getnative(drawing_area, &xwin);
-        render_context_init(xwin, glctx);
+        render_context_init(xwin, &glctx);
 }
