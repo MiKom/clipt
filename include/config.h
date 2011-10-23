@@ -14,5 +14,6 @@
 #define CLIT_VERSION_STRING "0.1.0"
 
 #define CLIT_DEFAULT_CONFIG "clitrc.ini"
+#define CLIT_DEFAULT_SYMBOL "clit_plugin_info"
 
 #endif
