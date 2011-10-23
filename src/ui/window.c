@@ -13,7 +13,8 @@ static GtkWidget* ui_menu_items;
 
 void ui_add_item_to_menu(GtkWidget* menubar, gchar* menu_name, GtkWidget* item);
 
-int ui_window_init(ui_widget_t** widget)
+sys_result_t
+ui_window_init(ui_widget_t** widget)
 {
 	ui_widget_t* ui_widget = ui_widget_defaults(*widget, "Application Window", 400, 300);
 	GtkWidget*   ui_window = ui_widget->widget;
@@ -26,13 +27,6 @@ int ui_window_init(ui_widget_t** widget)
 
 	g_signal_connect(ui_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 	
-	ui_menu = gtk_menu_new();
-	
-        /* Open menu item */
-	ui_menu_items = gtk_menu_item_new_with_mnemonic("_Open");
-	gtk_menu_shell_append(GTK_MENU_SHELL(ui_menu), ui_menu_items);
-	gtk_widget_show(ui_menu_items);
-
         //setting up app vbox
         ui_vbox = gtk_vbox_new(FALSE, 0);
         gtk_container_add(GTK_CONTAINER(ui_window), ui_vbox);
