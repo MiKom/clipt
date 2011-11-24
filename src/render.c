@@ -2,6 +2,8 @@
 #include <system.h>
 #include <render.h>
 
+#include <stdio.h>
+
 void init_glx(void)
 {
     glXChooseFBConfig =
@@ -20,14 +22,14 @@ render_context_init(Window xwindow, GLXContext* out_ctx){
 
         init_glx();
         static int fb_attribs[] = {
-                GLX_RENDER_TYPE, GLX_RGBA_BIT,
                 GLX_X_RENDERABLE, True,
+                GLX_RENDER_TYPE, GLX_RGBA_BIT,
                 GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
                 GLX_DOUBLEBUFFER, False,
                 GLX_RED_SIZE, 8,
                 GLX_BLUE_SIZE, 8,
                 GLX_GREEN_SIZE, 8,
-                0
+                None
         };
 
         static GLint gl_attribs[] = {
@@ -48,17 +50,29 @@ render_context_init(Window xwindow, GLXContext* out_ctx){
         fb_configs  = glXChooseFBConfig(disp, DefaultScreen(disp), fb_attribs, &num_configs);
         visual_info = glXGetVisualFromFBConfig(disp, fb_configs[0]);
 
+        int (*oldHandler)(Display*, XErrorEvent*) =
+              XSetErrorHandler(NULL);
+
         ctx = glXCreateContextAttribsARB(disp, fb_configs[0], 0, True, gl_attribs);
-        glXMakeCurrent(disp, xwindow, ctx);
+        if(!glXMakeCurrent(disp, xwindow, ctx) ){
+            fprintf(stderr, "Couldn't bind OpenGL context to X window\n");
+        }
 
         XFlush(disp);
         XFree(fb_configs);
         XFree(visual_info);
 
-        glewInit();
+        GLenum glew_error = glewInit();
+        if(glew_error != GLEW_OK) {
+            fprintf(stderr, "glew error: %s\n",glewGetErrorString(glew_error));
+        }
 
         *out_ctx = ctx;
 
+        glClearColor(0.0,1.0,0.0,1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glXSwapBuffers(disp,xwindow);
+        XSetErrorHandler(oldHandler);
         return CLIT_OK;
 }
 

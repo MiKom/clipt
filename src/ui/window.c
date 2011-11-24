@@ -70,10 +70,6 @@ ui_window_init(ui_widget_t** widget)
                          G_CALLBACK(gtk_main_quit), NULL);
         ui_add_item_to_menu(ui_menu_bar,"_File", ui_menu_items);
 
-//Edit menu
-        ui_menu_items = gtk_menu_item_new_with_mnemonic("Undo");
-        ui_add_item_to_menu(ui_menu_bar, "_Edit", ui_menu_items);
-
 //Help menu
         ui_menu_items = gtk_menu_item_new_with_mnemonic("About");
         ui_add_item_to_menu(ui_menu_bar, "_Help", ui_menu_items);
@@ -83,9 +79,15 @@ ui_window_init(ui_widget_t** widget)
         ui_drawing_area->widget = gtk_drawing_area_new();
 
         gtk_box_pack_end(GTK_BOX(ui_vbox), ui_drawing_area->widget, TRUE, TRUE, 0);
-        g_signal_connect(ui_drawing_area->widget, "realize",
-                         G_CALLBACK(ui_drawing_area_init), ui_drawing_area);
+        //g_signal_connect(ui_drawing_area->widget, "realize",
+        //                 G_CALLBACK(ui_drawing_area_init), ui_drawing_area);
         gtk_widget_show(ui_drawing_area->widget);
+
+        //Edit menu
+                ui_menu_items = gtk_menu_item_new_with_mnemonic("Undo");
+                ui_add_item_to_menu(ui_menu_bar, "_Edit", ui_menu_items);
+                g_signal_connect(ui_menu_items, "activate",
+                                 G_CALLBACK(ui_drawing_area_init), ui_drawing_area);
 
         ui_widget->widget = ui_window;
 	return CLIT_OK;
