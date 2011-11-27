@@ -25,5 +25,25 @@ INCLUDE_DIRECTORIES( ${OPENCL_INCLUDE_DIRS} )
 
 ADD_SUBDIRECTORY(plugins)
 
-ADD_EXECUTABLE(clit src/main.c src/core.c src/system.c src/render.c src/plugin.c src/ui/common.c src/ui/window.c)
+SET( clit_SOURCES
+        src/main.c
+        src/core.c
+        src/system.c
+        src/render.c
+        src/plugin.c
+        src/ui/common.c
+        src/ui/window.c
+)
+
+SET( clit_HEADERS
+        include/config.h
+        include/core.h
+        include/plugin.h
+        include/render.h
+        include/system.h
+        include/ui/ui.h
+        include/ui/window.h
+)
+
+ADD_EXECUTABLE(clit ${clit_SOURCES} ${clit_HEADERS})
 TARGET_LINK_LIBRARIES(clit ${GTK3_LIBRARIES} ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} ${OPENCL_LIBRARIES} )

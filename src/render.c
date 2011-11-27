@@ -17,6 +17,8 @@ void init_glx(void)
         glXGetProcAddress((GLubyte*)"glXCreateContextAttribsARB");
 }
 
+Display* disp;
+
 sys_result_t
 render_context_init(Window xwindow, GLXContext* out_ctx){
 
@@ -41,7 +43,10 @@ render_context_init(Window xwindow, GLXContext* out_ctx){
 
         XVisualInfo* visual_info;
 
-        Display* disp = XOpenDisplay(NULL);
+        disp = XOpenDisplay(NULL);
+
+        XWindowAttributes attrs;
+        XGetWindowAttributes(disp, xwindow, &attrs);
 
         int num_configs = 0;
         GLXFBConfig* fb_configs;
@@ -77,7 +82,19 @@ render_context_init(Window xwindow, GLXContext* out_ctx){
 }
 
 sys_result_t
+render_context_draw(Window xwindow, GLXContext* ctx)
+{
+        //if(!glXMakeCurrent(disp, xwindow, ctx) ){
+        //    fprintf(stderr, "Couldn't bind OpenGL context to X window\n");
+        //}
+        glClear(GL_COLOR_BUFFER_BIT);
+        glXSwapBuffers(disp, xwindow);
+}
+
+
+sys_result_t
 render_context_free(GLXContext* ctx){
 
+        XCloseDisplay(disp);
         return CLIT_OK;
 }

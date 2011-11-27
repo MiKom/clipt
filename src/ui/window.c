@@ -13,10 +13,13 @@ static GtkWidget* ui_root_item;
 static GtkWidget* ui_menu_items;
 static ui_widget_t* ui_drawing_area;
 
+static gboolean gl_initialized = FALSE;
 static GLXContext glctx;
 
 void ui_add_item_to_menu(GtkWidget* menubar, gchar* menu_name, GtkWidget* item);
 void ui_drawing_area_init(GtkWidget* widget, gpointer data);
+void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data);
+void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t*, gpointer data);
 
 sys_result_t
 ui_window_init(ui_widget_t** widget)
@@ -35,12 +38,12 @@ ui_window_init(ui_widget_t** widget)
         //setting up app vbox
         ui_vbox = gtk_vbox_new(FALSE, 0);
         gtk_container_add(GTK_CONTAINER(ui_window), ui_vbox);
-        gtk_widget_show(ui_vbox);
+        //gtk_widget_show(ui_vbox);
 
         //setting up menbubar
         ui_menu_bar = gtk_menu_bar_new();
         gtk_box_pack_start(GTK_BOX(ui_vbox), ui_menu_bar, FALSE, FALSE, 2);
-        gtk_widget_show(ui_menu_bar);
+        //gtk_widget_show(ui_menu_bar);
 
         char* root_menus[] = {"_File", "_Edit","_Tools", "_Colors", "_Effects", "_Help", NULL};
         int i;
@@ -49,7 +52,7 @@ ui_window_init(ui_widget_t** widget)
             ui_submenu = gtk_menu_new();
             gtk_menu_item_set_submenu(GTK_MENU_ITEM(ui_root_item), ui_submenu);
             gtk_menu_shell_append(GTK_MENU_SHELL(ui_menu_bar), ui_root_item);
-            gtk_widget_show(ui_root_item);
+            //gtk_widget_show(ui_root_item);
         }
 
 //File menu
@@ -80,11 +83,13 @@ ui_window_init(ui_widget_t** widget)
 //Drawing area
         ui_drawing_area = ui_widget_init(NULL, "Drawing area", 100, 100);
         ui_drawing_area->widget = gtk_drawing_area_new();
-
+        g_signal_connect_after(ui_drawing_area->widget, "realize",
+                         G_CALLBACK(ui_drawing_area_after_realize_cb), ui_drawing_area);
+        g_signal_connect_after(ui_drawing_area->widget, "draw",
+                         G_CALLBACK(ui_drawing_area_draw_cb), ui_drawing_area);
         gtk_box_pack_end(GTK_BOX(ui_vbox), ui_drawing_area->widget, TRUE, TRUE, 0);
-        //g_signal_connect(ui_drawing_area->widget, "realize",
-        //                 G_CALLBACK(ui_drawing_area_init), ui_drawing_area);
-        gtk_widget_show(ui_drawing_area->widget);
+        gtk_widget_set_double_buffered(ui_drawing_area->widget, FALSE);
+        //gtk_widget_show(ui_drawing_area->widget);
 
 //Tools menu
         ui_menu_items = gtk_menu_item_new_with_mnemonic("_Initialize GL");
@@ -133,10 +138,33 @@ void ui_add_item_to_menu(GtkWidget* menubar, gchar* menu_name, GtkWidget* menu_i
     g_list_free(menus);
 }
 
+void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data) {
+    ui_widget_t* drawing_area = (ui_widget_t*) data;
+    Window xwin;
+    if(ui_widget_getnative(drawing_area, &xwin) != CLIT_OK) {
+            fprintf(stderr, "Cannot get native window of drawing area, aborting\n");
+            exit(1);
+    }
+}
 
 void ui_drawing_area_init(GtkWidget* widget, gpointer data){
         Window xwin;
         ui_widget_t* drawing_area = (ui_widget_t*)data;
         ui_widget_getnative(drawing_area, &xwin);
         render_context_init(xwin, &glctx);
+        gl_initialized = TRUE;
+}
+
+void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data) {
+
+        Window xwin;
+        ui_widget_getnative((ui_widget_t*) data, &xwin);
+
+        if(!gl_initialized) {
+                ui_drawing_area_init(widget, data);
+        }
+        else
+        {
+                render_context_draw(xwin, glctx);
+        }
 }

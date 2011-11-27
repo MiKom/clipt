@@ -44,9 +44,12 @@ void ui_widget_free(ui_widget_t* widget)
 sys_result_t
 ui_widget_getnative(ui_widget_t* widget, Window* xwindow)
 {
-    GdkWindow* gdk_window = gtk_widget_get_parent_window(widget->widget);
-    if(!gdk_window_ensure_native(gdk_window))
+    GdkWindow* gdk_window = gtk_widget_get_window(widget->widget);
+    gboolean is_native = gdk_window_ensure_native(gdk_window);
+    if(!is_native)
         return CLIT_EINVALID;
-    *xwindow = gdk_x11_window_get_xid(gdk_window);
+    Window ret = gdk_x11_window_get_xid(gdk_window);
+    *xwindow = ret;
+
     return CLIT_OK;
 }

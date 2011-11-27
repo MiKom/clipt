@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 {
 	int retvalue = CLIT_OK;
 	sys_config_t* sys_config = sys_get_config();
-	
+
 	parse_arguments(argc, argv, sys_config);
 	g_message("%s is starting ...", CLIT_NAME_STRING);
 	parse_config(NULL, "clit", sys_config);
