@@ -127,6 +127,8 @@ ui_window_init(ui_widget_t** widget)
         gtk_box_pack_start(GTK_BOX(ui_vbox), ui_menu_bar, FALSE, FALSE, 2);
 
         ui_toolbar = gtk_ui_manager_get_widget(ui_manager, "/MainToolbar");
+        GtkStyleContext* style_ctx = gtk_widget_get_style_context(ui_toolbar);
+        gtk_style_context_add_class(style_ctx, GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
         gtk_box_pack_start(GTK_BOX(ui_vbox), ui_toolbar, FALSE, FALSE, 2);
 
         gtk_window_add_accel_group(GTK_WINDOW(ui_window),
