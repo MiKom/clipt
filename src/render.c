@@ -18,7 +18,7 @@ void init_glx(void)
 }
 
 Display* disp;
-
+float color;
 sys_result_t
 render_context_init(Window xwindow, GLXContext* out_ctx){
 
@@ -75,13 +75,20 @@ render_context_init(Window xwindow, GLXContext* out_ctx){
         glClear(GL_COLOR_BUFFER_BIT);
         glXSwapBuffers(disp,xwindow);
         XSetErrorHandler(oldHandler);
+        color = 0.0f;
         return CLIT_OK;
 }
 
 sys_result_t
 render_context_draw(Window xwindow, GLXContext* ctx)
 {
+        glClearColor(0.0, color, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        color += 0.02;
+        if(color > 1.0f) {
+                color = 0.0f;
+        }
         glXSwapBuffers(disp, xwindow);
 }
 
