@@ -6,3 +6,10 @@ sys_config_t* sys_get_config(void)
 	static sys_config_t config;
 	return &config;
 }
+
+sys_state_t* sys_get_state(void)
+{
+        static sys_state_t state;
+        state.plugin_handles = NULL;
+        return &state;
+}

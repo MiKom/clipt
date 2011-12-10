@@ -6,7 +6,7 @@ enum device_result_e {
     DEVICE_EUNAVAIL,
     DEVICE_ERROR,
 };
-typedef device_result_e device_result_t;
+typedef enum device_result_e device_result_t;
 
 device_result_t device_init(void);
     

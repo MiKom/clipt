@@ -78,23 +78,23 @@ core_plugin_stop(void)
 // Main
 int core_main(void)
 {
-	sys_config_t* sys_config = sys_get_config();
-    ui_widget_t*  ui;
-	
-	if(core_ui_start(&ui) != CLIT_OK)
-        return CLIT_ERROR;
-    if(core_render_start() != CLIT_OK)
-        return CLIT_ERROR;
-    if(core_device_start() != CLIT_OK)
-        return CLIT_ERROR;
-    if(core_plugin_start() != CLIT_OK)
-        return CLIT_ERROR;
+        sys_config_t* sys_config = sys_get_config();
+        ui_widget_t*  ui;
 
-	gtk_main();
+        if(core_ui_start(&ui) != CLIT_OK)
+                return CLIT_ERROR;
+        if(core_render_start() != CLIT_OK)
+                return CLIT_ERROR;
+        if(core_device_start() != CLIT_OK)
+                return CLIT_ERROR;
+        if(core_plugin_start() != CLIT_OK)
+                return CLIT_ERROR;
 
-    core_plugin_stop();
-    core_device_stop();
-    core_render_stop();
-    core_ui_stop(ui);
-	return CLIT_OK;
+        gtk_main();
+
+        core_plugin_stop();
+        core_device_stop();
+        core_render_stop();
+        core_ui_stop(ui);
+        return CLIT_OK;
 }

@@ -8,7 +8,7 @@ enum sys_result_e
     CLIT_EINVALID,
     CLIT_ERESOURCES,
     CLIT_ENOTFOUND,
-    CLIT_ERROR,
+    CLIT_ERROR
 };
 typedef enum sys_result_e sys_result_t;
 
@@ -22,5 +22,13 @@ struct sys_config_s
 typedef struct sys_config_s sys_config_t;
 
 sys_config_t* sys_get_config(void);
+
+struct sys_state_s
+{
+        GList* plugin_handles;
+};
+typedef struct sys_state_s sys_state_t;
+
+sys_state_t* sys_get_state(void);
 
 #endif

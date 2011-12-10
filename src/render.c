@@ -1,5 +1,7 @@
 #include <config.h>
 #include <system.h>
+#include <image.h>
+#include <plugin.h>
 #include <render.h>
 
 #include <stdio.h>
@@ -76,6 +78,8 @@ render_context_init(Window xwindow, GLXContext* out_ctx){
         glXSwapBuffers(disp,xwindow);
         XSetErrorHandler(oldHandler);
         color = 0.0f;
+
+        load_plugins();
         return CLIT_OK;
 }
 

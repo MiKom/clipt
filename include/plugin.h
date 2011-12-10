@@ -1,12 +1,13 @@
 #ifndef __CLIT_PLUGIN_H
 #define __CLIT_PLUGIN_H
 
+
 typedef sys_result_t (*plugin_load_func_t)(void);
 typedef sys_result_t (*plugin_unload_func_t)(void);
 
 enum plugin_type_e {
     PLUGIN_FILEIO,
-    PLUGIN_NODE,
+    PLUGIN_NODE
 };
 typedef enum plugin_type_e plugin_type_t;
 
@@ -34,7 +35,7 @@ struct plugin_load_handler_s
 {
         char *ext;
         char *desc;
-        plugin_io_load_func_t handler;
+        plugin_io_load_func_t function;
 };
 typedef struct plugin_load_handler_s plugin_load_handler_t;
 
@@ -43,7 +44,7 @@ struct plugin_save_handler_s
 {
         char *ext;
         char *desc;
-        plugin_io_save_func_t handler;
+        plugin_io_save_func_t function;
 };
 typedef struct plugin_save_handler_s plugin_save_handler_t;
 
@@ -51,10 +52,10 @@ struct plugin_fileio_s
 {
     struct plugin_s base;
     size_t n_load_handlers;
-    plugin_load_handler_t *load_handlers;
+    plugin_load_handler_t **load_handlers;
 
     size_t n_save_handlers;
-    plugin_save_handler_t *save_handlers;
+    plugin_save_handler_t **save_handlers;
 };
 typedef struct plugin_fileio_s plugin_fileio_t;
 
@@ -64,5 +65,17 @@ struct plugin_node_s
     
 };
 typedef struct plugin_node_s plugin_node_t;
+
+sys_result_t
+plugin_load(const char* path, plugin_handle_t* handle);
+
+sys_result_t
+plugin_unload(plugin_handle_t* handle);
+
+/**
+ * Loads all plugins from directory specified in config file, otherwise from /usr/lib/clit
+ **/
+sys_result_t
+load_plugins();
 
 #endif
