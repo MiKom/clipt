@@ -196,10 +196,7 @@ void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data) {
         if(!gl_initialized) {
                 ui_drawing_area_init(widget, data);
         }
-        else
-        {
-                render_context_draw(xwin, &glctx);
-        }
+        render_context_draw(xwin, &glctx);
 }
 
 void ui_open_file_cb(GtkWidget* widget, gpointer data)
