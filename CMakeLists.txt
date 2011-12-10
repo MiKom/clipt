@@ -38,6 +38,7 @@ SET( clit_SOURCES
 SET( clit_HEADERS
         include/config.h
         include/core.h
+        include/image.h
         include/plugin.h
         include/render.h
         include/system.h

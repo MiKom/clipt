@@ -29,10 +29,32 @@ struct plugin_handle_s
 };
 typedef struct plugin_handle_s plugin_handle_t;
 
+typedef sys_result_t (*plugin_io_load_func_t)(char *path, image_t **image);
+struct plugin_load_handler_s
+{
+        char *ext;
+        char *desc;
+        plugin_io_load_func_t handler;
+};
+typedef struct plugin_load_handler_s plugin_load_handler_t;
+
+typedef sys_result_t (*plugin_io_save_func_t)(char *path, image_t *image);
+struct plugin_save_handler_s
+{
+        char *ext;
+        char *desc;
+        plugin_io_save_func_t handler;
+};
+typedef struct plugin_save_handler_s plugin_save_handler_t;
+
 struct plugin_fileio_s
 {
     struct plugin_s base;
-    
+    size_t n_load_handlers;
+    plugin_load_handler_t *load_handlers;
+
+    size_t n_save_handlers;
+    plugin_save_handler_t *save_handlers;
 };
 typedef struct plugin_fileio_s plugin_fileio_t;
 

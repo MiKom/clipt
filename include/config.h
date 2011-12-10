@@ -2,6 +2,7 @@
 #define __CLIT_CONFIG_H
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <limits.h>
 #include <glib.h>
 #include <GL/glew.h>

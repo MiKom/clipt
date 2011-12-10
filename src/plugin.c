@@ -1,5 +1,6 @@
 #include <config.h>
 #include <system.h>
+#include <image.h>
 #include <plugin.h>
 
 #include <dlfcn.h>
