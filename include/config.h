@@ -8,6 +8,12 @@
 #include <GL/glew.h>
 #include <GL/glxew.h>
 
+#if defined (__APPLE__) || defined(MACOSX)
+#include <OpenCL/opencl.h>
+#else
+#include <CL/opencl.h>
+#endif
+
 #define CLIT_VERSION_MAJOR 0
 #define CLIT_VERSION_MINOR 1
 
