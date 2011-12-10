@@ -8,9 +8,6 @@
 
 static GtkWidget* ui_vbox;
 static GtkWidget* ui_menu_bar;
-static GtkWidget* ui_submenu;
-static GtkWidget* ui_root_item;
-static GtkWidget* ui_menu_items;
 static GtkActionGroup* ui_action_group;
 static GtkUIManager* ui_manager;
 static GtkWidget* ui_toolbar;
@@ -97,7 +94,6 @@ ui_window_init(ui_widget_t** widget)
 {
         ui_widget_t	*ui_widget = ui_widget_defaults(*widget, "Application Window", 400, 300);
         GtkWidget	*ui_window = ui_widget->widget;
-        GtkActionGroup 	*actions;
         GError 		*error = NULL;
 	
 	if(!ui_window)
@@ -113,9 +109,9 @@ ui_window_init(ui_widget_t** widget)
         gtk_container_add(GTK_CONTAINER(ui_window), ui_vbox);
         //gtk_widget_show(ui_vbox);
         ui_manager = gtk_ui_manager_new();
-        actions = gtk_action_group_new("Actions");
-        gtk_action_group_add_actions(actions, entries, n_entries, NULL);
-        gtk_ui_manager_insert_action_group(ui_manager, actions, 0);
+        ui_action_group = gtk_action_group_new("Actions");
+        gtk_action_group_add_actions(ui_action_group, entries, n_entries, NULL);
+        gtk_ui_manager_insert_action_group(ui_manager, ui_action_group, 0);
 
         gtk_ui_manager_add_ui_from_string(ui_manager, ui_definition,-1, &error);
         if(error) {
@@ -202,7 +198,7 @@ void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data) {
         }
         else
         {
-                render_context_draw(xwin, glctx);
+                render_context_draw(xwin, &glctx);
         }
 }
 
