@@ -31,6 +31,7 @@ SET( clit_SOURCES
         src/system.c
         src/render.c
         src/plugin.c
+        src/device.c
         src/ui/common.c
         src/ui/window.c
 )
@@ -42,6 +43,7 @@ SET( clit_HEADERS
         include/plugin.h
         include/render.h
         include/system.h
+        include/device.h
         include/ui/ui.h
         include/ui/window.h
 )
