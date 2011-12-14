@@ -298,14 +298,19 @@ void ui_window_setglcontext(GLXContext ctx)
 
 static void ui_about_cb(GtkWidget* widget, gpointer data)
 {
-        const gchar *authors[] = {"Michal Siejak <masterm@wmi.amu.edu.pl>",
+
+        static const gchar *authors[] = {"Michal Siejak <masterm@wmi.amu.edu.pl>",
                                   "Milosz Kosobucki <mikom3@gmail.com>",
                                   NULL};
+        static const gchar copyrights[] = "Copyright © 2011 Michał Siejak\n"
+                                          "Copyright © 2011 Miłosz Kosobucki\n";
 
         gtk_show_about_dialog(GTK_WINDOW(ui_window),
                               "program-name", CLIT_NAME_STRING,
                               "authors", authors,
+                              "copyright", copyrights,
                               "version", CLIT_VERSION_STRING,
+                              "logo-icon-name", CLIT_PROGRAM_NAME,
                               "comments", "Hardware accelerated Image Processing toolkit",
                               "license-type", GTK_LICENSE_GPL_3_0,
                               NULL
