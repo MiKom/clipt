@@ -48,7 +48,7 @@ core_render_start(void)
 static sys_result_t
 core_render_stop(void)
 {
-        // and here
+        render_context_free(ui_window_getglcontext());
         g_message("Subsystem [RENDER]: Stopped");
         return CLIT_OK;
 }

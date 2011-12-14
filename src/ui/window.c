@@ -19,17 +19,22 @@ static ui_widget_t* ui_drawing_area;
 static gboolean gl_initialized = FALSE;
 static GLXContext glctx;
 
-void ui_open_file_cb(GtkWidget* widget, gpointer data);
-void ui_save_file_cb(GtkWidget* widget, gpointer data);
+static void ui_quit(void);
 
-void ui_undo_cb(GtkWidget* widget, gpointer data);
-void ui_reset_cb(GtkWidget* widget, gpointer data);
+static void ui_open_file_cb(GtkWidget* widget, gpointer data);
+static void ui_save_file_cb(GtkWidget* widget, gpointer data);
+static void ui_menu_quit_cb(GtkWidget* widget, gpointer data);
+
+static void ui_undo_cb(GtkWidget* widget, gpointer data);
+static void ui_reset_cb(GtkWidget* widget, gpointer data);
 
 static void ui_about_cb(GtkWidget* widget, gpointer data);
 
-void ui_drawing_area_init(GtkWidget* widget, gpointer data);
-void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data);
-void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t*, gpointer data);
+static gboolean ui_window_delete_event_cb(GtkWidget *widget, gpointer data);
+
+static void ui_drawing_area_init(GtkWidget* widget, gpointer data);
+static void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data);
+static void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t*, gpointer data);
 
 char *ui_definition =
 "<ui>"
@@ -74,7 +79,7 @@ static GtkActionEntry entries[] = {
         { "FileQuitAction", GTK_STOCK_QUIT,
           "_Quit", "<control>Q",
           "Quit program",
-          G_CALLBACK(gtk_main_quit)},
+          G_CALLBACK(ui_menu_quit_cb)},
 
 //Edit Menu
         { "EditMenuAction", NULL, "_Edit"},
@@ -102,7 +107,9 @@ static guint n_entries = G_N_ELEMENTS(entries);
 sys_result_t
 ui_window_init(ui_widget_t** widget)
 {
-        ui_widget_t *ui_widget = ui_widget_defaults(*widget, "Application Window", 400, 300);
+        ui_widget_t *ui_widget = ui_widget_defaults(*widget,
+                                                    "Application Window",
+                                                    400, 300);
         ui_window = ui_widget->widget;
         GError *error = NULL;
 	
@@ -112,7 +119,7 @@ ui_window_init(ui_widget_t** widget)
 	gtk_window_set_title(GTK_WINDOW(ui_window), ui_widget->title);
 	gtk_window_set_default_size(GTK_WINDOW(ui_window), ui_widget->width, ui_widget->height);
 
-	g_signal_connect(ui_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+        g_signal_connect(ui_window, "delete-event", G_CALLBACK(ui_window_delete_event_cb), NULL);
 	
         //setting up app vbox
         ui_vbox = gtk_vbox_new(FALSE, 0);
@@ -163,6 +170,25 @@ int ui_window_destroy(ui_widget_t* widget)
 	return CLIT_OK;
 }
 
+static gboolean ui_window_delete_event_cb(GtkWidget *widget, gpointer data)
+{
+        ui_quit();
+        //Do not destroy window, will die on application quit
+        return TRUE;
+}
+
+static void ui_menu_quit_cb(GtkWidget *widget, gpointer data)
+{
+        ui_quit();
+}
+
+static void ui_quit()
+{
+        //TODO: put save before quitting dialog here
+        core_subsystem_stop();
+        gtk_main_quit();
+}
+
 int ui_window_event(ui_widget_t* widget, unsigned long event)
 {
 	switch(event) {
@@ -186,6 +212,9 @@ void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data) {
 }
 
 void ui_drawing_area_init(GtkWidget* widget, gpointer data){
+        // This is here because gtk cannot return XWindow that is proper
+        // GLXRenderable until it is shown on screen so we have to postpone all
+        // OpenGL and OpenCL stuff unitl window is drawn for the first time.
         core_subsystem_start();
         
         gl_initialized = TRUE;
@@ -224,23 +253,23 @@ void ui_reset_cb(GtkWidget* widget, gpointer data)
         printf("Reset action\n");
 
         GtkWidget* dialog;
-        dialog = gtk_message_dialog_new(ui_window,
+        dialog = gtk_message_dialog_new(GTK_WINDOW(ui_window),
                                         GTK_DIALOG_MODAL,
                                         GTK_MESSAGE_WARNING,
                                         GTK_BUTTONS_NONE,
                                         "Reset all changes?");
-        gtk_message_dialog_format_secondary_text(dialog,
+        gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),
                                                  "This operation is irreversible, "
                                                  "all changes made to current "
                                                  "file will be lost.");
 
-        gtk_dialog_add_buttons(dialog,
+        gtk_dialog_add_buttons(GTK_DIALOG(dialog),
                                "Don't reset",
                                GTK_RESPONSE_NO,
                                "Reset",
                                GTK_RESPONSE_YES,
                                NULL);
-        gint response = gtk_dialog_run(dialog);
+        gint response = gtk_dialog_run(GTK_DIALOG(dialog));
 
         if(response == GTK_RESPONSE_YES) {
                 printf("User chose to reset\n");
@@ -257,6 +286,11 @@ ui_widget_t* ui_window_getdrawable(void)
         return ui_drawing_area;
 }
 
+GLXContext ui_window_getglcontext(void)
+{
+        return glctx;
+}
+
 void ui_window_setglcontext(GLXContext ctx)
 {
         glctx = ctx;
@@ -264,11 +298,14 @@ void ui_window_setglcontext(GLXContext ctx)
 
 static void ui_about_cb(GtkWidget* widget, gpointer data)
 {
-        const gchar *authors[] = {"Michal Siejak", "Milosz Kosobucki", NULL};
+        const gchar *authors[] = {"Michal Siejak <masterm@wmi.amu.edu.pl>",
+                                  "Milosz Kosobucki <mikom3@gmail.com>",
+                                  NULL};
 
-        gtk_show_about_dialog(ui_window,
-                              "program-name", "OpenCL Image ToolKit",
+        gtk_show_about_dialog(GTK_WINDOW(ui_window),
+                              "program-name", CLIT_NAME_STRING,
                               "authors", authors,
+                              "version", CLIT_VERSION_STRING,
                               "comments", "Hardware accelerated Image Processing toolkit",
                               "license-type", GTK_LICENSE_GPL_3_0,
                               NULL
