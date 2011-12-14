@@ -38,7 +38,7 @@ device_result_t device_create(device_context_t* context)
 
     clGetDeviceInfo(context->device, CL_DEVICE_EXTENSIONS, 0, NULL, &size_entries);
 
-    extensions = (char*)malloc(num_entries);
+    extensions = (char*)malloc(size_entries);
     clGetDeviceInfo(context->device, CL_DEVICE_EXTENSIONS, size_entries, extensions, NULL);
     if(!strstr(extensions, GL_SHARING_EXTENSION))
         return DEVICE_EUNAVAIL;

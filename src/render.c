@@ -3,8 +3,11 @@
 #include <image.h>
 #include <plugin.h>
 #include <render.h>
+#include <device.h>
 
 #include <stdio.h>
+
+static device_context_t device_context;
 
 void init_glx(void)
 {
@@ -19,8 +22,9 @@ void init_glx(void)
         glXGetProcAddress((GLubyte*)"glXCreateContextAttribsARB");
 }
 
-Display* disp;
-float color;
+static Display* disp;
+static float color;
+
 sys_result_t
 render_context_init(Window xwindow, GLXContext* out_ctx){
 
@@ -79,6 +83,7 @@ render_context_init(Window xwindow, GLXContext* out_ctx){
         XSetErrorHandler(oldHandler);
         color = 0.0f;
 
+        device_create(&device_context);
         load_plugins();
         return CLIT_OK;
 }
@@ -99,7 +104,7 @@ render_context_draw(Window xwindow, GLXContext* ctx)
 
 sys_result_t
 render_context_free(GLXContext* ctx){
-
+        device_destroy(&device_context);    
         XCloseDisplay(disp);
         return CLIT_OK;
 }

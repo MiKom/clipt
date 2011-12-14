@@ -2,6 +2,7 @@
 
 #include <config.h>
 #include <system.h>
+#include <core.h>
 #include <render.h>
 #include <ui/ui.h>
 #include <ui/window.h>
@@ -181,10 +182,8 @@ void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data) {
 }
 
 void ui_drawing_area_init(GtkWidget* widget, gpointer data){
-        Window xwin;
-        ui_widget_t* drawing_area = (ui_widget_t*)data;
-        ui_widget_getnative(drawing_area, &xwin);
-        render_context_init(xwin, &glctx);
+        core_subsystem_start();
+        
         gl_initialized = TRUE;
 }
 
@@ -215,4 +214,14 @@ void ui_undo_cb(GtkWidget* widget, gpointer data)
 {
         printf("Undo action\n");
         fflush(stdout);
+}
+
+ui_widget_t* ui_window_getdrawable(void)
+{
+        return ui_drawing_area;
+}
+
+void ui_window_setglcontext(GLXContext ctx)
+{
+        glctx = ctx;
 }

@@ -8,4 +8,7 @@ sys_result_t ui_window_init(ui_widget_t** widget);
 int ui_window_destroy(ui_widget_t* widget);
 int ui_window_event(ui_widget_t* widget, unsigned long event);
 
+ui_widget_t* ui_window_getdrawable(void);
+void         ui_window_setglcontext(GLXContext ctx);
+
 #endif
