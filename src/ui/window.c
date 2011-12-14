@@ -7,6 +7,7 @@
 #include <ui/ui.h>
 #include <ui/window.h>
 
+static GtkWidget* ui_window;
 static GtkWidget* ui_vbox;
 static GtkWidget* ui_menu_bar;
 static GtkActionGroup* ui_action_group;
@@ -22,6 +23,9 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data);
 void ui_save_file_cb(GtkWidget* widget, gpointer data);
 
 void ui_undo_cb(GtkWidget* widget, gpointer data);
+void ui_reset_cb(GtkWidget* widget, gpointer data);
+
+static void ui_about_cb(GtkWidget* widget, gpointer data);
 
 void ui_drawing_area_init(GtkWidget* widget, gpointer data);
 void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data);
@@ -38,6 +42,7 @@ char *ui_definition =
 "    </menu>"
 "    <menu name='EditMenu' action='EditMenuAction'>"
 "      <menuitem action='UndoAction'/>"
+"      <menuitem action='ResetAction' />"
 "    </menu>"
 "    <menu name='ToolsMenu' action='ToolsMenuAction'>"
 "      <placeholder/>"
@@ -77,6 +82,10 @@ static GtkActionEntry entries[] = {
           "Undo", "<control>Z",
           "Undo last action",
           G_CALLBACK(ui_undo_cb)},
+        { "ResetAction", GTK_STOCK_REVERT_TO_SAVED,
+          "Reset image", NULL,
+          "Reset all changes made to image",
+          G_CALLBACK(ui_reset_cb)},
 
 //Tools Menu
         { "ToolsMenuAction", NULL, "_Tools"},
@@ -86,16 +95,16 @@ static GtkActionEntry entries[] = {
         { "AboutAction", GTK_STOCK_ABOUT,
           "About", NULL,
           "Information about program",
-          NULL}
+          G_CALLBACK(ui_about_cb)}
 };
 static guint n_entries = G_N_ELEMENTS(entries);
 
 sys_result_t
 ui_window_init(ui_widget_t** widget)
 {
-        ui_widget_t	*ui_widget = ui_widget_defaults(*widget, "Application Window", 400, 300);
-        GtkWidget	*ui_window = ui_widget->widget;
-        GError 		*error = NULL;
+        ui_widget_t *ui_widget = ui_widget_defaults(*widget, "Application Window", 400, 300);
+        ui_window = ui_widget->widget;
+        GError *error = NULL;
 	
 	if(!ui_window)
 		ui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -141,11 +150,6 @@ ui_window_init(ui_widget_t** widget)
         gtk_widget_set_double_buffered(ui_drawing_area->widget, FALSE);
         //gtk_widget_show(ui_drawing_area->widget);
 
-//Tools menu
-//        ui_menu_items = gtk_menu_item_new_with_mnemonic("_Initialize GL");
-//        ui_add_item_to_menu(ui_menu_bar, "_Tools", ui_menu_items);
-//        g_signal_connect(ui_menu_items, "activate",
-//                         G_CALLBACK(ui_drawing_area_init), ui_drawing_area);
         gtk_widget_show_all(ui_window);
         ui_widget->widget = ui_window;
 	return CLIT_OK;
@@ -215,6 +219,38 @@ void ui_undo_cb(GtkWidget* widget, gpointer data)
         printf("Undo action\n");
         fflush(stdout);
 }
+void ui_reset_cb(GtkWidget* widget, gpointer data)
+{
+        printf("Reset action\n");
+
+        GtkWidget* dialog;
+        dialog = gtk_message_dialog_new(ui_window,
+                                        GTK_DIALOG_MODAL,
+                                        GTK_MESSAGE_WARNING,
+                                        GTK_BUTTONS_NONE,
+                                        "Reset all changes?");
+        gtk_message_dialog_format_secondary_text(dialog,
+                                                 "This operation is irreversible, "
+                                                 "all changes made to current "
+                                                 "file will be lost.");
+
+        gtk_dialog_add_buttons(dialog,
+                               "Don't reset",
+                               GTK_RESPONSE_NO,
+                               "Reset",
+                               GTK_RESPONSE_YES,
+                               NULL);
+        gint response = gtk_dialog_run(dialog);
+
+        if(response == GTK_RESPONSE_YES) {
+                printf("User chose to reset\n");
+        } else {
+                printf("User chose not to reset\n");
+        }
+
+        gtk_widget_destroy(dialog);
+        fflush(stdout);
+}
 
 ui_widget_t* ui_window_getdrawable(void)
 {
@@ -224,4 +260,17 @@ ui_widget_t* ui_window_getdrawable(void)
 void ui_window_setglcontext(GLXContext ctx)
 {
         glctx = ctx;
+}
+
+static void ui_about_cb(GtkWidget* widget, gpointer data)
+{
+        const gchar *authors[] = {"Michal Siejak", "Milosz Kosobucki", NULL};
+
+        gtk_show_about_dialog(ui_window,
+                              "program-name", "OpenCL Image ToolKit",
+                              "authors", authors,
+                              "comments", "Hardware accelerated Image Processing toolkit",
+                              "license-type", GTK_LICENSE_GPL_3_0,
+                              NULL
+                              );
 }
