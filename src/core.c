@@ -1,8 +1,10 @@
 #include <config.h>
 #include <system.h>
 #include <core.h>
+#include <image.h>
 #include <render.h>
 #include <device.h>
+#include <plugin.h>
 
 #include <ui/window.h>
 

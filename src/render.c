@@ -102,10 +102,10 @@ render_context_draw(Window xwindow, GLXContext* ctx)
 
 
 sys_result_t
-render_context_free(GLXContext* ctx)
+render_context_free(GLXContext ctx)
 {
 	device_destroy(&device_context);
-	glXDestroyContext(disp, *ctx);
+	glXDestroyContext(disp, ctx);
 	XCloseDisplay(disp);
 	return CLIT_OK;
 }

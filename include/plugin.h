@@ -33,7 +33,8 @@ typedef struct plugin_handle_s plugin_handle_t;
 typedef sys_result_t (*plugin_io_load_func_t)(char *path, image_t **image);
 struct plugin_load_handler_s
 {
-	char *ext;
+	size_t nfilters;
+	char **filters;
 	char *desc;
 	plugin_io_load_func_t function;
 };
@@ -42,7 +43,8 @@ typedef struct plugin_load_handler_s plugin_load_handler_t;
 typedef sys_result_t (*plugin_io_save_func_t)(char *path, image_t *image);
 struct plugin_save_handler_s
 {
-	char *ext;
+	size_t nfilters;
+	char **filters;
 	char *desc;
 	plugin_io_save_func_t function;
 };

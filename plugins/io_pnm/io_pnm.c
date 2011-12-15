@@ -34,7 +34,14 @@ plugin_t* clit_plugin_info()
 	ret->load_handlers = malloc(sizeof(plugin_load_handler_t *) * 1);
 
 	plugin_load_handler_t *handler = malloc(sizeof(plugin_load_handler_t));
-	handler->ext = "pnm,pbm,pgm";
+
+	handler->nfilters = 4;
+	handler->filters = malloc(sizeof(char*) * handler->nfilters);
+	handler->filters[0] = "*.ppm",
+	handler->filters[1] = "*.pgm",
+	handler->filters[2] = "*.pbm",
+	handler->filters[3] = "*.ppm",
+
 	handler->desc = "Portable Anymap";
 	handler->function = load_pnm;
 
