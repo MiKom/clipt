@@ -84,7 +84,6 @@ render_context_init(Window xwindow, GLXContext* out_ctx){
         color = 0.0f;
 
         device_create(&device_context);
-        load_plugins();
         return CLIT_OK;
 }
 

@@ -70,12 +70,14 @@ sys_result_t
 plugin_load(const char* path, plugin_handle_t* handle);
 
 sys_result_t
-plugin_unload(plugin_handle_t* handle);
+plugin_unload(plugin_handle_t* handle, gpointer placeholder);
 
 /**
  * Loads all plugins from directory specified in config file, otherwise from /usr/lib/clit
  **/
 sys_result_t
-load_plugins();
+plugin_load_all();
+
+sys_result_t plugin_unload_all();
 
 #endif

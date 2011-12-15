@@ -78,6 +78,7 @@ core_device_stop(void)
 static sys_result_t
 core_plugin_start(void)
 {
+        plugin_load_all();
         g_message("Subsystem [PLUGIN]: Started");
         return CLIT_OK;
 }
@@ -85,6 +86,7 @@ core_plugin_start(void)
 static sys_result_t
 core_plugin_stop(void)
 {
+        plugin_unload_all();
         g_message("Subsystem [PLUGIN]: Stopped");
         return CLIT_OK;
 }
