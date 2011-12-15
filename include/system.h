@@ -3,12 +3,12 @@
 
 enum sys_result_e
 {
-    CLIT_OK = 0x00,
-    CLIT_ENOTIMPLEMENTED,
-    CLIT_EINVALID,
-    CLIT_ERESOURCES,
-    CLIT_ENOTFOUND,
-    CLIT_ERROR
+	CLIT_OK = 0x00,
+	CLIT_ENOTIMPLEMENTED,
+	CLIT_EINVALID,
+	CLIT_ERESOURCES,
+	CLIT_ENOTFOUND,
+	CLIT_ERROR
 };
 typedef enum sys_result_e sys_result_t;
 
@@ -25,7 +25,7 @@ sys_config_t* sys_get_config(void);
 
 struct sys_state_s
 {
-        GList* plugin_handles;
+	GList* plugin_handles;
 };
 typedef struct sys_state_s sys_state_t;
 

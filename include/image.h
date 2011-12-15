@@ -3,10 +3,10 @@
 
 struct image_s
 {
-        int width;
-        int height;
-        int bpp;
-        char *data;
+	int width;
+	int height;
+	int bpp;
+	char *data;
 };
 typedef struct image_s image_t;
 

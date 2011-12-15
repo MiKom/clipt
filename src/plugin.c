@@ -45,7 +45,8 @@ plugin_unload(plugin_handle_t* handle, gpointer placeholder)
 	return deinit_result;
 }
 
-int filter_f(const struct dirent *entry) {
+int filter_f(const struct dirent *entry)
+{
 	char* name = entry->d_name;
 	size_t len = strlen(name);
 	if(len < 3) {

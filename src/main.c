@@ -39,7 +39,7 @@ static void parse_arguments(int argc, char** argv, sys_config_t* config)
 }
 
 static int parse_config(const gchar* filename, const gchar* group,
-												sys_config_t* config)
+			sys_config_t* config)
 {
 	gchar* rcfile_keys[] = {
 		"plugin-dir", "/usr/lib/clit", config->dir_plugins,
