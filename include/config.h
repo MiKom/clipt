@@ -11,7 +11,7 @@
 #if defined (__APPLE__) || defined(MACOSX)
 #include <OpenCL/opencl.h>
 #else
-#include <CL/opencl.h>
+#include <CL/cl.h>
 #endif
 
 #define CLIT_VERSION_MAJOR 0
