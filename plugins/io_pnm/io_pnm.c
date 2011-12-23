@@ -40,7 +40,7 @@ plugin_t* clit_plugin_info()
 	handler->filters[0] = "*.ppm",
 	handler->filters[1] = "*.pgm",
 	handler->filters[2] = "*.pbm",
-	handler->filters[3] = "*.ppm",
+	handler->filters[3] = "*.pnm",
 
 	handler->desc = "Portable Anymap";
 	handler->function = load_pnm;
