@@ -4,6 +4,8 @@
 #include <system.h>
 #include <core.h>
 #include <render.h>
+#include <image.h>
+#include <plugin.h>
 #include <ui/ui.h>
 #include <ui/window.h>
 
@@ -235,7 +237,68 @@ void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data) {
 
 void ui_open_file_cb(GtkWidget* widget, gpointer data)
 {
-	printf("Open action\n");
+	GtkWidget* ui_filedialog;
+	GtkFileFilter* ui_filefilter;
+
+	ui_filedialog = gtk_file_chooser_dialog_new("Open...",
+							   ui_window,
+							   GTK_FILE_CHOOSER_ACTION_OPEN,
+							   GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+							   GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+							   NULL);
+
+	sys_state_t* state = sys_get_state();
+	GList* iter = g_list_first(state->plugin_handles);
+
+	while(iter != NULL) {
+		plugin_handle_t* handle = iter->data;
+		plugin_t* plugin = (plugin_t*) (handle->plugin);
+
+		if(plugin->type == PLUGIN_FILEIO) {
+			plugin_fileio_t* fplugin = (plugin_fileio_t*) plugin;
+
+			size_t i;
+			for(i=0; i<fplugin->n_load_handlers; i++) {
+				ui_filefilter = gtk_file_filter_new();
+				gtk_file_filter_set_name(ui_filefilter,
+							 fplugin->load_handlers[i]->desc);
+				size_t j;
+				for(j=0; j<fplugin->load_handlers[i]->nfilters; j++) {
+					gtk_file_filter_add_pattern(ui_filefilter,
+								    fplugin->load_handlers[i]->filters[j]);
+				}
+				gtk_file_chooser_add_filter(ui_filedialog,
+							    ui_filefilter);
+			}
+		}
+
+		iter = g_list_next(iter);
+	}
+
+	if( gtk_dialog_run(ui_filedialog) == GTK_RESPONSE_ACCEPT) {
+		gchar* filename;
+		filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(ui_filedialog));
+
+		//reusing iterator from previous loop
+		iter = g_list_first(state->plugin_handles);
+		while(iter != NULL) {
+			plugin_handle_t* handle = iter->data;
+			plugin_t* plugin = (plugin_t*) (handle->plugin);
+
+			if(plugin->type == PLUGIN_FILEIO) {
+				plugin_fileio_t* fplugin = (plugin_fileio_t*) plugin;
+				size_t i;
+				for(i=0; i<fplugin->n_load_handlers; i++) {
+					if(fplugin->load_handlers[i]->can_open(filename)){
+						//TODO: Acutal file loading here
+						goto done;
+					}
+				}
+			}
+		}
+	}
+done:
+	gtk_widget_destroy(ui_filedialog);
 	fflush(stdout);
 }
 

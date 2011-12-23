@@ -31,12 +31,18 @@ struct plugin_handle_s
 typedef struct plugin_handle_s plugin_handle_t;
 
 typedef sys_result_t (*plugin_io_load_func_t)(char *path, image_t **image);
+typedef int (*plugin_io_can_open_func_t)(char *path);
 struct plugin_load_handler_s
 {
 	size_t nfilters;
 	char **filters;
 	char *desc;
 	plugin_io_load_func_t function;
+	/**
+	 * This functions returns true, if file can be open by this handler.
+	 * It should check for proper magic numbers etc.
+	 **/
+	plugin_io_can_open_func_t can_open;
 };
 typedef struct plugin_load_handler_s plugin_load_handler_t;
 
@@ -75,7 +81,8 @@ sys_result_t
 plugin_unload(plugin_handle_t* handle, gpointer placeholder);
 
 /**
- * Loads all plugins from directory specified in config file, otherwise from /usr/lib/clit
+ * Loads all plugins from directory specified in config file,
+ * otherwise from /usr/lib/clit
  **/
 sys_result_t
 plugin_load_all();

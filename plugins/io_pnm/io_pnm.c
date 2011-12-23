@@ -17,6 +17,8 @@ sys_result_t pnm_plugin_unload();
 
 sys_result_t load_pnm(char *path, image_t **image);
 
+int can_open(char* path);
+
 plugin_t* clit_plugin_info()
 {
 	plugin_fileio_t *ret = malloc(sizeof(plugin_fileio_t));
@@ -42,10 +44,11 @@ plugin_t* clit_plugin_info()
 	handler->filters[2] = "*.pbm",
 	handler->filters[3] = "*.pnm",
 
-	handler->desc = "Portable Anymap";
+	handler->desc = "Portable Anymap (.ppm, .pgm, .pbm, .pnm)";
 	handler->function = load_pnm;
+	handler->can_open = can_open;
 
-	ret->load_handlers[1] = handler;
+	ret->load_handlers[0] = handler;
 	return (plugin_t*) ret;
 }
 
@@ -57,6 +60,31 @@ sys_result_t pnm_plugin_load()
 sys_result_t pnm_plugin_unload()
 {
 	return CLIT_OK;
+}
+
+int can_open(char* path)
+{
+	FILE *fd = fopen(path, "r");
+	if(fd == NULL) {
+		return 0;
+	}
+	char magic[2];
+	fread(magic, sizeof(char), 2, fd);
+
+	//Wrong magic
+	if(magic[0] != 'P') {
+		if(
+			magic[1] != '1' &&
+			magic[1] != '2' &&
+			magic[1] != '3' &&
+			magic[1] != '4' &&
+			magic[1] != '5' &&
+			magic[1] != '6'
+		) {
+			return 0;
+		}
+	}
+	return 1;
 }
 
 /**
