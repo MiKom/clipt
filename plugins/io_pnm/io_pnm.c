@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <config.h>
-#include <system.h>
-#include <image.h>
-#include <plugin.h>
+
+#include <clit.h>
 
 enum pnm_data_type_e {
 	PNM_ASCII = 0,
