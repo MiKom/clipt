@@ -6,6 +6,7 @@ enum device_result_e {
 	DEVICE_EUNAVAIL,
 	DEVICE_ECONTEXT,
 	DEVICE_EQUEUE,
+        DEVICE_EINVALID,
 	DEVICE_ERROR,
 };
 typedef enum device_result_e device_result_t;
@@ -49,6 +50,14 @@ device_result_t device_buffer_create(device_context_t* context, device_buffer_st
                                      size_t width, size_t height, size_t bpp,
                                      device_buffer_t* buffer);
 device_result_t device_buffer_destroy(device_context_t* context, device_buffer_t* buffer);
+
+void* device_buffer_map(device_context_t* context, device_buffer_t* buffer);
+void  device_buffer_unmap(device_context_t* context, device_buffer_t* buffer);
+device_result_t device_buffer_copy(device_context_t* context,
+                                   device_buffer_t* src, device_buffer_t* dst);
+
+device_result_t device_buffer_getprop(device_buffer_t* buffer, size_t* width, size_t* height, size_t* bpp);
+device_result_t device_buffer_getsize(device_buffer_t* buffer, size_t* size);
 
 
 #endif

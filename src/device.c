@@ -117,3 +117,89 @@ device_result_t device_buffer_destroy(device_context_t* context, device_buffer_t
         buffer->storage = DEVICE_BUFFER_INVALID;
         return DEVICE_OK;
 }
+
+device_result_t device_buffer_copy(device_context_t* context,
+                                   device_buffer_t* src, device_buffer_t* dst)
+{
+        size_t data_size;
+        cl_int cl_error;
+        
+        if(src->storage == DEVICE_BUFFER_INVALID || dst->storage == DEVICE_BUFFER_INVALID)
+                return DEVICE_EINVALID;
+        
+        if(src->rbuf.width != dst->rbuf.width
+           || src->rbuf.height != dst->rbuf.height
+           || src->rbuf.bpp != dst->rbuf.bpp)
+                return DEVICE_EINVALID;   
+
+        device_buffer_getsize(src, &data_size);
+        
+        if(src->storage == DEVICE_BUFFER_HARDWARE && dst->storage == DEVICE_BUFFER_HARDWARE) {
+                cl_error = clEnqueueCopyBuffer(context->queue, src->cl_object, dst->cl_object,
+                                               0, 0, data_size, 0, NULL, NULL);
+                if(cl_error != CL_SUCCESS)
+                        return DEVICE_ERROR;
+        }
+        else {
+                void *srcptr, *dstptr;
+                
+                if((srcptr = device_buffer_map(context, src)) == NULL)
+                        return DEVICE_ERROR;
+                if((dstptr = device_buffer_map(context, dst)) == NULL) {
+                        device_buffer_unmap(context, src);
+                        return DEVICE_ERROR;
+                }
+                
+                memcpy(dstptr, srcptr, data_size);
+                
+                device_buffer_unmap(context, src);
+                device_buffer_unmap(context, dst);
+                
+        }
+        return DEVICE_OK;
+}
+
+device_result_t device_buffer_getprop(device_buffer_t* buffer, size_t* width, size_t* height, size_t* bpp)
+{
+        if(buffer->storage == DEVICE_BUFFER_INVALID)
+                return DEVICE_EINVALID;
+        
+        if(width)  *width  = buffer->rbuf.width;
+        if(height) *height = buffer->rbuf.height;
+        if(bpp)    *bpp    = buffer->rbuf.bpp;
+        return DEVICE_OK;
+}
+
+device_result_t device_buffer_getsize(device_buffer_t* buffer, size_t* size)
+{
+        if(buffer->storage == DEVICE_BUFFER_INVALID)
+                return DEVICE_EINVALID;
+        *size = buffer->rbuf.width * buffer->rbuf.height * buffer->rbuf.bpp;
+        return DEVICE_OK;
+}
+
+void* device_buffer_map(device_context_t* context, device_buffer_t* buffer)
+{
+        cl_int cl_error;
+        size_t mem_size;
+
+        if(buffer->storage == DEVICE_BUFFER_HARDWARE) {
+                mem_size = buffer->rbuf.width * buffer->rbuf.height * buffer->rbuf.bpp;
+                buffer->rbuf.hostptr = clEnqueueMapBuffer(context->queue, buffer->cl_object,
+                                                          CL_TRUE, CL_MAP_READ | CL_MAP_WRITE,
+                                                          0, mem_size, 0, NULL, NULL, &cl_error);
+                if(cl_error != CL_SUCCESS)
+                        buffer->rbuf.hostptr = NULL;
+        }
+        return buffer->rbuf.hostptr;
+}
+
+
+void device_buffer_unmap(device_context_t* context, device_buffer_t* buffer)
+{
+        if(buffer->storage == DEVICE_BUFFER_HARDWARE) {
+                clEnqueueUnmapMemObject(context->queue, buffer->cl_object, buffer->rbuf.hostptr,
+                                        0, NULL, NULL);
+                buffer->rbuf.hostptr = NULL;
+        }
+}
