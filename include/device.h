@@ -11,8 +11,9 @@ enum device_result_e {
 typedef enum device_result_e device_result_t;
 
 enum device_buffer_storage_e {
-    DEVICE_BUFFER_SOFTWARE,
-    DEVICE_BUFFER_HARDWARE,
+        DEVICE_BUFFER_SOFTWARE,
+        DEVICE_BUFFER_HARDWARE,
+        DEVICE_BUFFER_INVALID,
 };
 typedef enum device_buffer_storage_e device_buffer_storage_t;
 
@@ -32,9 +33,9 @@ struct device_kernel_s {
 typedef struct device_kernel_s device_kernel_t;
 
 struct device_buffer_s {
-    device_buffer_storage_t storage;
-    render_buffer_t buffer;
-    cl_mem cl_object;
+        device_buffer_storage_t storage;
+        render_buffer_t rbuf;
+        cl_mem cl_object;
 };
 typedef struct device_buffer_s device_buffer_t;
 

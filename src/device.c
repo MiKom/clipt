@@ -71,10 +71,49 @@ device_result_t device_buffer_create(device_context_t* context, device_buffer_st
                                      size_t width, size_t height, size_t bpp,
                                      device_buffer_t* buffer)
 {
-    return DEVICE_OK;
+        cl_int cl_error;
+        buffer->storage = DEVICE_BUFFER_INVALID;
+        
+        if(storage == DEVICE_BUFFER_HARDWARE) {
+                if(render_buffer_create(width, height, bpp, &buffer->rbuf) != CLIT_OK)
+                        return DEVICE_ERROR;
+                
+                buffer->cl_object = clCreateFromGLBuffer(context->context,
+                                                         CL_MEM_READ_WRITE, buffer->rbuf.gl_object,
+                                                         &cl_error);
+                if(cl_error != CL_SUCCESS) {
+                        render_buffer_destroy(&buffer->rbuf);
+                        return DEVICE_ERROR;
+                }
+                buffer->rbuf.hostptr = NULL;
+        }
+        else {
+                buffer->rbuf.hostptr = malloc(width*height*bpp);
+                if(!buffer->rbuf.hostptr)
+                        return DEVICE_EUNAVAIL;
+                buffer->rbuf.width  = width;
+                buffer->rbuf.height = height;
+                buffer->rbuf.bpp    = bpp;
+                
+                buffer->rbuf.gl_object = 0;
+                buffer->cl_object = 0;
+        }
+
+        buffer->storage = storage;
+        return DEVICE_OK;
 }
 
 device_result_t device_buffer_destroy(device_context_t* context, device_buffer_t* buffer)
 {
-    return DEVICE_OK;
+        if(buffer->storage == DEVICE_BUFFER_HARDWARE) {
+                clReleaseMemObject(buffer->cl_object);
+                render_buffer_destroy(&buffer->rbuf);
+                buffer->cl_object = 0;
+        }
+        else {
+                free(buffer->rbuf.hostptr);
+                buffer->rbuf.hostptr = NULL;
+        }
+        buffer->storage = DEVICE_BUFFER_INVALID;
+        return DEVICE_OK;
 }

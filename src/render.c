@@ -122,9 +122,9 @@ render_buffer_create(size_t width, size_t height, size_t bpp,
     glBufferData(GL_PIXEL_PACK_BUFFER, width*height*bpp, NULL, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
-    buffer->width  = width;
-    buffer->height = height;
-    buffer->bpp    = bpp;
+    buffer->width   = width;
+    buffer->height  = height;
+    buffer->bpp     = bpp;
     return CLIT_OK;
 }
 

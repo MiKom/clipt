@@ -4,10 +4,11 @@
 #include <X11/Xlib.h>
 
 struct render_buffer_s {
-    GLuint gl_object;
-    size_t width;
-    size_t height;
-    size_t bpp;
+        GLuint gl_object;
+        void*  hostptr;
+        size_t width;
+        size_t height;
+        size_t bpp;
 };
 typedef struct render_buffer_s render_buffer_t;
 
