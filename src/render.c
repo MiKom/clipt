@@ -109,3 +109,29 @@ render_context_free(GLXContext ctx)
 	XCloseDisplay(disp);
 	return CLIT_OK;
 }
+
+sys_result_t
+render_buffer_create(size_t width, size_t height, size_t bpp,
+                     render_buffer_t* buffer)
+{
+    if(width == 0 || height == 0 || bpp == 0)
+        return CLIT_EINVALID;
+        
+    glGenBuffers(1, &buffer->gl_object);
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer->gl_object);
+    glBufferData(GL_PIXEL_PACK_BUFFER, width*height*bpp, NULL, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+
+    buffer->width  = width;
+    buffer->height = height;
+    buffer->bpp    = bpp;
+    return CLIT_OK;
+}
+
+sys_result_t
+render_buffer_destroy(render_buffer_t* buffer)
+{
+    glDeleteBuffers(1, &buffer->gl_object);
+    buffer->gl_object = 0;
+    return CLIT_OK;
+}

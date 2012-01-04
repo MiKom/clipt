@@ -1,5 +1,6 @@
 #include <config.h>
 #include <system.h>
+#include <render.h>
 #include <device.h>
 
 #include <stdlib.h>
@@ -64,4 +65,16 @@ device_result_t device_destroy(device_context_t* context)
 	clReleaseContext(context->context);
 	memset(context, 0, sizeof(device_context_t));
 	return DEVICE_OK;
+}
+
+device_result_t device_buffer_create(device_context_t* context, device_buffer_storage_t storage,
+                                     size_t width, size_t height, size_t bpp,
+                                     device_buffer_t* buffer)
+{
+    return DEVICE_OK;
+}
+
+device_result_t device_buffer_destroy(device_context_t* context, device_buffer_t* buffer)
+{
+    return DEVICE_OK;
 }
