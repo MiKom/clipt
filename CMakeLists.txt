@@ -32,8 +32,12 @@ SET( clit_SOURCES
         src/render.c
         src/plugin.c
         src/device.c
+        
         src/ui/common.c
         src/ui/window.c
+        src/ui/histogram.c
+
+        src/nodes/histogram.c
 )
 
 SET( clit_HEADERS
@@ -45,8 +49,12 @@ SET( clit_HEADERS
         include/render.h
         include/system.h
         include/device.h
+        
         include/ui/ui.h
         include/ui/window.h
+        include/ui/histogram.h
+
+        include/nodes/histogram.h
 )
 
 SET(COMMON_LIBRARIES m dl)

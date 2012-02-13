@@ -1,0 +1,4 @@
+#ifndef __CLIT_NODES_HISTOGRAM_H
+#define __CLIT_NODES_HISTOGRAM_H
+
+#endif
