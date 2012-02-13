@@ -1,6 +1,9 @@
 #ifndef __CLIT_DEVICE_H
 #define __CLIT_DEVICE_H
 
+#include <system.h>
+#include <render.h>
+
 enum device_result_e {
 	DEVICE_OK = 0x00,
 	DEVICE_EUNAVAIL,
@@ -38,7 +41,6 @@ struct device_buffer_s {
         render_buffer_t rbuf;
         cl_mem cl_object;
 };
-typedef struct device_buffer_s device_buffer_t;
 
 device_result_t device_create(device_context_t* context);
 device_result_t device_destroy(device_context_t* context);

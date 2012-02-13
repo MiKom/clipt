@@ -1,4 +1,5 @@
 #include <config.h>
+#include <image.h>
 #include <system.h>
 #include <core.h>
 #include <image.h>

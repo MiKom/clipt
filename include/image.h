@@ -1,6 +1,8 @@
 #ifndef __CLIT_IMAGE_H
 #define __CLIT_IMAGE_H
 
+#include <system.h>
+
 struct image_s
 {
 	int width;
@@ -8,6 +10,5 @@ struct image_s
 	int bpp;
 	char *data;
 };
-typedef struct image_s image_t;
 
 #endif

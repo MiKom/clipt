@@ -1,4 +1,5 @@
 #include <config.h>
+#include <image.h>
 #include <system.h>
 
 sys_config_t* sys_get_config(void)

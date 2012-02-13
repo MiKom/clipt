@@ -1,9 +1,12 @@
 #ifndef __CLIT_SYSTEM_H
 #define __CLIT_SYSTEM_H
 
+typedef struct device_buffer_s device_buffer_t;
+typedef struct image_s image_t;
+
 enum sys_result_e
 {
-	CLIT_OK = 0x00,
+        CLIT_OK = 0x00,
 	CLIT_ENOTIMPLEMENTED,
 	CLIT_EINVALID,
 	CLIT_ERESOURCES,
@@ -26,6 +29,8 @@ sys_config_t* sys_get_config(void);
 
 struct sys_state_s
 {
+        image_t *cur_image;
+        device_buffer_t *cur_buf;
 	GList* plugin_handles;
 };
 typedef struct sys_state_s sys_state_t;

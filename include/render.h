@@ -2,6 +2,7 @@
 #define __CLIT_RENDER_H
 
 #include <X11/Xlib.h>
+#include <system.h>
 
 struct render_buffer_s {
         GLuint gl_object;

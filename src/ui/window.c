@@ -1,10 +1,10 @@
 #include <stdlib.h>
 
 #include <config.h>
+#include <image.h>
 #include <system.h>
 #include <core.h>
 #include <render.h>
-#include <image.h>
 #include <plugin.h>
 #include <ui/ui.h>
 #include <ui/window.h>

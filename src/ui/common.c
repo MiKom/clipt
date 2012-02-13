@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <config.h>
+#include <image.h>
 #include <system.h>
 #include <ui/ui.h>
 
