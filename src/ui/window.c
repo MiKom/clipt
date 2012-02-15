@@ -35,6 +35,7 @@ static void ui_reset_cb(GtkWidget* widget, gpointer data);
 static void ui_about_cb(GtkWidget* widget, gpointer data);
 
 static gboolean ui_window_delete_event_cb(GtkWidget *widget, gpointer data);
+static void ui_window_image_changed_cb(GtkWidget *widget, gpointer data);
 
 static void ui_drawing_area_init(GtkWidget* widget, gpointer data);
 static void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data);
@@ -52,6 +53,9 @@ char *ui_definition =
 "    <menu name='EditMenu' action='EditMenuAction'>"
 "      <menuitem action='UndoAction'/>"
 "      <menuitem action='ResetAction' />"
+"    </menu>"
+"    <menu name='ColorMenu' action='ColorMenuAction'>"
+"      <placeholder />"
 "    </menu>"
 "    <menu name='ToolsMenu' action='ToolsMenuAction'>"
 "      <placeholder/>"
@@ -96,6 +100,7 @@ static GtkActionEntry entries[] = {
 	  "Reset all changes made to image",
 	  G_CALLBACK(ui_reset_cb)},
 
+	{ "ColorMenuAction", NULL, "_Color"},
 	//Tools Menu
 	{ "ToolsMenuAction", NULL, "_Tools"},
 
@@ -167,6 +172,9 @@ ui_window_init(ui_widget_t** widget)
 					   0, NULL, NULL, NULL,
 					   G_TYPE_NONE, 0);
 
+	g_signal_connect(G_OBJECT(ui_window), "image-changed",
+			 G_CALLBACK(ui_window_image_changed_cb), NULL);
+
 	gtk_widget_show_all(ui_window);
 	ui_widget->widget = ui_window;
 	return CLIT_OK;
@@ -232,7 +240,8 @@ void ui_drawing_area_init(GtkWidget* widget, gpointer data)
 	gl_initialized = TRUE;
 }
 
-void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data) {
+void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data)
+{
 
 	Window xwin;
 	ui_widget_getnative((ui_widget_t*) data, &xwin);
@@ -241,6 +250,13 @@ void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data) {
 		ui_drawing_area_init(widget, data);
 	}
 	render_context_draw(xwin, &glctx);
+}
+
+
+void ui_window_image_changed_cb(GtkWidget *widget, gpointer data)
+{
+	g_debug("image changed");
+	gtk_widget_queue_draw(ui_drawing_area->widget);
 }
 
 gulong

@@ -1,0 +1,4 @@
+#ifndef __CLIT_UI_HISTOGRAM_DIALOG_H
+#define __CLIT_UI_HISTOGRAM_DIALOG_H
+
+#endif
