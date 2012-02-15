@@ -8,6 +8,7 @@
 #include <plugin.h>
 #include <ui/ui.h>
 #include <ui/window.h>
+#include <ui/histogram_dialog.h>
 
 static GtkWidget* ui_window;
 static GtkWidget* ui_vbox;
@@ -137,9 +138,13 @@ ui_window_init(ui_widget_t** widget)
 	ui_manager = gtk_ui_manager_new();
 	ui_action_group = gtk_action_group_new("Actions");
 	gtk_action_group_add_actions(ui_action_group, entries, n_entries, NULL);
-	gtk_ui_manager_insert_action_group(ui_manager, ui_action_group, 0);
 
 	gtk_ui_manager_add_ui_from_string(ui_manager, ui_definition,-1, &error);
+
+	gtk_action_group_add_actions(ui_action_group, ui_histogram_get_action_entry(), 1, NULL);
+	gtk_ui_manager_add_ui_from_string(ui_manager, ui_histogram_get_ui_string(), -1, &error);
+
+	gtk_ui_manager_insert_action_group(ui_manager, ui_action_group, 0);
 	if(error) {
 		g_error("Building menus failed: %s", error->message);
 		g_error_free(error);
@@ -260,13 +265,13 @@ void ui_window_image_changed_cb(GtkWidget *widget, gpointer data)
 }
 
 gulong
-ui_window_add_image_cb(GCallback cb, gpointer data)
+ui_window_add_image_changed_cb(GCallback cb, gpointer data)
 {
 	return g_signal_connect(G_OBJECT(ui_window), "image-changed", cb, data);
 }
 
 void
-ui_window_remove_image_cb(gulong handler_id)
+ui_window_remove_image_changed_handler(gulong handler_id)
 {
 	g_signal_handler_disconnect(G_OBJECT(ui_window), handler_id);
 }

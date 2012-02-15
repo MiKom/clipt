@@ -21,9 +21,9 @@ ui_window_setglcontext(GLXContext ctx);
  * \return handle id of the connected callback, use for removal
  **/
 gulong
-ui_window_add_image_cb(GCallback cb, gpointer data);
+ui_window_add_image_changed_cb(GCallback cb, gpointer data);
 
 void
-ui_window_remove_image_cb(gulong handler_id);
+ui_window_remove_image_changed_handler(gulong handler_id);
 
 #endif
