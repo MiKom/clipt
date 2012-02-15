@@ -18,6 +18,8 @@ static GtkWidget* ui_toolbar;
 
 static ui_widget_t* ui_drawing_area;
 
+static guint ui_new_image_signal;
+
 static gboolean gl_initialized = FALSE;
 static GLXContext glctx;
 
@@ -159,6 +161,12 @@ ui_window_init(ui_widget_t** widget)
 	gtk_widget_set_double_buffered(ui_drawing_area->widget, FALSE);
 	//gtk_widget_show(ui_drawing_area->widget);
 
+	//signal emitted when image gets changed somehow
+	ui_new_image_signal = g_signal_new("image-changed",
+					   G_TYPE_OBJECT, G_SIGNAL_RUN_FIRST,
+					   0, NULL, NULL, NULL,
+					   G_TYPE_NONE, 0);
+
 	gtk_widget_show_all(ui_window);
 	ui_widget->widget = ui_window;
 	return CLIT_OK;
@@ -235,6 +243,18 @@ void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data) {
 	render_context_draw(xwin, &glctx);
 }
 
+gulong
+ui_window_add_image_cb(GCallback cb, gpointer data)
+{
+	return g_signal_connect(G_OBJECT(ui_window), "image-changed", cb, data);
+}
+
+void
+ui_window_remove_image_cb(gulong handler_id)
+{
+	g_signal_handler_disconnect(G_OBJECT(ui_window), handler_id);
+}
+
 void ui_open_file_cb(GtkWidget* widget, gpointer data)
 {
 	GtkWidget* ui_filedialog;
@@ -291,6 +311,7 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 				for(i=0; i<fplugin->n_load_handlers; i++) {
 					if(fplugin->load_handlers[i]->can_open(filename)){
 						//TODO: Acutal file loading here
+						g_signal_emit(ui_window, ui_new_image_signal, 0);
 						goto done;
 					}
 				}
