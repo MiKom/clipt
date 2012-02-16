@@ -1,6 +1,7 @@
 #ifndef __CLIT_SYSTEM_H
 #define __CLIT_SYSTEM_H
 
+typedef struct device_context_s device_context_t;
 typedef struct device_buffer_s device_buffer_t;
 typedef struct image_s image_t;
 
@@ -29,12 +30,18 @@ sys_config_t* sys_get_config(void);
 
 struct sys_state_s
 {
-        image_t *cur_image;
-        device_buffer_t *cur_buf;
+        image_t *image;
+        device_buffer_t* buffer;
+        device_context_t* context;
 	GList* plugin_handles;
+
+        int buffer_index;
 };
 typedef struct sys_state_s sys_state_t;
 
 sys_state_t* sys_get_state(void);
+
+device_buffer_t* sys_get_active_buffer(void);
+device_buffer_t* sys_swap_buffers(void);
 
 #endif

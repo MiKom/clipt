@@ -28,7 +28,7 @@ struct device_context_s {
 	cl_command_queue queue;
 	char             devname[1024];
 };
-typedef struct device_context_s device_context_t;
+//typedef struct device_context_s device_context_t;
 
 struct device_kernel_s {
 	cl_kernel  kernel;
@@ -60,6 +60,7 @@ device_result_t device_buffer_copy(device_context_t* context,
 
 device_result_t device_buffer_getprop(device_buffer_t* buffer, size_t* width, size_t* height, size_t* bpp);
 device_result_t device_buffer_getsize(device_buffer_t* buffer, size_t* size);
+device_result_t device_buffer_draw(device_buffer_t* buffer);
 
 
 #endif

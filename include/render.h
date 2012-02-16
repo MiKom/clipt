@@ -20,5 +20,6 @@ sys_result_t render_context_free(GLXContext ctx);
 sys_result_t render_buffer_create(size_t width, size_t height, size_t bpp,
                                   render_buffer_t* buffer);
 sys_result_t render_buffer_destroy(render_buffer_t* buffer);
+void render_buffer_draw(render_buffer_t* buffer);
 
 #endif

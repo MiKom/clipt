@@ -179,6 +179,17 @@ device_result_t device_buffer_getsize(device_buffer_t* buffer, size_t* size)
         return DEVICE_OK;
 }
 
+device_result_t device_buffer_draw(device_buffer_t* buffer)
+{
+        if(buffer->storage != DEVICE_BUFFER_HARDWARE)
+                return DEVICE_EINVALID;
+        if(buffer->rbuf.bpp != 24)
+                return DEVICE_EINVALID;
+        
+        render_buffer_draw(&buffer->rbuf);
+        return DEVICE_OK;
+}
+
 void* device_buffer_map(device_context_t* context, device_buffer_t* buffer)
 {
         cl_int cl_error;
@@ -186,11 +197,16 @@ void* device_buffer_map(device_context_t* context, device_buffer_t* buffer)
 
         if(buffer->storage == DEVICE_BUFFER_HARDWARE) {
                 mem_size = buffer->rbuf.width * buffer->rbuf.height * buffer->rbuf.bpp;
-                buffer->rbuf.hostptr = clEnqueueMapBuffer(context->queue, buffer->cl_object,
-                                                          CL_TRUE, CL_MAP_READ | CL_MAP_WRITE,
-                                                          0, mem_size, 0, NULL, NULL, &cl_error);
-                if(cl_error != CL_SUCCESS)
-                        buffer->rbuf.hostptr = NULL;
+
+                glBindBuffer(GL_ARRAY_BUFFER, buffer->rbuf.gl_object);
+                buffer->rbuf.hostptr = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+                //buffer->rbuf.hostptr = clEnqueueMapBuffer(context->queue, buffer->cl_object,
+                //                                          CL_TRUE, CL_MAP_READ | CL_MAP_WRITE,
+                //                                          0, 3, 0, NULL, NULL, &cl_error);
+                //if(cl_error != CL_SUCCESS) {
+                //        printf("%d\n", cl_error);
+                //        buffer->rbuf.hostptr = NULL;
+                //}
         }
         return buffer->rbuf.hostptr;
 }
@@ -198,9 +214,13 @@ void* device_buffer_map(device_context_t* context, device_buffer_t* buffer)
 
 void device_buffer_unmap(device_context_t* context, device_buffer_t* buffer)
 {
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        /*
         if(buffer->storage == DEVICE_BUFFER_HARDWARE) {
                 clEnqueueUnmapMemObject(context->queue, buffer->cl_object, buffer->rbuf.hostptr,
                                         0, NULL, NULL);
                 buffer->rbuf.hostptr = NULL;
         }
+        */
 }

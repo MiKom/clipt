@@ -48,7 +48,7 @@ render_context_init(Window xwindow, GLXContext* out_ctx)
 	};
 
 	XVisualInfo* visual_info;
-
+        
 	disp = XOpenDisplay(NULL);
 
 	int num_configs = 0;
@@ -96,8 +96,49 @@ render_context_draw(Window xwindow, GLXContext* ctx)
 	color += 0.02;
 	if(color > 1.0f) {
 		color = 0.0f;
-	}
+        }
+
+
+        // DEBUG
+        glGetError();
+        
+        static int once = 0;
+        static GLuint buf;
+        static unsigned char* ptr;
+        if(!once) {
+                once = 1;
+
+                ptr = malloc(320*240*3);
+
+                glGenBuffers(1, &buf);
+                printf("%s\n", gluErrorString(glGetError()));                        
+                glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buf);
+                printf("%s\n", gluErrorString(glGetError()));
+                glBufferData(GL_PIXEL_UNPACK_BUFFER, 320*240*3, NULL, GL_DYNAMIC_DRAW);
+                printf("%s\n", gluErrorString(glGetError()));
+                //ptr = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+                memset(ptr, 255, 320*240*3);
+                //glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+                printf("%s\n", gluErrorString(glGetError()));
+                glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+                printf("%s\n", gluErrorString(glGetError()));                        
+        }
+
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, buf);
+        printf("%s\n", gluErrorString(glGetError()));
+        glDrawBuffer(GL_FRONT);
+        printf("%s\n", gluErrorString(glGetError()));
+        glDrawPixels(320, 240, GL_RGB, GL_UNSIGNED_BYTE, ptr);
+        printf("%s\n", gluErrorString(glGetError()));
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+        printf("%s\n", gluErrorString(glGetError()));
+
+        
+        // END DEBUG
+        
+        //device_buffer_draw(sys_get_active_buffer());
 	glXSwapBuffers(disp, xwindow);
+        printf("----------\n");
 }
 
 
@@ -114,24 +155,33 @@ sys_result_t
 render_buffer_create(size_t width, size_t height, size_t bpp,
                      render_buffer_t* buffer)
 {
-    if(width == 0 || height == 0 || bpp == 0)
-        return CLIT_EINVALID;
+        if(width == 0 || height == 0 || bpp == 0)
+                return CLIT_EINVALID;
         
-    glGenBuffers(1, &buffer->gl_object);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer->gl_object);
-    glBufferData(GL_PIXEL_PACK_BUFFER, width*height*bpp, NULL, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+        glGenBuffers(1, &buffer->gl_object);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer->gl_object);
+        glBufferData(GL_PIXEL_PACK_BUFFER, width*height*bpp, NULL, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
-    buffer->width   = width;
-    buffer->height  = height;
-    buffer->bpp     = bpp;
-    return CLIT_OK;
+        buffer->width   = width;
+        buffer->height  = height;
+        buffer->bpp     = bpp;
+        return CLIT_OK;
 }
 
 sys_result_t
 render_buffer_destroy(render_buffer_t* buffer)
 {
-    glDeleteBuffers(1, &buffer->gl_object);
-    buffer->gl_object = 0;
-    return CLIT_OK;
+        glDeleteBuffers(1, &buffer->gl_object);
+        buffer->gl_object = 0;
+        return CLIT_OK;
 }
+
+void
+render_buffer_draw(render_buffer_t* buffer)
+{
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer->gl_object);
+        glDrawPixels(buffer->width, buffer->height, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+}
+

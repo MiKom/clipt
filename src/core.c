@@ -108,6 +108,8 @@ int core_main(void)
 	return CLIT_OK;
 }
 
+device_buffer_t buf;
+
 int core_subsystem_start(void)
 {
 	if(core_render_start() != CLIT_OK)
@@ -117,6 +119,14 @@ int core_subsystem_start(void)
 	if(core_plugin_start() != CLIT_OK)
 		return CLIT_ERROR;
 
+//        device_context_t* ctx = sys_get_state()->context;
+        device_buffer_t* buf = sys_get_active_buffer();
+        device_buffer_create(&device_context, DEVICE_BUFFER_HARDWARE, 640, 480, 3, buf);
+        unsigned char* pixels = device_buffer_map(&device_context, buf);
+        memset(pixels, 255, 3);
+        device_buffer_unmap(&device_context, buf);
+
+        sys_get_state()->context = &device_context;
 	return CLIT_OK;
 }
 
