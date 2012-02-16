@@ -56,6 +56,8 @@ char *ui_definition =
 "      <menuitem action='ResetAction' />"
 "    </menu>"
 "    <menu name='ColorMenu' action='ColorMenuAction'>"
+"      <menu name='HistogramMenu' action='HistogramMenuAction'>"
+"      </menu>"
 "      <placeholder />"
 "    </menu>"
 "    <menu name='ToolsMenu' action='ToolsMenuAction'>"
@@ -141,8 +143,10 @@ ui_window_init(ui_widget_t** widget)
 
 	gtk_ui_manager_add_ui_from_string(ui_manager, ui_definition,-1, &error);
 
-	gtk_action_group_add_actions(ui_action_group, ui_histogram_get_action_entry(), 1, NULL);
-	gtk_ui_manager_add_ui_from_string(ui_manager, ui_histogram_get_ui_string(), -1, &error);
+	ui_histogram_add_action_entries(ui_action_group);
+	if( ui_histogram_add_ui_string(ui_manager) != CLIT_OK ) {
+		g_warning("Adding histogram menus failed");
+	}
 
 	gtk_ui_manager_insert_action_group(ui_manager, ui_action_group, 0);
 	if(error) {

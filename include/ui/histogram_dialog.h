@@ -1,20 +1,22 @@
 #ifndef __CLIT_UI_HISTOGRAM_DIALOG_H
 #define __CLIT_UI_HISTOGRAM_DIALOG_H
 
+#include <system.h>
 #include <ui/ui.h>
 
 struct ui_histogram_s
 {
-	ui_widget_t* window;
+	GtkWidget* window;
 	GtkWidget* drawing_area;
 	GtkWidget* combobox;
 	guint cb_handler;
 };
 typedef struct ui_histogram_s ui_histogram_t;
 
-char* ui_histogram_get_ui_string();
+sys_result_t
+ui_histogram_add_ui_string(GtkUIManager* ui_manager);
 
-GtkActionEntry*
-ui_histogram_get_action_entry();
+void
+ui_histogram_add_action_entries(GtkActionGroup* action_group);
 
 #endif
