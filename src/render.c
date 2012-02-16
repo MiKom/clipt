@@ -36,14 +36,14 @@ render_context_init(Window xwindow, GLXContext* out_ctx)
 		GLX_DOUBLEBUFFER, False,
 		GLX_RED_SIZE, 8,
 		GLX_BLUE_SIZE, 8,
-		GLX_GREEN_SIZE, 8,
-		None
+                GLX_GREEN_SIZE, 8,
+                None
 	};
 
 	static GLint gl_attribs[] = {
 		GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
 		GLX_CONTEXT_MINOR_VERSION_ARB, 0,
-		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+                GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
 		0
 	};
 
@@ -79,7 +79,7 @@ render_context_init(Window xwindow, GLXContext* out_ctx)
 
 	glClearColor(0.0,1.0,0.0,1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glXSwapBuffers(disp,xwindow);
+        glXSwapBuffers(disp,xwindow);
 	XSetErrorHandler(oldHandler);
 	color = 0.0f;
 
@@ -90,7 +90,15 @@ render_context_init(Window xwindow, GLXContext* out_ctx)
 sys_result_t
 render_context_draw(Window xwindow, GLXContext* ctx)
 {
-	glClearColor(0.0, color, 0.0, 1.0);
+        int cur_width;
+        int cur_height;
+        XWindowAttributes attr;
+
+        XGetWindowAttributes(disp, xwindow, &attr);
+        cur_width	= attr.width;
+        cur_height	= attr.height;
+
+        glClearColor(0.0, color, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	color += 0.02;
@@ -105,6 +113,7 @@ render_context_draw(Window xwindow, GLXContext* ctx)
         static int once = 0;
         static GLuint buf;
         static unsigned char* ptr;
+        glRasterPos2d(0,0);
         if(!once) {
                 once = 1;
 
@@ -126,14 +135,15 @@ render_context_draw(Window xwindow, GLXContext* ctx)
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, buf);
         printf("%s\n", gluErrorString(glGetError()));
-        glDrawBuffer(GL_FRONT);
+        glDrawBuffer(GL_BACK);
         printf("%s\n", gluErrorString(glGetError()));
         glDrawPixels(320, 240, GL_RGB, GL_UNSIGNED_BYTE, ptr);
         printf("%s\n", gluErrorString(glGetError()));
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
         printf("%s\n", gluErrorString(glGetError()));
 
-        
+        glFinish();
+        fflush(stdout);
         // END DEBUG
         
         //device_buffer_draw(sys_get_active_buffer());
