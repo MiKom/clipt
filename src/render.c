@@ -113,7 +113,7 @@ render_context_draw(Window xwindow, GLXContext* ctx)
         static int once = 0;
         static GLuint buf;
         static unsigned char* ptr;
-        glRasterPos2d(0,0);
+	glWindowPos2f((cur_width - 320.0f)/2.0f, (cur_height - 240.0f)/2.0f );
         if(!once) {
                 once = 1;
 
