@@ -98,6 +98,8 @@ render_context_draw(Window xwindow, GLXContext* ctx)
         cur_width	= attr.width;
         cur_height	= attr.height;
 
+        g_debug("Width: %d, Height: %d", cur_width, cur_height);
+
         glClearColor(0.0, color, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -120,27 +122,19 @@ render_context_draw(Window xwindow, GLXContext* ctx)
                 ptr = malloc(320*240*3);
 
                 glGenBuffers(1, &buf);
-                printf("%s\n", gluErrorString(glGetError()));                        
                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buf);
-                printf("%s\n", gluErrorString(glGetError()));
                 glBufferData(GL_PIXEL_UNPACK_BUFFER, 320*240*3, NULL, GL_DYNAMIC_DRAW);
-                printf("%s\n", gluErrorString(glGetError()));
                 //ptr = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
                 memset(ptr, 255, 320*240*3);
                 //glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
-                printf("%s\n", gluErrorString(glGetError()));
                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-                printf("%s\n", gluErrorString(glGetError()));                        
         }
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, buf);
-        printf("%s\n", gluErrorString(glGetError()));
         glDrawBuffer(GL_BACK);
-        printf("%s\n", gluErrorString(glGetError()));
         glDrawPixels(320, 240, GL_RGB, GL_UNSIGNED_BYTE, ptr);
-        printf("%s\n", gluErrorString(glGetError()));
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-        printf("%s\n", gluErrorString(glGetError()));
+        //printf("%s\n", gluErrorString(glGetError()));
 
         glFinish();
         fflush(stdout);

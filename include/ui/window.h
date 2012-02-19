@@ -18,6 +18,13 @@ void
 ui_window_setglcontext(GLXContext ctx);
 
 /**
+ * Forces redrawing of image from the current draw buffer. Use for previews
+ * with sliders etc.
+ **/
+void
+ui_window_force_redraw(void);
+
+/**
  * \return handle id of the connected callback, use for removal
  **/
 gulong

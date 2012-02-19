@@ -9,6 +9,7 @@
 #include <ui/ui.h>
 #include <ui/window.h>
 #include <ui/histogram_dialog.h>
+#include <ui/ui_curves.h>
 
 static GtkWidget* ui_window;
 static GtkWidget* ui_vbox;
@@ -143,10 +144,16 @@ ui_window_init(ui_widget_t** widget)
 
 	gtk_ui_manager_add_ui_from_string(ui_manager, ui_definition,-1, &error);
 
-	ui_histogram_add_action_entries(ui_action_group);
+        //Populating menus with operations
+        ui_histogram_add_action_entries(ui_action_group, ui_window);
 	if( ui_histogram_add_ui_string(ui_manager) != CLIT_OK ) {
 		g_warning("Adding histogram menus failed");
 	}
+
+        ui_curves_add_action_entries(ui_action_group, ui_window);
+        if( ui_curves_add_ui_string(ui_manager) != CLIT_OK ) {
+                g_warning("Adding curves menus failed");
+        }
 
 	gtk_ui_manager_insert_action_group(ui_manager, ui_action_group, 0);
 	if(error) {
@@ -178,7 +185,7 @@ ui_window_init(ui_widget_t** widget)
 	//signal emitted when image gets changed somehow
 	ui_new_image_signal = g_signal_new("image-changed",
 					   G_TYPE_OBJECT, G_SIGNAL_RUN_FIRST,
-					   0, NULL, NULL, NULL,
+                                           0, NULL, NULL, g_cclosure_marshal_VOID__VOID,
 					   G_TYPE_NONE, 0);
 
 	g_signal_connect(G_OBJECT(ui_window), "image-changed",
@@ -247,6 +254,12 @@ void ui_drawing_area_init(GtkWidget* widget, gpointer data)
 	core_subsystem_start();
 
 	gl_initialized = TRUE;
+}
+
+void
+ui_window_force_redraw(void)
+{
+        ui_window_image_changed_cb(NULL, NULL);
 }
 
 void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data)

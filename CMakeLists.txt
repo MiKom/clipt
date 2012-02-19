@@ -36,8 +36,10 @@ SET( clit_SOURCES
         src/ui/common.c
         src/ui/window.c
         src/ui/histogram_dialog.c
+        src/ui/ui_curves.c
 
         src/nodes/histogram.c
+        src/nodes/curves.c
 )
 
 SET( clit_HEADERS
@@ -53,8 +55,10 @@ SET( clit_HEADERS
         include/ui/ui.h
         include/ui/window.h
         include/ui/histogram_dialog.h
+        include/ui/ui_curves.h
 
         include/nodes/histogram.h
+        include/nodes/curves.h
 )
 
 SET(COMMON_LIBRARIES m dl)

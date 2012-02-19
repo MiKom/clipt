@@ -17,6 +17,8 @@ sys_result_t
 ui_histogram_add_ui_string(GtkUIManager* ui_manager);
 
 void
-ui_histogram_add_action_entries(GtkActionGroup* action_group);
+ui_histogram_add_action_entries(
+                GtkActionGroup* action_group,
+                GtkWindow *parent);
 
 #endif
