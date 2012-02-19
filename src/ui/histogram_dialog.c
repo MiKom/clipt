@@ -72,7 +72,7 @@ ui_histogram_add_ui_string(GtkUIManager* ui_manager)
 void
 ui_histogram_add_action_entries(GtkActionGroup* action_group, GtkWindow *parent)
 {
-        gtk_action_group_add_actions(action_group, actions, n_actions, parent);
+	gtk_action_group_add_actions(action_group, actions, n_actions, parent);
 }
 
 static void ui_show_histogram_action_cb(GtkWidget* widget, gpointer data)
@@ -82,7 +82,7 @@ static void ui_show_histogram_action_cb(GtkWidget* widget, gpointer data)
 	GtkWidget* window;
 	GtkWidget* vbox;
 	GtkWidget* combobox;
-        GtkWidget* drawing_area;
+	GtkWidget* drawing_area;
 
 	// setting up window
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -100,10 +100,10 @@ static void ui_show_histogram_action_cb(GtkWidget* widget, gpointer data)
 
 	//setting up combobox
 	combobox = gtk_combo_box_text_new();
-        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "lum", "Luminance");
-        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "red", "Red channel");
-        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "green", "Green channel");
-        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "blue", "Blue channel");
+	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "lum", "Luminance");
+	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "red", "Red channel");
+	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "green", "Green channel");
+	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "blue", "Blue channel");
 	gtk_combo_box_set_active(GTK_COMBO_BOX(combobox), 0);
 	g_signal_connect(GTK_WIDGET(combobox), "changed",
 			 G_CALLBACK(ui_histogram_combobox_changed_cb), hist_obj);
@@ -112,7 +112,7 @@ static void ui_show_histogram_action_cb(GtkWidget* widget, gpointer data)
 
 
 	//setting up drawing area
-        drawing_area = gtk_drawing_area_new();
+	drawing_area = gtk_drawing_area_new();
 	gtk_widget_set_size_request(GTK_WIDGET(drawing_area), 264, 256);
 	gtk_box_pack_start(GTK_BOX(vbox), drawing_area, FALSE, FALSE, 5);
 	g_signal_connect(GTK_WIDGET(drawing_area), "draw",
@@ -150,17 +150,16 @@ ui_histogram_surface_draw_cb (GtkWidget* widget, cairo_t* cr, gpointer data)
 			maxval = histogram[i];
 		}
 	}
-        gchar* text = gtk_combo_box_get_active_id(GTK_COMBO_BOX_TEXT(obj->combobox));
-        if(g_strcmp0(text, "lum") == 0) {
+	gchar* text = gtk_combo_box_get_active_id(GTK_COMBO_BOX_TEXT(obj->combobox));
+	if(g_strcmp0(text, "lum") == 0) {
 		cairo_set_source_rgb (cr, 0, 0, 0);
-        } else if(g_strcmp0(text, "red") == 0) {
+	} else if(g_strcmp0(text, "red") == 0) {
 		cairo_set_source_rgb (cr, 0.8, 0, 0);
-        } else if(g_strcmp0(text, "green") == 0) {
+	} else if(g_strcmp0(text, "green") == 0) {
 		cairo_set_source_rgb (cr, 0, 0.8, 0);
-        } else if(g_strcmp0(text, "blue") == 0) {
+	} else if(g_strcmp0(text, "blue") == 0) {
 		cairo_set_source_rgb (cr, 0, 0, 0.8);
 	}
-	g_free(text);
 
 	for(i=0; i<256; i++) {
 		cairo_move_to(cr, (double)(i+5), 256.0);
