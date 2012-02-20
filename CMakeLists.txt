@@ -55,7 +55,7 @@ SET( clit_HEADERS
         include/ui/ui.h
         include/ui/window.h
         include/ui/histogram_dialog.h
-        include/ui/ui_curves.h
+	include/ui/ui_curves.h
 
         include/nodes/histogram.h
         include/nodes/curves.h

@@ -76,9 +76,12 @@ ui_curves_show_dialog(GtkWidget* widget, gpointer data)
 	gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(parent));
 	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
 	gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
-	gtk_dialog_add_button(GTK_DIALOG(dialog),
-			      "Apply",
-			      GTK_RESPONSE_APPLY);
+	gtk_dialog_add_buttons(GTK_DIALOG(dialog),
+			       "Cancel",
+			       GTK_RESPONSE_CANCEL,
+			       "Apply",
+			       GTK_RESPONSE_APPLY,
+			       NULL);
 	obj->dialog = dialog;
 	box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
@@ -173,8 +176,6 @@ ui_curves_drawing_area_redraw_cb(GtkWidget* widget, cairo_t *cr, gpointer data)
 			maxval = histogram[i];
 		}
 	}
-
-	lut[0] = lut[255] = 255;
 
 	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
 	cairo_paint(cr);
