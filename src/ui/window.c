@@ -64,6 +64,9 @@ char *ui_definition =
 "    <menu name='ToolsMenu' action='ToolsMenuAction'>"
 "      <placeholder/>"
 "    </menu>"
+"    <menu name='FiltersMenu' action='FiltersMenuAction'>"
+"    "
+"    </menu>"
 "    <menu name='HelpMenu' action='HelpMenuAction'>"
 "      <menuitem action='AboutAction' />"
 "    </menu>"
@@ -105,6 +108,8 @@ static GtkActionEntry entries[] = {
 	  G_CALLBACK(ui_reset_cb)},
 
 	{ "ColorMenuAction", NULL, "_Color"},
+
+	{ "FiltersMenuAction", NULL, "_Filters"},
 	//Tools Menu
 	{ "ToolsMenuAction", NULL, "_Tools"},
 
