@@ -108,41 +108,67 @@ render_context_draw(Window xwindow, GLXContext* ctx)
 		color = 0.0f;
         }
 
+        static int once = 0;
+        device_buffer_t* buf = sys_get_active_buffer();
+        if(!once) {
+                size_t i=0;
+                size_t w, h, bpp;
+                float* pix;
+
+                device_buffer_getprop(buf, &w, &h, &bpp);
+                pix = device_buffer_map(buf);
+                assert(pix != NULL);
+                for(i=0; i<10; i++)
+                        pix[i] = 1.0f;
+                device_buffer_unmap(buf);
+                once = 1;
+        }
+        
+        glWindowPos2f((cur_width - 320.0f)/2.0f, (cur_height - 240.0f)/2.0f );
+        device_buffer_draw(buf);
+
+#if 0
 
         // DEBUG
         glGetError();
         
         static int once = 0;
         static GLuint buf;
-        static unsigned char* ptr;
+        static float* ptr;
 	glWindowPos2f((cur_width - 320.0f)/2.0f, (cur_height - 240.0f)/2.0f );
         if(!once) {
+                int x, y;
                 once = 1;
 
-                ptr = malloc(320*240*3);
+                ptr = malloc(320*240*3*sizeof(float));
 
                 glGenBuffers(1, &buf);
                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buf);
-                glBufferData(GL_PIXEL_UNPACK_BUFFER, 320*240*3, NULL, GL_DYNAMIC_DRAW);
-                //ptr = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
-                memset(ptr, 255, 320*240*3);
-                //glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+                glBufferData(GL_PIXEL_UNPACK_BUFFER, 320*240*3*sizeof(float), NULL, GL_DYNAMIC_DRAW);
+                ptr = glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+                for(x=0; x<320; x++) {
+                        for(y=0; y<240; y++) {
+                                ptr[y*320*3+x*3]   = 1.0f;
+                                ptr[y*320*3+x*3+1] = 0.5f;
+                                ptr[y*320*3+x*3+2] = 200.0f;
+                        }
+                }
+                
+//                memset(ptr, 200, 320*240*3);
+                glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
                 glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
         }
 
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, buf);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buf);
         glDrawBuffer(GL_BACK);
-        glDrawPixels(320, 240, GL_RGB, GL_UNSIGNED_BYTE, ptr);
-        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+        glDrawPixels(320, 240, GL_RGB, GL_FLOAT, NULL);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
         //printf("%s\n", gluErrorString(glGetError()));
 
+#endif
         glFinish();
-        fflush(stdout);
-        // END DEBUG
-        
         //device_buffer_draw(sys_get_active_buffer());
 	glXSwapBuffers(disp, xwindow);
-        printf("----------\n");
 }
 
 
@@ -185,7 +211,44 @@ void
 render_buffer_draw(render_buffer_t* buffer)
 {
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer->gl_object);
-        glDrawPixels(buffer->width, buffer->height, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glDrawBuffer(GL_BACK);
+        glDrawPixels(buffer->width, buffer->height, GL_RGB, GL_FLOAT, NULL);
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
+float*
+render_buffer_map(render_buffer_t* buffer)
+{
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer->gl_object);
+        buffer->hostptr = (float*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+        return buffer->hostptr;
+}
+
+void
+render_buffer_unmap(render_buffer_t* buffer)
+{
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer->gl_object);
+        glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+        buffer->hostptr = NULL;
+}
+
+sys_result_t
+render_buffer_copy(render_buffer_t* src, render_buffer_t* dst,
+                   size_t offset, size_t size)
+{
+        GLenum gl_error;
+        
+        glBindBuffer(GL_COPY_READ_BUFFER, src->gl_object);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, dst->gl_object);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
+                            offset, offset, size);
+        gl_error = glGetError();
+        glBindBuffer(GL_COPY_READ_BUFFER, 0);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+
+        if(gl_error != 0)
+                return CLIT_ERROR;
+        return CLIT_OK;                
+}

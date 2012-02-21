@@ -1,6 +1,7 @@
 #ifndef __CLIT_CONFIG_H
 #define __CLIT_CONFIG_H
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <limits.h>

@@ -57,14 +57,16 @@ core_render_stop(void)
 }
 
 // SUBSYSTEM: device
-static device_context_t device_context;
-
 static sys_result_t
 core_device_start(void)
 {
-	if(device_create(&device_context) != DEVICE_OK)
+        device_context_t* device_context = sys_get_state()->context;
+	if(device_create(device_context) != DEVICE_OK)
 		return CLIT_ERROR;
-	g_message("Subsystem [DEVICE]: OpenCL device initialized: %s", device_context.devname);
+	g_message("Subsystem [DEVICE]: OpenCL device initialized: %s", device_context->devname);
+
+        device_buffer_create(device_context, DEVICE_BUFFER_HARDWARE, 640, 480, 3, &sys_get_state()->buffer[0]);
+        device_buffer_create(device_context, DEVICE_BUFFER_HARDWARE, 640, 480, 3, &sys_get_state()->buffer[1]);
 	g_message("Subsystem [DEVICE]: Started");
 	return CLIT_OK;
 }
@@ -72,7 +74,7 @@ core_device_start(void)
 static sys_result_t
 core_device_stop(void)
 {
-	device_destroy(&device_context);
+	device_destroy(sys_get_state()->context);
 	g_message("Subsystem [DEVICE]: Stopped");
 	return CLIT_OK;
 }
@@ -119,14 +121,6 @@ int core_subsystem_start(void)
 	if(core_plugin_start() != CLIT_OK)
 		return CLIT_ERROR;
 
-//        device_context_t* ctx = sys_get_state()->context;
-        device_buffer_t* buf = sys_get_active_buffer();
-        device_buffer_create(&device_context, DEVICE_BUFFER_HARDWARE, 640, 480, 3, buf);
-        unsigned char* pixels = device_buffer_map(&device_context, buf);
-        memset(pixels, 255, 3);
-        device_buffer_unmap(&device_context, buf);
-
-        sys_get_state()->context = &device_context;
 	return CLIT_OK;
 }
 
