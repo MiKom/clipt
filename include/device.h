@@ -45,8 +45,10 @@ struct device_buffer_s {
 device_result_t device_create(device_context_t* context);
 device_result_t device_destroy(device_context_t* context);
 
-device_result_t device_kernel_create(device_context_t* context, const char* filename);
-device_result_t device_kernel_destroy(device_context_t* context, device_kernel_t* kernel);
+device_result_t device_kernel_create(device_context_t* context, const char* filename,
+                                     device_kernel_t* kernel);
+device_result_t device_kernel_destroy(device_kernel_t* kernel);
+
 
 device_result_t device_buffer_create(device_context_t* context, device_buffer_storage_t storage,
                                      size_t width, size_t height, size_t channels,

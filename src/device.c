@@ -4,6 +4,7 @@
 #include <render.h>
 #include <device.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,6 +13,67 @@
 #else
 #define GL_SHARING_EXTENSION "cl_khr_gl_sharing"
 #endif
+
+static char*
+device_read_source(const char* filename, char** buffer)
+{
+        FILE* file;
+
+        *buffer = NULL;
+        file = fopen(filename, "r");
+        if(file) {
+                size_t len;
+                fseek(file, 0, SEEK_END);
+                len = ftell(file);
+                fseek(file, 0, SEEK_SET);
+
+                *buffer = malloc(len+1);
+                if(fread(*buffer, 1, len, file) != len) {
+                        free(*buffer);
+                        *buffer = NULL;
+                }
+                else
+                        *buffer[len] = 0;
+                fclose(file);
+        }
+        
+        return *buffer;
+}
+
+static device_result_t
+device_print_log(cl_program program, const char* filename, FILE* descriptor)
+{
+        cl_uint       num_devices;
+        cl_device_id* devices;
+        cl_device_id  prog_device;
+                        
+        size_t        build_log_size;
+        char*         build_log;
+                        
+        clGetProgramInfo(program, CL_PROGRAM_NUM_DEVICES,
+                         sizeof(cl_uint), &num_devices, NULL);
+        devices = malloc(num_devices * sizeof(cl_device_id));
+        clGetProgramInfo(program, CL_PROGRAM_DEVICES,
+                         num_devices*sizeof(cl_device_id), devices, NULL);
+        prog_device = *devices;
+        free(devices);
+                        
+        clGetProgramBuildInfo(program, prog_device, CL_PROGRAM_BUILD_LOG,
+                              0, NULL, &build_log_size);
+                        
+        build_log = malloc(build_log_size + 1);
+        build_log[build_log_size] = 0;
+        clGetProgramBuildInfo(program, prog_device, CL_PROGRAM_BUILD_LOG,
+                              build_log_size, build_log, NULL);
+
+        fprintf(descriptor, "*** BUILD LOG FOR: %s ***\n", filename);
+        fprintf(descriptor, "%s\n", build_log);
+        fprintf(descriptor, "*** END OF BUILD LOG ***\n");
+        fflush(descriptor);
+        free(build_log);
+
+        return DEVICE_OK;
+}
 
 device_result_t device_create(device_context_t* context)
 {
@@ -66,6 +128,44 @@ device_result_t device_destroy(device_context_t* context)
 	clReleaseContext(context->context);
 	memset(context, 0, sizeof(device_context_t));
 	return DEVICE_OK;
+}
+
+device_result_t device_kernel_create(device_context_t* context, const char* filename,
+                                     device_kernel_t* kernel)
+{
+        char* source;
+        cl_int cl_error;
+        
+        if(!device_read_source(filename, &source))
+                return DEVICE_EUNAVAIL;
+
+        kernel->program = clCreateProgramWithSource(context->context, 1,
+                                                    (const char**)&source, NULL, &cl_error);
+        free(source);
+        if(cl_error != CL_SUCCESS)
+                return DEVICE_ERROR;
+
+        cl_error = clBuildProgram(kernel->program, 0, NULL, "", NULL, NULL);
+        if(cl_error != CL_SUCCESS) {
+                if(cl_error == CL_BUILD_PROGRAM_FAILURE)
+                        device_print_log(kernel->program, filename, stderr);
+                clReleaseProgram(kernel->program);
+                return DEVICE_ERROR;
+        }
+        kernel->kernel = clCreateKernel(kernel->program, "main", &cl_error);
+        if(cl_error != CL_SUCCESS) {
+                clReleaseProgram(kernel->program);
+                return DEVICE_ERROR;
+        }
+        
+        return DEVICE_OK;
+}
+
+device_result_t device_kernel_destroy(device_kernel_t* kernel)
+{
+        clReleaseKernel(kernel->kernel);
+        clReleaseProgram(kernel->program);
+        return DEVICE_OK;
 }
 
 device_result_t device_buffer_create(device_context_t* context, device_buffer_storage_t storage,

@@ -7,9 +7,7 @@
 
 #include <stdio.h>
 
-static device_context_t device_context;
 static Display* disp;
-static float color;
 
 void init_glx(void)
 {
@@ -76,14 +74,7 @@ render_context_init(Window xwindow, GLXContext* out_ctx)
 	}
 
 	*out_ctx = ctx;
-
-	glClearColor(0.0,1.0,0.0,1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-        glXSwapBuffers(disp,xwindow);
 	XSetErrorHandler(oldHandler);
-	color = 0.0f;
-
-	device_create(&device_context);
 	return CLIT_OK;
 }
 
@@ -123,7 +114,6 @@ render_context_draw(Window xwindow, GLXContext* ctx)
 sys_result_t
 render_context_free(GLXContext ctx)
 {
-	device_destroy(&device_context);
 	glXDestroyContext(disp, ctx);
 	XCloseDisplay(disp);
 	return CLIT_OK;
@@ -172,14 +162,14 @@ render_buffer_map(render_buffer_t* buffer, sys_access_t access)
         
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer->gl_object);
         buffer->hostptr = (float*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, gl_access[access]);
-        //glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
         return buffer->hostptr;
 }
 
 void
 render_buffer_unmap(render_buffer_t* buffer)
 {
-        //glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer->gl_object);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer->gl_object);
         glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
         buffer->hostptr = NULL;
