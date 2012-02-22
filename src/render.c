@@ -96,21 +96,22 @@ render_context_draw(Window xwindow, GLXContext* ctx)
         int pos_x, pos_y;
         
         XGetWindowAttributes(disp, xwindow, &attr);
-
-        buffer = sys_get_active_buffer();
-        device_buffer_getprop(buffer, &buffer_w, &buffer_h, NULL);
-        
-        pos_x = attr.width - buffer_w;
-        pos_y = attr.height - buffer_h;
-        if(pos_x < 0) pos_x = 0;
-        if(pos_y < 0) pos_y = 0;
-        glWindowPos2f(pos_x*0.5f, pos_y*0.5f);
         
         glClearColor(0.35f, 0.35f, 0.35f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
         glDrawBuffer(GL_BACK);
-        
-        device_buffer_draw(buffer);
+
+        buffer = sys_get_active_buffer();
+        if(buffer) {
+                device_buffer_getprop(buffer, &buffer_w, &buffer_h, NULL);
+                pos_x = attr.width - buffer_w;
+                pos_y = attr.height - buffer_h;
+                if(pos_x < 0) pos_x = 0;
+                if(pos_y < 0) pos_y = 0;
+                
+                glWindowPos2f(pos_x*0.5f, pos_y*0.5f);
+                device_buffer_draw(buffer);
+        }
 
         glFinish();
 	glXSwapBuffers(disp, xwindow);
