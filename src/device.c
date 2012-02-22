@@ -69,14 +69,14 @@ device_result_t device_destroy(device_context_t* context)
 }
 
 device_result_t device_buffer_create(device_context_t* context, device_buffer_storage_t storage,
-                                     size_t width, size_t height, size_t bpp,
+                                     size_t width, size_t height, size_t channels,
                                      device_buffer_t* buffer)
 {
         cl_int cl_error;
         buffer->storage = DEVICE_BUFFER_INVALID;
         
         if(storage == DEVICE_BUFFER_HARDWARE) {
-                if(render_buffer_create(width, height, bpp, &buffer->rbuf) != CLIT_OK)
+                if(render_buffer_create(width, height, channels, &buffer->rbuf) != CLIT_OK)
                         return DEVICE_ERROR;
                 
                 buffer->cl_object = clCreateFromGLBuffer(context->context,
@@ -89,12 +89,12 @@ device_result_t device_buffer_create(device_context_t* context, device_buffer_st
                 buffer->rbuf.hostptr = NULL;
         }
         else {
-                buffer->rbuf.hostptr = malloc(width*height*bpp);
+                buffer->rbuf.hostptr = malloc(width*height*channels);
                 if(!buffer->rbuf.hostptr)
                         return DEVICE_EUNAVAIL;
-                buffer->rbuf.width  = width;
-                buffer->rbuf.height = height;
-                buffer->rbuf.bpp    = bpp;
+                buffer->rbuf.width    = width;
+                buffer->rbuf.height   = height;
+                buffer->rbuf.channels = channels;
                 
                 buffer->rbuf.gl_object = 0;
                 buffer->cl_object = 0;
@@ -128,7 +128,7 @@ device_result_t device_buffer_copy(device_buffer_t* src, device_buffer_t* dst)
         
         if(src->rbuf.width != dst->rbuf.width
            || src->rbuf.height != dst->rbuf.height
-           || src->rbuf.bpp != dst->rbuf.bpp)
+           || src->rbuf.channels != dst->rbuf.channels)
                 return DEVICE_EINVALID;
 
         device_buffer_getsize(src, &data_size);
@@ -140,9 +140,9 @@ device_result_t device_buffer_copy(device_buffer_t* src, device_buffer_t* dst)
         else {
                 void *srcptr, *dstptr;
                 
-                if((srcptr = device_buffer_map(src)) == NULL)
+                if((srcptr = device_buffer_map(src, CLIT_READ_ONLY)) == NULL)
                         return DEVICE_ERROR;
-                if((dstptr = device_buffer_map(dst)) == NULL) {
+                if((dstptr = device_buffer_map(dst, CLIT_WRITE_ONLY)) == NULL) {
                         device_buffer_unmap(src);
                         return DEVICE_ERROR;
                 }
@@ -156,14 +156,14 @@ device_result_t device_buffer_copy(device_buffer_t* src, device_buffer_t* dst)
         return DEVICE_OK;
 }
 
-device_result_t device_buffer_getprop(device_buffer_t* buffer, size_t* width, size_t* height, size_t* bpp)
+device_result_t device_buffer_getprop(device_buffer_t* buffer, size_t* width, size_t* height, size_t* channels)
 {
         if(buffer->storage == DEVICE_BUFFER_INVALID)
                 return DEVICE_EINVALID;
         
-        if(width)  *width  = buffer->rbuf.width;
-        if(height) *height = buffer->rbuf.height;
-        if(bpp)    *bpp    = buffer->rbuf.bpp;
+        if(width)    *width    = buffer->rbuf.width;
+        if(height)   *height   = buffer->rbuf.height;
+        if(channels) *channels = buffer->rbuf.channels;
         return DEVICE_OK;
 }
 
@@ -171,7 +171,7 @@ device_result_t device_buffer_getsize(device_buffer_t* buffer, size_t* size)
 {
         if(buffer->storage == DEVICE_BUFFER_INVALID)
                 return DEVICE_EINVALID;
-        *size = buffer->rbuf.width * buffer->rbuf.height * buffer->rbuf.bpp * sizeof(float);
+        *size = buffer->rbuf.width * buffer->rbuf.height * buffer->rbuf.channels * sizeof(float);
         return DEVICE_OK;
 }
 
@@ -179,17 +179,15 @@ device_result_t device_buffer_draw(device_buffer_t* buffer)
 {
         if(buffer->storage != DEVICE_BUFFER_HARDWARE)
                 return DEVICE_EINVALID;
-        if(buffer->rbuf.bpp != 24)
-                return DEVICE_EINVALID;
         
         render_buffer_draw(&buffer->rbuf);
         return DEVICE_OK;
 }
 
-float* device_buffer_map(device_buffer_t* buffer)
+float* device_buffer_map(device_buffer_t* buffer, sys_access_t access)
 {
         if(buffer->storage == DEVICE_BUFFER_HARDWARE)
-                return render_buffer_map(&buffer->rbuf);
+                return render_buffer_map(&buffer->rbuf, access);
         return buffer->rbuf.hostptr;
 }
 
@@ -198,4 +196,48 @@ void device_buffer_unmap(device_buffer_t* buffer)
 {
         if(buffer->storage == DEVICE_BUFFER_HARDWARE)
                 render_buffer_unmap(&buffer->rbuf);
+}
+
+device_result_t device_buffer_clear_1f(device_buffer_t* buffer, float r)
+{
+        float* ptr = device_buffer_map(buffer, CLIT_WRITE_ONLY);
+        size_t i, n = buffer->rbuf.width * buffer->rbuf.height * buffer->rbuf.channels;
+
+        for(i=0; i<n; i++)
+                *ptr++ = r;
+        device_buffer_unmap(buffer);
+        return DEVICE_OK;
+}
+
+device_result_t device_buffer_clear_2f(device_buffer_t* buffer, float r, float g)
+{
+        if(buffer->rbuf.channels != 2)
+                return DEVICE_EINVALID;
+        
+        float* ptr  = device_buffer_map(buffer, CLIT_WRITE_ONLY);
+        size_t i, n = buffer->rbuf.width * buffer->rbuf.height;
+
+        for(i=0; i<n; i++) {
+                *ptr++ = r;
+                *ptr++ = g;
+        }
+        device_buffer_unmap(buffer);
+        return DEVICE_OK;
+}
+
+device_result_t device_buffer_clear_3f(device_buffer_t* buffer, float r, float g, float b)
+{
+        if(buffer->rbuf.channels != 3)
+                return DEVICE_EINVALID;
+        
+        float* ptr  = device_buffer_map(buffer, CLIT_WRITE_ONLY);
+        size_t i, n = buffer->rbuf.width * buffer->rbuf.height;
+        
+        for(i=0; i<n; i++) {
+                *ptr++ = r;
+                *ptr++ = g;
+                *ptr++ = b;
+        }
+        device_buffer_unmap(buffer);
+        return DEVICE_OK;
 }

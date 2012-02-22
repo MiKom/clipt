@@ -17,6 +17,14 @@ enum sys_result_e
 };
 typedef enum sys_result_e sys_result_t;
 
+enum sys_access_e
+{
+        CLIT_READ_ONLY = 0,
+        CLIT_WRITE_ONLY,
+        CLIT_READ_WRITE
+};
+typedef enum sys_access_e sys_access_t;
+
 struct sys_config_s
 {
 	gchar project[PATH_MAX];
