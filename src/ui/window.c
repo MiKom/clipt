@@ -10,6 +10,7 @@
 #include <ui/window.h>
 #include <ui/histogram_dialog.h>
 #include <ui/ui_curves.h>
+#include <ui/ui_convolutions.h>
 
 static GtkWidget* ui_window;
 static GtkWidget* ui_vbox;
@@ -155,10 +156,15 @@ ui_window_init(ui_widget_t** widget)
 		g_warning("Adding histogram menus failed");
 	}
 
-        ui_curves_add_action_entries(ui_action_group, ui_window);
-        if( ui_curves_add_ui_string(ui_manager) != CLIT_OK ) {
-                g_warning("Adding curves menus failed");
-        }
+	ui_curves_add_action_entries(ui_action_group, ui_window);
+	if( ui_curves_add_ui_string(ui_manager) != CLIT_OK ) {
+		g_warning("Adding curves menus failed");
+	}
+
+	ui_convolutions_add_action_entries(ui_action_group, ui_window);
+	if( ui_convolutions_add_ui_string(ui_manager) != CLIT_OK ) {
+		g_warning("Adding convolutions menu failed");
+	}
 
 	gtk_ui_manager_insert_action_group(ui_manager, ui_action_group, 0);
 	if(error) {
