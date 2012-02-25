@@ -60,14 +60,14 @@ core_render_stop(void)
 static sys_result_t
 core_device_start(void)
 {
-        device_context_t* device_context = sys_get_state()->context;
+	device_context_t* device_context = sys_get_state()->context;
 	if(device_create(device_context) != DEVICE_OK)
 		return CLIT_ERROR;
 	g_message("Subsystem [DEVICE]: OpenCL device initialized: %s", device_context->devname);
 
-        device_buffer_create(device_context, DEVICE_BUFFER_HARDWARE, 640, 480, 3, &sys_get_state()->buffer[0]);
-        device_buffer_create(device_context, DEVICE_BUFFER_HARDWARE, 640, 480, 3, &sys_get_state()->buffer[1]);
-        device_buffer_clear_3f(&sys_get_state()->buffer[0], 1.0f, 1.0f, 1.0f);
+	device_buffer_create(device_context, DEVICE_BUFFER_HARDWARE, 640, 480, 3, &sys_get_state()->buffer[0]);
+	device_buffer_create(device_context, DEVICE_BUFFER_HARDWARE, 640, 480, 3, &sys_get_state()->buffer[1]);
+	device_buffer_clear_3f(&sys_get_state()->buffer[0], 1.0f, 1.0f, 1.0f);
 	g_message("Subsystem [DEVICE]: Started");
 	return CLIT_OK;
 }

@@ -86,11 +86,13 @@ int can_open(char* path)
 }
 
 /**
- *                                 (float) y * 255.0f
- * normalized(x) = (unsigned int) ------------------- + 0.5f
- *                                    (float) max
+ *                                     (float) x * 255.0f
+ * normalized(x,max) = (unsigned int) ------------------- + 0.5f
+ *                                        (float) max
  */
 #define normalize(x,max) (unsigned int)(((float)x*255.0f)/(float)max + 0.5f)
+
+#define BYTE_TO_FLOAT(x) (float) x / 255.0f
 
 char* read_next_non_comment(FILE* fd) {
 
@@ -152,7 +154,13 @@ sys_result_t load_pnm(char *path, image_data_t **image)
 	ret->width = width;
 	ret->height = height;
 
-	ret->data = malloc(sizeof(unsigned char) * width * height * 4);
+	if(magic[1] == '1' || magic[1] == '2' || magic[1] == '4' || magic[1] == '5') {
+		ret->channels = 1;
+	} else {
+		ret->channels = 3;
+	}
+
+	ret->data = malloc(sizeof(float) * width * height * 3);
 
 	int error;
 	switch(magic[1]){
@@ -202,9 +210,7 @@ sys_result_t load_bitmap(FILE* fp, image_data_t* dst)
 		unsigned char c = getc(fp);
 		for(j=7; j>=0; j--) {
 			single_pixel = (1 - ((c >> j) & 0x01)) * 255;
-			memset(dst->data + data_idx, single_pixel, 3);
-			data_idx += 3;
-			dst->data[data_idx++] = 0;
+			dst->data[data_idx++] = BYTE_TO_FLOAT(single_pixel);
 		}
 
 	}
@@ -214,9 +220,7 @@ sys_result_t load_bitmap(FILE* fp, image_data_t* dst)
 	size_t significant_bits = dst->width * dst->height - 8*(num_bytes - 1);
 	for(i=significant_bits; i>=0; i--) {
 		single_pixel = (1 - ((last_byte >> j) & 0x01)) * 255;
-		memset(dst->data + data_idx, single_pixel, 3);
-		data_idx += 3;
-		dst->data[data_idx++] = 0;
+		dst->data[data_idx++] = BYTE_TO_FLOAT(single_pixel);
 	}
 	return CLIT_OK;
 }
@@ -242,10 +246,7 @@ sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, in
 				// load_bitmap(...)
 				lum = (int) (getc(fd) - '0');
 				lum = 1 - lum;
-				dst->data[dest_idx++] = lum * 255;
-				dst->data[dest_idx++] = lum * 255;
-				dst->data[dest_idx++] = lum * 255;
-				dst->data[dest_idx++] = 0;
+				dst->data[dest_idx++] = (float) lum;
 				break;
 			case 8:
 				if(type == PNM_ASCII) {
@@ -253,9 +254,8 @@ sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, in
 				} else {
 					lum = getc(fd);
 				}
-				memset(dst->data + dest_idx, (unsigned char) normalize(lum, maxval), 3);
-				dest_idx += 3;
-				dst->data[dest_idx++] = 0;
+				unsigned char value = (unsigned char) normalize(lum, maxval);
+				dst->data[dest_idx++] = BYTE_TO_FLOAT(value);
 				break;
 			case 24:
 				if(type == PNM_ASCII) {
@@ -265,10 +265,9 @@ sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, in
 					g = getc(fd);
 					b = getc(fd);
 				}
-				dst->data[dest_idx++] = normalize(b, maxval);
-				dst->data[dest_idx++] = normalize(g, maxval);
-				dst->data[dest_idx++] = normalize(r, maxval);
-				dst->data[dest_idx++] = 0;
+				dst->data[dest_idx++] = BYTE_TO_FLOAT(normalize(b, maxval));
+				dst->data[dest_idx++] = BYTE_TO_FLOAT(normalize(g, maxval));
+				dst->data[dest_idx++] = BYTE_TO_FLOAT(normalize(r, maxval));
 			}
 		}
 	}

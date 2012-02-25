@@ -360,6 +360,8 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 				for(i=0; i<fplugin->n_load_handlers; i++) {
 					if(fplugin->load_handlers[i]->can_open(filename)){
 						//TODO: Acutal file loading here
+						image_data_t *data;
+						//fplugin->load_handlers[i]->function(filename, &data);
 						g_signal_emit(ui_window, ui_new_image_signal, 0);
 						goto done;
 					}

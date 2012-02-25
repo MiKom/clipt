@@ -8,7 +8,8 @@ struct image_data_s
 	size_t width;
 	size_t height;
 	size_t bpp; // *bits* per pixel
-	char *data;
+	size_t channels;
+	float *data;
 };
 //typedef struct image_data_s image_data_t;
 
