@@ -41,10 +41,9 @@ curves_get_contrast_lut8(int contrast, int *lut)
 }
 
 void
-curves_get_gamma_lut8(int gamma, int *lut)
+curves_get_gamma_lut8(float exponent, int *lut)
 {
 	float tmp;
-	float exponent = (float) (gamma+255) /  255.0f;
 	int i;
 	for(i=0; i<256; i++){
 		tmp = 255.0f * powf(((float)i / 255.0f), exponent);
