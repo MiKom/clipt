@@ -30,7 +30,7 @@ struct plugin_handle_s
 };
 typedef struct plugin_handle_s plugin_handle_t;
 
-typedef sys_result_t (*plugin_io_load_func_t)(char *path, image_t **image);
+typedef sys_result_t (*plugin_io_load_func_t)(char *path, image_data_t **image);
 typedef int (*plugin_io_can_open_func_t)(char *path);
 struct plugin_load_handler_s
 {
@@ -46,7 +46,7 @@ struct plugin_load_handler_s
 };
 typedef struct plugin_load_handler_s plugin_load_handler_t;
 
-typedef sys_result_t (*plugin_io_save_func_t)(char *path, image_t *image);
+typedef sys_result_t (*plugin_io_save_func_t)(char *path, image_data_t *image);
 struct plugin_save_handler_s
 {
 	size_t nfilters;

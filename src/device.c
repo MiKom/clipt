@@ -168,6 +168,29 @@ device_result_t device_kernel_destroy(device_kernel_t* kernel)
         return DEVICE_OK;
 }
 
+device_result_t device_buffer_create_from_data(device_context_t* context, device_buffer_storage_t storage,
+                                               image_data_t* data, device_buffer_t* buffer)
+{
+        device_result_t result;
+        float* pixels;
+        size_t i, channels = data->bpp / 8;
+        
+        if(channels == 0) channels = 1;
+        result = device_buffer_create(context, storage, data->width, data->height, channels, buffer);
+        if(result != DEVICE_OK)
+                return result;
+        
+        pixels = device_buffer_map(buffer, CLIT_WRITE_ONLY);
+        if(!pixels) {
+                device_buffer_destroy(context, buffer);
+                return DEVICE_ERROR;
+        }
+
+ 
+        device_buffer_unmap(buffer);
+        return DEVICE_OK;
+}
+
 device_result_t device_buffer_create(device_context_t* context, device_buffer_storage_t storage,
                                      size_t width, size_t height, size_t channels,
                                      device_buffer_t* buffer)
@@ -298,29 +321,13 @@ void device_buffer_unmap(device_buffer_t* buffer)
                 render_buffer_unmap(&buffer->rbuf);
 }
 
-device_result_t device_buffer_clear_1f(device_buffer_t* buffer, float r)
+device_result_t device_buffer_clear_1f(device_buffer_t* buffer, float v)
 {
         float* ptr = device_buffer_map(buffer, CLIT_WRITE_ONLY);
         size_t i, n = buffer->rbuf.width * buffer->rbuf.height * buffer->rbuf.channels;
 
         for(i=0; i<n; i++)
-                *ptr++ = r;
-        device_buffer_unmap(buffer);
-        return DEVICE_OK;
-}
-
-device_result_t device_buffer_clear_2f(device_buffer_t* buffer, float r, float g)
-{
-        if(buffer->rbuf.channels != 2)
-                return DEVICE_EINVALID;
-        
-        float* ptr  = device_buffer_map(buffer, CLIT_WRITE_ONLY);
-        size_t i, n = buffer->rbuf.width * buffer->rbuf.height;
-
-        for(i=0; i<n; i++) {
-                *ptr++ = r;
-                *ptr++ = g;
-        }
+                *ptr++ = v;
         device_buffer_unmap(buffer);
         return DEVICE_OK;
 }

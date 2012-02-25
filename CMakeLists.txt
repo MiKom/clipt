@@ -32,6 +32,7 @@ SET( clit_SOURCES
         src/render.c
         src/plugin.c
         src/device.c
+        src/image.c
         
         src/ui/common.c
         src/ui/window.c

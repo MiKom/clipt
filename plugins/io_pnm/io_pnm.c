@@ -13,7 +13,7 @@ typedef enum pnm_data_type_e pnm_data_type_t;
 sys_result_t pnm_plugin_load();
 sys_result_t pnm_plugin_unload();
 
-sys_result_t load_pnm(char *path, image_t **image);
+sys_result_t load_pnm(char *path, image_data_t **image);
 
 int can_open(char* path);
 
@@ -111,9 +111,9 @@ char* read_next_non_comment(FILE* fd) {
  * dst must have it's metadata properly filled before (height,
  * width, bpp), and allocated enough space for data.
  */
-sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_t* dst, int maxval);
+sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, int maxval);
 
-sys_result_t load_pnm(char *path, image_t **image)
+sys_result_t load_pnm(char *path, image_data_t **image)
 {
 
 	FILE *fd = fopen(path, "r");
@@ -143,7 +143,7 @@ sys_result_t load_pnm(char *path, image_t **image)
 		sscanf(text_line, "%d", &maxval);
 		free(text_line);
 	}
-	image_t* ret = malloc(sizeof(image_t));
+	image_data_t* ret = malloc(sizeof(image_data_t));
 
 	if(!ret) {
 		return CLIT_ERESOURCES;
@@ -191,7 +191,7 @@ sys_result_t load_pnm(char *path, image_t **image)
 	}
 }
 
-sys_result_t load_bitmap(FILE* fp, image_t* dst)
+sys_result_t load_bitmap(FILE* fp, image_data_t* dst)
 {
 	size_t num_bytes = (size_t) ceilf((float)(dst->width * dst->height) / 8.0f);
 	int i,j;
@@ -221,7 +221,7 @@ sys_result_t load_bitmap(FILE* fp, image_t* dst)
 	return CLIT_OK;
 }
 
-sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_t* dst, int maxval)
+sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, int maxval)
 {
 
 	// 1-bit binary data is handled separately

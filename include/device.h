@@ -53,6 +53,9 @@ device_result_t device_kernel_destroy(device_kernel_t* kernel);
 device_result_t device_buffer_create(device_context_t* context, device_buffer_storage_t storage,
                                      size_t width, size_t height, size_t channels,
                                      device_buffer_t* buffer);
+device_result_t device_buffer_create_from_data(device_context_t* context, device_buffer_storage_t storage,
+                                               image_data_t* data, device_buffer_t* buffer);
+
 device_result_t device_buffer_destroy(device_context_t* context, device_buffer_t* buffer);
 
 float* device_buffer_map(device_buffer_t* buffer, sys_access_t access);
@@ -63,8 +66,7 @@ device_result_t device_buffer_getprop(device_buffer_t* buffer, size_t* width, si
 device_result_t device_buffer_getsize(device_buffer_t* buffer, size_t* size);
 
 device_result_t device_buffer_draw(device_buffer_t* buffer);
-device_result_t device_buffer_clear_1f(device_buffer_t* buffer, float r);
-device_result_t device_buffer_clear_2f(device_buffer_t* buffer, float r, float g);
+device_result_t device_buffer_clear_1f(device_buffer_t* buffer, float v);
 device_result_t device_buffer_clear_3f(device_buffer_t* buffer, float r, float g, float b);
 
 

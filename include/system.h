@@ -3,6 +3,7 @@
 
 typedef struct device_context_s device_context_t;
 typedef struct device_buffer_s device_buffer_t;
+typedef struct image_data_s image_data_t;
 typedef struct image_s image_t;
 
 enum sys_result_e
