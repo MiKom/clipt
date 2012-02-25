@@ -173,20 +173,20 @@ device_result_t device_buffer_create_from_data(device_context_t* context, device
 {
         device_result_t result;
         float* pixels;
-        size_t i, channels = data->bpp / 8;
+        size_t i, datasize;
         
-        if(channels == 0) channels = 1;
-        result = device_buffer_create(context, storage, data->width, data->height, channels, buffer);
+        result = device_buffer_create(context, storage, data->width, data->height, data->channels, buffer);
         if(result != DEVICE_OK)
                 return result;
-        
+
         pixels = device_buffer_map(buffer, CLIT_WRITE_ONLY);
         if(!pixels) {
                 device_buffer_destroy(context, buffer);
                 return DEVICE_ERROR;
         }
 
- 
+        device_buffer_getsize(buffer, &datasize);
+        memcpy(pixels, data->data, datasize);
         device_buffer_unmap(buffer);
         return DEVICE_OK;
 }
