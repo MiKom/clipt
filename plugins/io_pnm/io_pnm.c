@@ -265,9 +265,9 @@ sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, in
 					g = getc(fd);
 					b = getc(fd);
 				}
-				dst->data[dest_idx++] = BYTE_TO_FLOAT(normalize(b, maxval));
-				dst->data[dest_idx++] = BYTE_TO_FLOAT(normalize(g, maxval));
 				dst->data[dest_idx++] = BYTE_TO_FLOAT(normalize(r, maxval));
+				dst->data[dest_idx++] = BYTE_TO_FLOAT(normalize(g, maxval));
+				dst->data[dest_idx++] = BYTE_TO_FLOAT(normalize(b, maxval));
 			}
 		}
 	}
