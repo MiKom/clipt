@@ -212,7 +212,7 @@ device_result_t device_buffer_create(device_context_t* context, device_buffer_st
                 buffer->rbuf.hostptr = NULL;
         }
         else {
-                buffer->rbuf.hostptr = malloc(width*height*channels);
+                buffer->rbuf.hostptr = malloc(width * height * channels * sizeof(float));
                 if(!buffer->rbuf.hostptr)
                         return DEVICE_EUNAVAIL;
                 buffer->rbuf.width    = width;
