@@ -64,6 +64,7 @@ sys_result_t plugin_load_all()
 	sys_state_t* state = sys_get_state();
 #if __unix__
 	struct dirent **match_entries;
+	g_debug("Current plugin path: %s", config->dir_plugins);
 	int num_entries = scandir(config->dir_plugins, &match_entries,
 				  filter_f, alphasort);
 	if(num_entries == -1) {
