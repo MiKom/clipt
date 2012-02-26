@@ -362,10 +362,15 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 						//TODO: Acutal file loading here
 						image_data_t *data;
 						fplugin->load_handlers[i]->function(filename, &data);
-//						device_buffer_create_from_data(sys_get_state()->context,
-//									       DEVICE_BUFFER_SOFTWARE, data,
-//									       sys_get_state()->source);
+						device_buffer_create_from_data(sys_get_state()->context,
+									       DEVICE_BUFFER_SOFTWARE, data,
+									       sys_get_state()->source);
 						free(data->data);
+						int j;
+						for(j=0; j<2; j++) {
+							device_buffer_create(sys_get_state()->context, DEVICE_BUFFER_HARDWARE, data->width, data->height, data->channels, &sys_get_state()->buffer[i]);
+						}
+						device_buffer_copy(sys_get_state()->source, sys_get_active_buffer());
 						g_signal_emit(ui_window, ui_new_image_signal, 0);
 						goto done;
 					}
