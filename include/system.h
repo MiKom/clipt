@@ -8,7 +8,7 @@ typedef struct image_s image_t;
 
 enum sys_result_e
 {
-        CLIT_OK = 0x00,
+	CLIT_OK = 0x00,
 	CLIT_ENOTIMPLEMENTED,
 	CLIT_EINVALID,
 	CLIT_ERESOURCES,
@@ -20,9 +20,9 @@ typedef enum sys_result_e sys_result_t;
 
 enum sys_access_e
 {
-        CLIT_READ_ONLY = 0,
-        CLIT_WRITE_ONLY,
-        CLIT_READ_WRITE
+	CLIT_READ_ONLY = 0,
+	CLIT_WRITE_ONLY,
+	CLIT_READ_WRITE
 };
 typedef enum sys_access_e sys_access_t;
 
@@ -39,12 +39,12 @@ sys_config_t* sys_get_config(void);
 
 struct sys_state_s
 {
-        image_t *image;
-        device_buffer_t* buffer;
-        device_context_t* context;
+	device_buffer_t* source;
+	device_buffer_t* buffer;
+	device_context_t* context;
 	GList* plugin_handles;
 
-        int buffer_index;
+	int buffer_index;
 };
 typedef struct sys_state_s sys_state_t;
 

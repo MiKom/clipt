@@ -6,6 +6,7 @@
 #include <core.h>
 #include <render.h>
 #include <plugin.h>
+#include <device.h>
 #include <ui/ui.h>
 #include <ui/window.h>
 #include <ui/histogram_dialog.h>
@@ -288,7 +289,6 @@ void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data)
 
 void ui_window_image_changed_cb(GtkWidget *widget, gpointer data)
 {
-	g_debug("image changed");
 	gtk_widget_queue_draw(ui_drawing_area->widget);
 }
 
@@ -361,7 +361,11 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 					if(fplugin->load_handlers[i]->can_open(filename)){
 						//TODO: Acutal file loading here
 						image_data_t *data;
-						//fplugin->load_handlers[i]->function(filename, &data);
+						fplugin->load_handlers[i]->function(filename, &data);
+//						device_buffer_create_from_data(sys_get_state()->context,
+//									       DEVICE_BUFFER_SOFTWARE, data,
+//									       sys_get_state()->source);
+						free(data->data);
 						g_signal_emit(ui_window, ui_new_image_signal, 0);
 						goto done;
 					}

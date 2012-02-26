@@ -47,7 +47,7 @@ plugin_unload(plugin_handle_t* handle, gpointer placeholder)
 
 int filter_f(const struct dirent *entry)
 {
-	char* name = entry->d_name;
+	const char* name = entry->d_name;
 	size_t len = strlen(name);
 	if(len < 3) {
 		return 0;
@@ -102,14 +102,16 @@ sys_result_t plugin_load_all()
 		free(plugin_path);
 	}
 	free(match_entries);
-
+	return CLIT_OK;
 #else
 	g_warning("No plugin system available");
+	return CLIT_ENOTIMPLEMENTED;
 #endif
 }
 
 sys_result_t plugin_unload_all()
 {
 	sys_state_t* state = sys_get_state();
-	g_list_foreach(state->plugin_handles, plugin_unload, NULL);
+	g_list_foreach(state->plugin_handles, (GFunc) plugin_unload, NULL);
+	return CLIT_OK;
 }

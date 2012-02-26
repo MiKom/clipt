@@ -11,9 +11,12 @@ static sys_state_t sys_state;
  static void sys_state_ctor(void)
 {
         static device_buffer_t _buffer[2];
-        static device_context_t _context;
+	static device_buffer_t _source;
+	static device_context_t _context;
+
         sys_state.buffer  = _buffer;
-        sys_state.context = &_context;
+	sys_state.source = &_source;
+	sys_state.context = &_context;
 }
 
 sys_state_t* sys_get_state(void)

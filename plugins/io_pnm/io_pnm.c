@@ -201,7 +201,7 @@ sys_result_t load_pnm(char *path, image_data_t **image)
 
 sys_result_t load_bitmap(FILE* fp, image_data_t* dst)
 {
-	size_t num_bytes = (size_t) ceilf((float)(dst->width * dst->height) / 8.0f);
+	int num_bytes = (size_t) ceilf((float)(dst->width * dst->height) / 8.0f);
 	int i,j;
 	size_t data_idx = 0;
 	unsigned char single_pixel;
