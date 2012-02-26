@@ -7,6 +7,7 @@
 #include <render.h>
 #include <plugin.h>
 #include <device.h>
+#include <io.h>
 #include <ui/ui.h>
 #include <ui/window.h>
 #include <ui/histogram_dialog.h>
@@ -310,39 +311,33 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 	GtkFileFilter* ui_filefilter;
 
 	ui_filedialog = gtk_file_chooser_dialog_new("Open...",
-							   ui_window,
-							   GTK_FILE_CHOOSER_ACTION_OPEN,
-							   GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							   GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-							   NULL);
+						    ui_window,
+						    GTK_FILE_CHOOSER_ACTION_OPEN,
+						    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+						    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+						    NULL);
 
 	sys_state_t* state = sys_get_state();
-	GList* iter = g_list_first(state->plugin_handles);
 
-	while(iter != NULL) {
-		plugin_handle_t* handle = iter->data;
-		plugin_t* plugin = (plugin_t*) (handle->plugin);
+	GList *formats = io_get_load_handler_descriptions();
+	GList *iter;
+	for(iter = g_list_first(formats); iter; iter = g_list_next(iter)) {
+		io_load_handler_desc_t *format =
+				(io_load_handler_desc_t *) iter->data;
 
-		if(plugin->type == PLUGIN_FILEIO) {
-			plugin_fileio_t* fplugin = (plugin_fileio_t*) plugin;
-
-			size_t i;
-			for(i=0; i<fplugin->n_load_handlers; i++) {
-				ui_filefilter = gtk_file_filter_new();
-				gtk_file_filter_set_name(ui_filefilter,
-							 fplugin->load_handlers[i]->desc);
-				size_t j;
-				for(j=0; j<fplugin->load_handlers[i]->nfilters; j++) {
-					gtk_file_filter_add_pattern(ui_filefilter,
-								    fplugin->load_handlers[i]->filters[j]);
-				}
-				gtk_file_chooser_add_filter(ui_filedialog,
-							    ui_filefilter);
-			}
+		ui_filefilter = gtk_file_filter_new();
+		gtk_file_filter_set_name(GTK_FILE_FILTER(ui_filefilter),
+							 format->desc);
+		GList *f_it;
+		for(f_it = g_list_first(format->filters); f_it; f_it = g_list_next(f_it)) {
+			gtk_file_filter_add_pattern(
+						GTK_FILE_FILTER(ui_filefilter),
+						(char *) f_it->data);
 		}
-
-		iter = g_list_next(iter);
+		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(ui_filedialog),
+					    ui_filefilter);
 	}
+	g_list_free_full(formats, free);
 
 	if( gtk_dialog_run(ui_filedialog) == GTK_RESPONSE_ACCEPT) {
 		gchar* filename;

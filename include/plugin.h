@@ -80,6 +80,9 @@ plugin_load(const char* path, plugin_handle_t* handle);
 sys_result_t
 plugin_unload(plugin_handle_t* handle, gpointer placeholder);
 
+GList*
+plugin_get_by_type(plugin_type_t type);
+
 /**
  * Loads all plugins from directory specified in config file,
  * otherwise from /usr/lib/clit

@@ -45,6 +45,24 @@ plugin_unload(plugin_handle_t* handle, gpointer placeholder)
 	return deinit_result;
 }
 
+GList*
+plugin_get_by_type(plugin_type_t type)
+{
+	GList *io_plugins = NULL;
+	GList *iter = g_list_first(sys_get_state()->plugin_handles);
+
+	for(;iter; iter = g_list_next(iter)) {
+		plugin_handle_t *handle = iter->data;
+		plugin_t *plugin = (plugin_t*) (handle->plugin);
+
+		if(plugin->type == type) {
+			io_plugins = g_list_append(io_plugins, plugin);
+		}
+
+	}
+	return io_plugins;
+}
+
 int filter_f(const struct dirent *entry)
 {
 	const char* name = entry->d_name;
