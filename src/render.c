@@ -93,13 +93,16 @@ render_context_draw(Window xwindow, GLXContext* ctx)
         glDrawBuffer(GL_BACK);
 
         buffer = sys_get_active_buffer();
-        if(buffer) {
+        if(buffer->storage == DEVICE_BUFFER_HARDWARE) {
                 device_buffer_getprop(buffer, &buffer_w, &buffer_h, NULL);
                 pos_x = attr.width - buffer_w;
                 pos_y = attr.height - buffer_h;
                 if(pos_x < 0) pos_x = 0;
                 if(pos_y < 0) pos_y = 0;
-                
+
+                printf("kupa\n");
+
+//                glPixelZoom(1.0f, -1.0f);
                 glWindowPos2f(pos_x*0.5f, pos_y*0.5f);
                 device_buffer_draw(buffer);
         }

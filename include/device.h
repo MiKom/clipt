@@ -15,9 +15,9 @@ enum device_result_e {
 typedef enum device_result_e device_result_t;
 
 enum device_buffer_storage_e {
+        DEVICE_BUFFER_INVALID = 0,
         DEVICE_BUFFER_SOFTWARE,
         DEVICE_BUFFER_HARDWARE,
-        DEVICE_BUFFER_INVALID,
 };
 typedef enum device_buffer_storage_e device_buffer_storage_t;
 
