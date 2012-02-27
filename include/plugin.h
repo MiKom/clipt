@@ -30,8 +30,8 @@ struct plugin_handle_s
 };
 typedef struct plugin_handle_s plugin_handle_t;
 
-typedef sys_result_t (*plugin_io_load_func_t)(char *path, image_data_t **image);
-typedef int (*plugin_io_can_open_func_t)(char *path);
+typedef sys_result_t (*plugin_io_load_func_t)(const char *path, image_data_t **image);
+typedef int (*plugin_io_can_open_func_t)(const char *path);
 struct plugin_load_handler_s
 {
 	size_t nfilters;

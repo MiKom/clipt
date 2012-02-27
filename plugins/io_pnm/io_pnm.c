@@ -13,9 +13,9 @@ typedef enum pnm_data_type_e pnm_data_type_t;
 sys_result_t pnm_plugin_load();
 sys_result_t pnm_plugin_unload();
 
-sys_result_t load_pnm(char *path, image_data_t **image);
+sys_result_t load_pnm(const char *path, image_data_t **image);
 
-int can_open(char* path);
+int can_open(const char* path);
 
 plugin_t* clit_plugin_info()
 {
@@ -60,7 +60,7 @@ sys_result_t pnm_plugin_unload()
 	return CLIT_OK;
 }
 
-int can_open(char* path)
+int can_open(const char* path)
 {
 	FILE *fd = fopen(path, "r");
 	if(fd == NULL) {
@@ -68,21 +68,25 @@ int can_open(char* path)
 	}
 	char magic[2];
 	fread(magic, sizeof(char), 2, fd);
+	fclose(fd);
 
-	//Wrong magic
-	if(magic[0] != 'P') {
-		if(
-			magic[1] != '1' &&
-			magic[1] != '2' &&
-			magic[1] != '3' &&
-			magic[1] != '4' &&
-			magic[1] != '5' &&
-			magic[1] != '6'
-		) {
-			return 0;
-		}
+	// Checking for P1, P2, P3, P4, P5, P6
+	if(
+		magic[0] == 'P' &&
+		(
+			magic[1] == '1' ||
+			magic[1] == '2' ||
+			magic[1] == '3' ||
+			magic[1] == '4' ||
+			magic[1] == '5' ||
+			magic[1] == '6'
+		)
+	) {
+		return 1;
+	} else {
+		return 0;
 	}
-	return 1;
+
 }
 
 /**
@@ -115,7 +119,7 @@ char* read_next_non_comment(FILE* fd) {
  */
 sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, int maxval);
 
-sys_result_t load_pnm(char *path, image_data_t **image)
+sys_result_t load_pnm(const char *path, image_data_t **image)
 {
 
 	FILE *fd = fopen(path, "r");

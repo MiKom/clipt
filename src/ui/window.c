@@ -82,7 +82,8 @@ char *ui_definition =
 
 static GtkActionEntry entries[] = {
 	//File Menu
-	{ "FileMenuAction", NULL, "_File"},
+	{ "FileMenuAction", NULL, "_File",
+	  NULL, NULL, NULL},
 
 	{ "FileOpenAction", GTK_STOCK_OPEN,
 	  "_Open", "<control>O",
@@ -100,7 +101,8 @@ static GtkActionEntry entries[] = {
 	  G_CALLBACK(ui_menu_quit_cb)},
 
 	//Edit Menu
-	{ "EditMenuAction", NULL, "_Edit"},
+	{ "EditMenuAction", NULL, "_Edit",
+	  NULL, NULL, NULL},
 	{ "UndoAction", GTK_STOCK_UNDO,
 	  "Undo", "<control>Z",
 	  "Undo last action",
@@ -110,14 +112,18 @@ static GtkActionEntry entries[] = {
 	  "Reset all changes made to image",
 	  G_CALLBACK(ui_reset_cb)},
 
-	{ "ColorMenuAction", NULL, "_Color"},
+	{ "ColorMenuAction", NULL, "_Color",
+	  NULL, NULL, NULL},
 
-	{ "FiltersMenuAction", NULL, "_Filters"},
+	{ "FiltersMenuAction", NULL, "_Filters",
+	  NULL, NULL, NULL},
 	//Tools Menu
-	{ "ToolsMenuAction", NULL, "_Tools"},
+	{ "ToolsMenuAction", NULL, "_Tools",
+	  NULL, NULL, NULL},
 
 	//Help Menu
-	{ "HelpMenuAction", NULL, "_Help"},
+	{ "HelpMenuAction", NULL, "_Help",
+	  NULL, NULL, NULL},
 	{ "AboutAction", GTK_STOCK_ABOUT,
 	  "About", NULL,
 	  "Information about program",
@@ -138,7 +144,9 @@ ui_window_init(ui_widget_t** widget)
 		ui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	gtk_window_set_title(GTK_WINDOW(ui_window), ui_widget->title);
-	gtk_window_set_default_size(GTK_WINDOW(ui_window), ui_widget->width, ui_widget->height);
+	gtk_window_set_default_size(GTK_WINDOW(ui_window),
+				    ui_widget->width,
+				    ui_widget->height);
 
 	g_signal_connect(ui_window, "delete-event", G_CALLBACK(ui_window_delete_event_cb), NULL);
 	
@@ -311,13 +319,14 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 	GtkFileFilter* ui_filefilter;
 
 	ui_filedialog = gtk_file_chooser_dialog_new("Open...",
-						    ui_window,
+						    GTK_WINDOW(ui_window),
 						    GTK_FILE_CHOOSER_ACTION_OPEN,
-						    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-						    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+						    GTK_STOCK_CANCEL,
+						    GTK_RESPONSE_CANCEL,
+						    GTK_STOCK_OPEN,
+						    GTK_RESPONSE_ACCEPT,
 						    NULL);
 
-	sys_state_t* state = sys_get_state();
 
 	GList *formats = io_get_load_handler_descriptions();
 	GList *iter;
@@ -339,43 +348,24 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 	}
 	g_list_free_full(formats, free);
 
-	if( gtk_dialog_run(ui_filedialog) == GTK_RESPONSE_ACCEPT) {
+	if( gtk_dialog_run(GTK_DIALOG(ui_filedialog)) == GTK_RESPONSE_ACCEPT) {
 		gchar* filename;
 		filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(ui_filedialog));
 
-		//reusing iterator from previous loop
-		iter = g_list_first(state->plugin_handles);
-		while(iter != NULL) {
-			plugin_handle_t* handle = iter->data;
-			plugin_t* plugin = (plugin_t*) (handle->plugin);
-
-			if(plugin->type == PLUGIN_FILEIO) {
-				plugin_fileio_t* fplugin = (plugin_fileio_t*) plugin;
-				size_t i;
-				for(i=0; i<fplugin->n_load_handlers; i++) {
-					if(fplugin->load_handlers[i]->can_open(filename)){
-						//TODO: Acutal file loading here
-						image_data_t *data;
-						fplugin->load_handlers[i]->function(filename, &data);
-						device_buffer_create_from_data(sys_get_state()->context,
-									       DEVICE_BUFFER_SOFTWARE, data,
-									       sys_get_state()->source);
-						free(data->data);
-						int j;
-						for(j=0; j<2; j++) {
-							device_buffer_create(sys_get_state()->context, DEVICE_BUFFER_HARDWARE, data->width, data->height, data->channels, &sys_get_state()->buffer[i]);
-						}
-						device_buffer_copy(sys_get_state()->source, sys_get_active_buffer());
-						g_signal_emit(ui_window, ui_new_image_signal, 0);
-						goto done;
-					}
-				}
-			}
+		if( io_load_image(filename) != CLIT_OK) {
+			GtkWidget *err_dialog;
+			err_dialog = gtk_message_dialog_new(ui_filedialog,
+							    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+							    GTK_MESSAGE_ERROR,
+							    GTK_BUTTONS_OK,
+							    "Cannot open file specified");
+			gtk_dialog_run(err_dialog);
+			gtk_widget_destroy(err_dialog);
 		}
+		g_free(filename);
 	}
-done:
+	g_signal_emit(ui_window, ui_new_image_signal, 0);
 	gtk_widget_destroy(ui_filedialog);
-	fflush(stdout);
 }
 
 void ui_save_file_cb(GtkWidget* widget, gpointer data)
