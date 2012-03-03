@@ -1,6 +1,8 @@
 #ifndef __CLIT_NODES_CURVES_H
 #define __CLIT_NODES_CURVES_H
 
+#include <device.h>
+
 void
 curves_get_neutral_lut8(int *lut);
 
@@ -17,5 +19,8 @@ curves_get_contrast_lut8(int contrast, int *lut);
 
 void
 curves_get_gamma_lut8(float exponent, int *lut);
+
+void
+curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst);
 
 #endif

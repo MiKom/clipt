@@ -92,7 +92,7 @@ render_context_draw(Window xwindow, GLXContext* ctx)
 	glClear(GL_COLOR_BUFFER_BIT);
         glDrawBuffer(GL_BACK);
 
-        buffer = sys_get_active_buffer();
+	buffer = sys_get_draw_buffer();
         if(buffer->storage == DEVICE_BUFFER_HARDWARE) {
                 device_buffer_getprop(buffer, &buffer_w, &buffer_h, NULL);
                 pos_x = attr.width - buffer_w;

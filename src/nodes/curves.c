@@ -51,3 +51,9 @@ curves_get_gamma_lut8(float exponent, int *lut)
 	}
 }
 
+void
+curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst)
+{
+
+}
+

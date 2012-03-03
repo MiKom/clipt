@@ -39,8 +39,12 @@ sys_config_t* sys_get_config(void);
 
 struct sys_state_s
 {
+	//Original image
 	device_buffer_t* source;
-	device_buffer_t* buffer;
+	//Previous commited image,
+	device_buffer_t* previous;
+	device_buffer_t* current;
+	device_buffer_t* draw;
 	device_context_t* context;
 	GList* plugin_handles;
 
@@ -48,9 +52,28 @@ struct sys_state_s
 };
 typedef struct sys_state_s sys_state_t;
 
-sys_state_t* sys_get_state(void);
+sys_state_t*
+sys_get_state(void);
 
-device_buffer_t* sys_get_active_buffer(void);
-device_buffer_t* sys_swap_buffers(void);
+device_buffer_t*
+sys_get_source_buffer(void);
+
+device_buffer_t*
+sys_get_current_buffer(void);
+
+device_buffer_t*
+sys_get_previous_buffer(void);
+
+device_buffer_t*
+sys_get_draw_buffer(void);
+
+/**
+  Saves buffer as commited buffer after copying current
+  buffer to prev_buffer. It may be a current draw buffer.
+
+  \param buffer a buffer to be saved as current
+*/
+sys_result_t*
+sys_commit_buffer(device_buffer_t *buffer);
 
 #endif
