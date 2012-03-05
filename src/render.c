@@ -105,7 +105,8 @@ render_context_draw(Window xwindow, GLXContext* ctx)
                 device_buffer_draw(buffer);
         }
 
-        glFinish();
+	glFinish();
+	glFlush();
 	glXSwapBuffers(disp, xwindow);
 
         return CLIT_OK;

@@ -33,7 +33,7 @@ device_read_source(const char* filename, char** buffer)
                         *buffer = NULL;
                 }
                 else
-                        *buffer[len] = 0;
+			(*buffer)[len] = 0;
                 fclose(file);
         }
         
@@ -140,8 +140,7 @@ device_result_t device_kernel_create(device_context_t* context, const char* file
                 return DEVICE_EUNAVAIL;
 
         kernel->program = clCreateProgramWithSource(context->context, 1,
-                                                    (const char**)&source, NULL, &cl_error);
-        free(source);
+						    &source, NULL, &cl_error);
         if(cl_error != CL_SUCCESS)
                 return DEVICE_ERROR;
 
@@ -157,7 +156,8 @@ device_result_t device_kernel_create(device_context_t* context, const char* file
                 clReleaseProgram(kernel->program);
                 return DEVICE_ERROR;
         }
-        
+	free(source);
+
         return DEVICE_OK;
 }
 

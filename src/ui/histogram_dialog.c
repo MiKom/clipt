@@ -27,7 +27,7 @@ ui_histogram_combobox_changed_cb (GtkWidget* widget, gpointer data);
 static char* ui_def =
 "<ui>"
 "  <menubar name='MainMenu'>"
-"    <menu name='ColorMenu' action='ColorMenuAction'>"
+"    <menu name='ColourMenu' action='ColourMenuAction'>"
 "      <menu name='HistogramMenu' action='HistogramMenuAction'>"
 "        <menuitem action='ShowHistogramAction'/>"
 "        <menuitem action='EqualizeAction'/>"

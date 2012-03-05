@@ -1,6 +1,31 @@
 #include <config.h>
 #include <math.h>
+#include <device.h>
+#include <stdio.h>
+#include <string.h>
 #include <nodes/curves.h>
+
+#define BLOCK_SIZE 512
+
+static char lut_filename[] = "lut.cl";
+static device_kernel_t lut_kernel;
+
+void
+curves_init()
+{
+	char *progdir = sys_get_config()->dir_clprogs;
+	size_t path_len = strlen(progdir) + strlen(lut_filename) + 1;
+	char *progpath = malloc(sizeof(char) * path_len);
+	sprintf(progpath, "%s%s",progdir, lut_filename);
+	g_debug("curves_init: %s", progpath);
+	device_result_t err = device_kernel_create(sys_get_state()->context,
+						   progpath, &lut_kernel);
+	if( err != DEVICE_OK ) {
+		g_error("Error while creating curves kernel");
+	}
+
+	free(progpath);
+}
 
 void
 curves_get_neutral_lut8(int *lut)
@@ -54,6 +79,53 @@ curves_get_gamma_lut8(float exponent, int *lut)
 void
 curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst)
 {
+	cl_uint i = 0;
+	int len = src->rbuf.width * src->rbuf.height;
+	clSetKernelArg(lut_kernel.kernel, i++,
+		       sizeof(src->cl_object), (void*) &src->cl_object);
+	clSetKernelArg(lut_kernel.kernel, i++,
+		       sizeof(dst->cl_object), (void*) &dst->cl_object);
+	clSetKernelArg(lut_kernel.kernel, i++,
+		       sizeof(len), (void*) &len);
 
+	size_t global_work_size;
+	int r = len % BLOCK_SIZE;
+	if( r == 0 ) {
+		global_work_size = len;
+	} else {
+		global_work_size = len + BLOCK_SIZE - r;
+	}
+
+	size_t local_work_size = BLOCK_SIZE;
+
+	cl_event event;
+	cl_command_queue queue = sys_get_state()->context->queue;
+
+	cl_int err;
+	cl_mem buffers[2];
+	buffers[0] = src->cl_object;
+	buffers[1] = dst->cl_object;
+
+	err = clEnqueueAcquireGLObjects(queue, 2, buffers, 0, NULL, &event);
+	if(err == CL_SUCCESS) {
+		clWaitForEvents(1, &event);
+	} else {
+		g_error("curves_apply_lut8: Couldn't aquire CL objects");
+	}
+
+	err = clEnqueueNDRangeKernel(queue, lut_kernel.kernel, 1, 0,
+					    &global_work_size, &local_work_size,
+					    0, 0, &event);
+	if( err == CL_SUCCESS ) {
+		clWaitForEvents(1, &event);
+	} else {
+		g_warning("curves_apply_lut8: Couldn't launch curves kernel");
+	}
+
+	err = clEnqueueReleaseGLObjects(queue, 2 , buffers, 0, NULL, &event);
+	if( err == CL_SUCCESS ) {
+		clWaitForEvents(1, &event);
+	} else {
+		g_warning("curves_apply_lut8: Couldn't release CL objects");
+	}
 }
-

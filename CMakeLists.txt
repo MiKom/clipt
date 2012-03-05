@@ -25,6 +25,7 @@ INCLUDE_DIRECTORIES( ${OPENCL_INCLUDE_DIRS} )
 
 ADD_SUBDIRECTORY(plugins)
 
+FILE(COPY clprogs DESTINATION ${PROJECT_BINARY_DIR})
 SET( clit_SOURCES
         src/main.c
         src/core.c
@@ -43,6 +44,10 @@ SET( clit_SOURCES
 
         src/nodes/histogram.c
         src/nodes/curves.c
+)
+
+SET( clit_CLPROGS
+	clprogs/lut.cl
 )
 
 SET( clit_HEADERS
@@ -68,5 +73,5 @@ SET( clit_HEADERS
 
 SET(COMMON_LIBRARIES m dl)
 
-ADD_EXECUTABLE(clit ${clit_SOURCES} ${clit_HEADERS})
+ADD_EXECUTABLE(clit ${clit_SOURCES} ${clit_HEADERS} ${clit_CLPROGS})
 TARGET_LINK_LIBRARIES(clit ${COMMON_LIBRARIES} ${GTK3_LIBRARIES} ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} ${OPENCL_LIBRARIES} )

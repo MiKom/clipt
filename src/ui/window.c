@@ -59,9 +59,7 @@ char *ui_definition =
 "      <menuitem action='UndoAction'/>"
 "      <menuitem action='ResetAction' />"
 "    </menu>"
-"    <menu name='ColorMenu' action='ColorMenuAction'>"
-"      <menu name='HistogramMenu' action='HistogramMenuAction'>"
-"      </menu>"
+"    <menu name='ColourMenu' action='ColourMenuAction'>"
 "      <placeholder />"
 "    </menu>"
 "    <menu name='ToolsMenu' action='ToolsMenuAction'>"
@@ -112,7 +110,7 @@ static GtkActionEntry entries[] = {
 	  "Reset all changes made to image",
 	  G_CALLBACK(ui_reset_cb)},
 
-	{ "ColorMenuAction", NULL, "_Color",
+	{ "ColourMenuAction", NULL, "_Colour",
 	  NULL, NULL, NULL},
 
 	{ "FiltersMenuAction", NULL, "_Filters",

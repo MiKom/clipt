@@ -22,7 +22,7 @@ ui_curves_drawing_area_redraw_cb(GtkWidget* widget, cairo_t *cr, gpointer data);
 static char* ui_def =
 "<ui>"
 "  <menubar name='MainMenu'>"
-"    <menu name='ColorMenu' action='ColorMenuAction'>"
+"    <menu name='ColourMenu' action='ColourMenuAction'>"
 "      <menuitem action='CurvesAction' />"
 "    </menu>"
 "  </menubar>"
@@ -68,6 +68,8 @@ ui_curves_show_dialog(GtkWidget* widget, gpointer data)
 	GtkWidget *label;
 
 	GtkWindow* parent = (GtkWindow*) data;
+
+	curves_init();
 
 	curves_get_neutral_lut8(obj->disp_lut);
 
@@ -123,6 +125,7 @@ ui_curves_show_dialog(GtkWidget* widget, gpointer data)
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(GTK_WIDGET(dialog));
 
+
 	free(obj);
 }
 
@@ -143,6 +146,7 @@ ui_curves_scale_cb(GtkWidget* widget, gpointer data)
 		curves_get_contrast_lut8((int) value, obj->disp_lut);
 	}
 
+	curves_apply_lut8(sys_get_current_buffer(), sys_get_draw_buffer());
 	gtk_widget_queue_draw(obj->drawing_area);
 
 	ui_window_force_redraw();

@@ -1,7 +1,9 @@
 #ifndef __CLIT_NODES_CURVES_H
 #define __CLIT_NODES_CURVES_H
 
-#include <device.h>
+
+void
+curves_init();
 
 void
 curves_get_neutral_lut8(int *lut);
