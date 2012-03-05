@@ -374,8 +374,8 @@ void ui_save_file_cb(GtkWidget* widget, gpointer data)
 
 void ui_undo_cb(GtkWidget* widget, gpointer data)
 {
-	printf("Undo action\n");
-	fflush(stdout);
+	sys_undo();
+	g_signal_emit(ui_window, ui_new_image_signal, 0);
 }
 void ui_reset_cb(GtkWidget* widget, gpointer data)
 {

@@ -40,6 +40,7 @@ sys_config_t* sys_get_config(void)
 	return &config;
 }
 
+//sys buffers state
 device_buffer_t*
 sys_get_source_buffer(void)
 {
@@ -68,9 +69,68 @@ sys_get_draw_buffer(void)
 	return state->draw;
 }
 
-sys_result_t*
+sys_result_t
 sys_commit_buffer(device_buffer_t *buffer)
 {
-	device_buffer_copy(sys_get_current_buffer(), sys_get_current_buffer());
-	device_buffer_copy(buffer, sys_get_current_buffer());
+	device_result_t err;
+	err =  device_buffer_copy(sys_get_current_buffer(), sys_get_previous_buffer());
+	err |= device_buffer_copy(buffer, sys_get_current_buffer());
+
+	if( err != DEVICE_OK ) {
+		return CLIT_EINVALID;
+	} else {
+		return CLIT_OK;
+	}
+}
+
+sys_result_t
+sys_clear_buffers()
+{
+	device_buffer_t *current = sys_get_current_buffer();
+	if( current->storage != DEVICE_BUFFER_INVALID ) {
+		device_buffer_destroy(sys_get_state()->context, current);
+	}
+
+	device_buffer_t *draw = sys_get_draw_buffer();
+	if( draw->storage != DEVICE_BUFFER_INVALID ) {
+		device_buffer_destroy(sys_get_state()->context, draw);
+	}
+
+	device_buffer_t *previous = sys_get_previous_buffer();
+	if( previous->storage != DEVICE_BUFFER_INVALID ) {
+		device_buffer_destroy(sys_get_state()->context, previous);
+	}
+
+	device_buffer_t *source = sys_get_source_buffer();
+	if( source->storage != DEVICE_BUFFER_INVALID ) {
+		device_buffer_destroy(sys_get_state()->context, source);
+	}
+	return CLIT_OK;
+}
+
+sys_result_t
+sys_undo()
+{
+	device_result_t err;
+	err = device_buffer_copy(sys_get_previous_buffer(), sys_get_current_buffer());
+	err |= device_buffer_copy(sys_get_current_buffer(), sys_get_draw_buffer());
+
+	if( err != DEVICE_OK ) {
+		return CLIT_EINVALID;
+	} else {
+		return CLIT_OK;
+	}
+}
+
+sys_result_t
+sys_draw_current_buffer()
+{
+	device_result_t err;
+	err = device_buffer_copy(sys_get_current_buffer(), sys_get_draw_buffer());
+
+	if( err != DEVICE_OK ) {
+		return CLIT_EINVALID;
+	} else {
+		return CLIT_OK;
+	}
 }

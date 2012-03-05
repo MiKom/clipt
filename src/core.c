@@ -103,6 +103,8 @@ int core_main(void)
 		return CLIT_ERROR;
 
 	gtk_main();
+	//TODO: should it be here?
+	sys_clear_buffers();
 	core_ui_stop(ui);
 	return CLIT_OK;
 }

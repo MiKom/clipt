@@ -73,7 +73,30 @@ sys_get_draw_buffer(void);
 
   \param buffer a buffer to be saved as current
 */
-sys_result_t*
+sys_result_t
 sys_commit_buffer(device_buffer_t *buffer);
+
+/**
+  Clears all system state buffers and makes them invalid:
+   * source buffer
+   * previous buffer
+   * draw buffer
+*/
+sys_result_t
+sys_clear_buffers();
+
+/**
+  Copies previous buffer to current buffer and draw buffer. Basically
+  it's an undo action
+*/
+sys_result_t
+sys_undo();
+
+/**
+  Copies current buffer to draw buffer. Use it when you finished working with
+  e.g. previews and user canceled action. Will restore last commited state.
+*/
+sys_result_t
+sys_draw_current_buffer();
 
 #endif

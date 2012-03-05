@@ -77,15 +77,28 @@ curves_get_gamma_lut8(float exponent, int *lut)
 }
 
 void
-curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst)
+curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst, int *lut)
 {
 	cl_uint i = 0;
+	cl_event event;
+	cl_command_queue queue = sys_get_state()->context->queue;
+	cl_int err;
+	cl_mem lut_d;
 	int len = src->rbuf.width * src->rbuf.height;
-	clSetKernelArg(lut_kernel.kernel, i++,
+
+	lut_d = clCreateBuffer(sys_get_state()->context->context,
+			       CL_MEM_READ_ONLY, sizeof(int)*256,
+			       NULL, &err);
+	clEnqueueWriteBuffer(sys_get_state()->context->queue, lut_d, CL_TRUE,
+			     0, sizeof(int) * 256, lut, 0, NULL, NULL);
+
+	err = clSetKernelArg(lut_kernel.kernel, i++,
 		       sizeof(src->cl_object), (void*) &src->cl_object);
-	clSetKernelArg(lut_kernel.kernel, i++,
+	err = clSetKernelArg(lut_kernel.kernel, i++,
 		       sizeof(dst->cl_object), (void*) &dst->cl_object);
-	clSetKernelArg(lut_kernel.kernel, i++,
+	err = clSetKernelArg(lut_kernel.kernel, i++,
+		       sizeof(lut_d), (void*) &lut_d);
+	err = clSetKernelArg(lut_kernel.kernel, i++,
 		       sizeof(len), (void*) &len);
 
 	size_t global_work_size;
@@ -98,10 +111,6 @@ curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst)
 
 	size_t local_work_size = BLOCK_SIZE;
 
-	cl_event event;
-	cl_command_queue queue = sys_get_state()->context->queue;
-
-	cl_int err;
 	cl_mem buffers[2];
 	buffers[0] = src->cl_object;
 	buffers[1] = dst->cl_object;

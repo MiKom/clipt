@@ -69,6 +69,8 @@ ui_curves_show_dialog(GtkWidget* widget, gpointer data)
 
 	GtkWindow* parent = (GtkWindow*) data;
 
+	gint response;
+
 	curves_init();
 
 	curves_get_neutral_lut8(obj->disp_lut);
@@ -122,9 +124,15 @@ ui_curves_show_dialog(GtkWidget* widget, gpointer data)
 	obj->scale = scale;
 
 	gtk_widget_show_all(GTK_WIDGET(box));
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(GTK_WIDGET(dialog));
+	response = gtk_dialog_run(GTK_DIALOG(dialog));
 
+	if( response == GTK_RESPONSE_APPLY ) {
+		sys_commit_buffer(sys_get_draw_buffer());
+	} else if ( response == GTK_RESPONSE_CANCEL ) {
+		sys_draw_current_buffer();
+	}
+	gtk_widget_destroy(GTK_WIDGET(dialog));
+	ui_window_force_redraw();
 
 	free(obj);
 }
@@ -146,7 +154,7 @@ ui_curves_scale_cb(GtkWidget* widget, gpointer data)
 		curves_get_contrast_lut8((int) value, obj->disp_lut);
 	}
 
-	curves_apply_lut8(sys_get_current_buffer(), sys_get_draw_buffer());
+	curves_apply_lut8(sys_get_current_buffer(), sys_get_draw_buffer(), obj->disp_lut);
 	gtk_widget_queue_draw(obj->drawing_area);
 
 	ui_window_force_redraw();

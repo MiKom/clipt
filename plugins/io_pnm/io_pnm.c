@@ -17,41 +17,50 @@ sys_result_t load_pnm(const char *path, image_data_t **image);
 
 int can_open(const char* path);
 
+static char *filters[] = {
+	"*.ppm", "*.pgm", "*.pbm", "*.pnm"
+};
+static size_t nfilters = G_N_ELEMENTS(filters);
+
+static plugin_load_handler_t pnm_handler;
+
+static plugin_load_handler_t *handlers;
+
+static plugin_t base_desc =
+{
+	"PNM extension plugin",
+	"Milosz Kosobucki",
+	"0.1",
+	PLUGIN_FILEIO,
+	pnm_plugin_load,
+	pnm_plugin_unload,
+};
+
+static plugin_fileio_t io_plugin_desc;
+
 plugin_t* clit_plugin_info()
 {
+	//TODO: clean up this shit
 	plugin_fileio_t *ret = malloc(sizeof(plugin_fileio_t));
 
-
-	ret->base.name = "PNM extension plugin";
-	ret->base.author = "Milosz Kosobucki";
-	ret->base.version = "0.1";
-
-	ret->base.type = PLUGIN_FILEIO;
-	ret->base.plugin_load = pnm_plugin_load;
-	ret->base.plugin_unload = pnm_plugin_unload;
-
+	ret->base = base_desc;
 	ret->n_load_handlers = 1;
 	ret->load_handlers = malloc(sizeof(plugin_load_handler_t *) * 1);
 
-	plugin_load_handler_t *handler = malloc(sizeof(plugin_load_handler_t));
+	pnm_handler.nfilters = nfilters;
+	pnm_handler.filters = filters;
+	pnm_handler.desc = "Portable Anymap (.ppm, .pgm, .pbm, .pnm)";
+	pnm_handler.function = load_pnm;
+	pnm_handler.can_open = can_open;
 
-	handler->nfilters = 4;
-	handler->filters = malloc(sizeof(char*) * handler->nfilters);
-	handler->filters[0] = "*.ppm",
-	handler->filters[1] = "*.pgm",
-	handler->filters[2] = "*.pbm",
-	handler->filters[3] = "*.pnm",
-
-	handler->desc = "Portable Anymap (.ppm, .pgm, .pbm, .pnm)";
-	handler->function = load_pnm;
-	handler->can_open = can_open;
-
-	ret->load_handlers[0] = handler;
+	ret->load_handlers[0] = &pnm_handler;
 	return (plugin_t*) ret;
 }
 
 sys_result_t pnm_plugin_load()
 {
+	io_plugin_desc.base = base_desc;
+
 	return CLIT_OK;
 }
 
