@@ -28,4 +28,14 @@ curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst, int *lut);
 void
 curves_apply_gamma(device_buffer_t *src, device_buffer_t *dst, float exponent);
 
+/**
+  Read data from src buffer, change brightness according to value and write to
+  destination buffer.
+
+  \param value [-255...255] 255 makes everything white and -255 makes everything
+  black
+*/
+void
+curves_apply_brightness(device_buffer_t *src, device_buffer_t *dst, int value);
+
 #endif

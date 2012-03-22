@@ -49,6 +49,7 @@ SET( clit_SOURCES
 SET( clit_CLPROGS
 	clprogs/lut.cl
 	clprogs/gamma.cl
+	clprogs/brightness.cl
 )
 
 SET( clit_HEADERS
