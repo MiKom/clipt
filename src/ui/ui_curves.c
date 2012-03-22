@@ -148,13 +148,14 @@ ui_curves_scale_cb(GtkWidget* widget, gpointer data)
 				GTK_COMBO_BOX(obj->combobox));
 	if( g_strcmp0(box_id,"brightness") == 0) {
 		curves_get_brightness_lut8((int) value, obj->disp_lut);
+		curves_apply_lut8(sys_get_current_buffer(), sys_get_draw_buffer(), obj->disp_lut);
 	} else if( g_strcmp0(box_id, "gamma") == 0) {
-		curves_get_gamma_lut8(value, obj->disp_lut);
+		curves_apply_gamma(sys_get_current_buffer(), sys_get_draw_buffer(), value);
 	} else if( g_strcmp0(box_id, "contrast") == 0 ) {
 		curves_get_contrast_lut8((int) value, obj->disp_lut);
+		curves_apply_lut8(sys_get_current_buffer(), sys_get_draw_buffer(), obj->disp_lut);
 	}
 
-	curves_apply_lut8(sys_get_current_buffer(), sys_get_draw_buffer(), obj->disp_lut);
 	gtk_widget_queue_draw(obj->drawing_area);
 
 	ui_window_force_redraw();
