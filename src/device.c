@@ -130,7 +130,9 @@ device_result_t device_destroy(device_context_t* context)
 	return DEVICE_OK;
 }
 
-device_result_t device_kernel_create(device_context_t* context, const char* filename,
+device_result_t device_kernel_create(device_context_t* context,
+				     const char* filename,
+				     const char* func_name,
                                      device_kernel_t* kernel)
 {
         char* source;
@@ -151,7 +153,7 @@ device_result_t device_kernel_create(device_context_t* context, const char* file
                 clReleaseProgram(kernel->program);
                 return DEVICE_ERROR;
         }
-        kernel->kernel = clCreateKernel(kernel->program, "main", &cl_error);
+	kernel->kernel = clCreateKernel(kernel->program, func_name, &cl_error);
         if(cl_error != CL_SUCCESS) {
                 clReleaseProgram(kernel->program);
                 return DEVICE_ERROR;

@@ -26,7 +26,8 @@ curves_init()
 	sprintf(progpath, "%s/%s",progdir, lut_filename);
 	g_debug("curves_init: %s", progpath);
 	device_result_t err = device_kernel_create(sys_get_state()->context,
-						   progpath, &lut_kernel);
+						   progpath, "main",
+						   &lut_kernel);
 	free(progpath);
 
 	if( err != DEVICE_OK ) {
@@ -37,6 +38,7 @@ curves_init()
 	sprintf(progpath, "%s/%s", progdir, gamma_filename);
 	g_debug("curves_init: %s", progpath);
 	err = device_kernel_create(sys_get_state()->context, progpath,
+				   "main",
 				   &gamma_kernel);
 
 	if( err != DEVICE_OK ) {
@@ -47,6 +49,7 @@ curves_init()
 	sprintf(progpath, "%s/%s", progdir, brightness_filename);
 	g_debug("curves_init: %s", progpath);
 	err = device_kernel_create(sys_get_state()->context, progpath,
+				   "main",
 				   &brightness_kernel);
 
 	if( err != DEVICE_OK ) {

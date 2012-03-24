@@ -45,8 +45,12 @@ struct device_buffer_s {
 device_result_t device_create(device_context_t* context);
 device_result_t device_destroy(device_context_t* context);
 
+/**
+  Create new kernel from file given in filename.
+  \param func_name name of the entry function of the kernel
+*/
 device_result_t device_kernel_create(device_context_t* context, const char* filename,
-                                     device_kernel_t* kernel);
+				     const char *func_name, device_kernel_t *kernel);
 device_result_t device_kernel_destroy(device_kernel_t* kernel);
 
 
