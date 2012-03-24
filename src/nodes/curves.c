@@ -19,6 +19,7 @@ static device_kernel_t brightness_kernel;
 void
 curves_init()
 {
+	//TODO: Move to some common function
 	char *progdir = sys_get_config()->dir_clprogs;
 
 	size_t path_len = strlen(progdir) + strlen(lut_filename) + 1;

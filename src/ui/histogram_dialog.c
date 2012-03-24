@@ -2,6 +2,7 @@
 #include <system.h>
 #include <ui/histogram_dialog.h>
 #include <ui/window.h>
+#include "nodes/histogram.h"
 
 static void
 ui_show_histogram_action_cb(GtkWidget* widget, gpointer data);
@@ -100,7 +101,7 @@ static void ui_show_histogram_action_cb(GtkWidget* widget, gpointer data)
 
 	//setting up combobox
 	combobox = gtk_combo_box_text_new();
-	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "lum", "Luminance");
+	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "value", "Value");
 	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "red", "Red channel");
 	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "green", "Green channel");
 	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combobox), "blue", "Blue channel");
@@ -118,7 +119,7 @@ static void ui_show_histogram_action_cb(GtkWidget* widget, gpointer data)
 	g_signal_connect(GTK_WIDGET(drawing_area), "draw",
 			 G_CALLBACK(ui_histogram_surface_draw_cb), hist_obj);
 	hist_obj->drawing_area = drawing_area;
-
+	histogram_init();
 	gtk_widget_show_all(window);
 
 }
@@ -133,7 +134,6 @@ static void
 ui_histogram_surface_draw_cb (GtkWidget* widget, cairo_t* cr, gpointer data)
 {
 	ui_histogram_t *obj = (ui_histogram_t*) data;
-
 //FOR TESTING
 	unsigned int histogram[256];
 	srand(1);
@@ -144,21 +144,26 @@ ui_histogram_surface_draw_cb (GtkWidget* widget, cairo_t* cr, gpointer data)
 	histogram[0] = histogram[255] = 255;
 //END
 
+	const gchar* text = gtk_combo_box_get_active_id(GTK_COMBO_BOX(obj->combobox));
+	if(g_strcmp0(text, "value") == 0) {
+		histogram_calculate_256(sys_get_draw_buffer(), HISTOGRAM_VALUE, histogram);
+		cairo_set_source_rgb (cr, 0, 0, 0);
+	} else if(g_strcmp0(text, "red") == 0) {
+		histogram_calculate_256(sys_get_draw_buffer(), HISTOGRAM_RED, histogram);
+		cairo_set_source_rgb (cr, 0.8, 0, 0);
+	} else if(g_strcmp0(text, "green") == 0) {
+		histogram_calculate_256(sys_get_draw_buffer(), HISTOGRAM_GREEN, histogram);
+		cairo_set_source_rgb (cr, 0, 0.8, 0);
+	} else if(g_strcmp0(text, "blue") == 0) {
+		histogram_calculate_256(sys_get_draw_buffer(), HISTOGRAM_BLUE, histogram);
+		cairo_set_source_rgb (cr, 0, 0, 0.8);
+	}
+
 	unsigned int maxval = histogram[0];
 	for(i=1; i<256; i++) {
 		if(histogram[i] > maxval) {
 			maxval = histogram[i];
 		}
-	}
-	gchar* text = gtk_combo_box_get_active_id(GTK_COMBO_BOX_TEXT(obj->combobox));
-	if(g_strcmp0(text, "lum") == 0) {
-		cairo_set_source_rgb (cr, 0, 0, 0);
-	} else if(g_strcmp0(text, "red") == 0) {
-		cairo_set_source_rgb (cr, 0.8, 0, 0);
-	} else if(g_strcmp0(text, "green") == 0) {
-		cairo_set_source_rgb (cr, 0, 0.8, 0);
-	} else if(g_strcmp0(text, "blue") == 0) {
-		cairo_set_source_rgb (cr, 0, 0, 0.8);
 	}
 
 	for(i=0; i<256; i++) {
