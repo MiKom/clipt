@@ -4,6 +4,8 @@
 #define WARP_COUNT 6
 #define HISTOGRAM_WORKGROUP_SIZE (WARP_COUNT * WARP_SIZE)
 
+#define MERGE_WORKGROUP_SIZE 256
+
 
 #define COUNT_MASK ((1U << (32 - LOG2_WARP_SIZE)) - 1U)
 #define TAG_MASK (~(COUNT_MASK))
@@ -22,8 +24,8 @@ void add_data256(
 	} while(l_warp_hist[data] != count);
 }
 
-__kernel void __attribute__((reqd_work_group_size(HISTOGRAM_WORKGROUP_SIZE, 1, 1)))
-histogram256 (
+__kernel __attribute__((reqd_work_group_size(HISTOGRAM_WORKGROUP_SIZE, 1, 1)))
+void histogram256 (
 	__global const float *src,
 	__global uint *partial_histograms,
 	int offset,
@@ -43,11 +45,11 @@ histogram256 (
 	for(uint pos = get_global_id(0); pos < size; pos += get_global_size(0)) {
 		uint data;
 		if(offset == -1) { //histogram of value, average channels
-			data = (uint)(
-			       (src[pos*3] + src[pos*3+1] + src[pos*3+2]) / 3.0f
+			data = (uint) round(
+			       (src[pos*3] + src[pos*3+1] + src[pos*3+2]) * 0.33333f
 			       * 255.0f);
 		} else {
-			data = (uint)(src[pos * 3 + offset] * 255.0f);
+			data = (uint) round(src[pos * 3 + offset] * 255.0f);
 		}
 		add_data256(l_warp_hist, data, tag);
 	}
@@ -59,4 +61,15 @@ histogram256 (
 		}
 		partial_histograms[get_group_id(0) * BIN_COUNT + i] = sum;
 	}
+}
+
+__kernel __attribute__((reqd_work_group_size(MERGE_WORKGROUP_SIZE, 1, 1)))
+void merge_histogram256(
+	__global uint *d_histogram,
+	__global uint *d_partial_histograms,
+	uint histogram_count)
+{
+	__local uint l_data[MERGE_WORKGROUP_SIZE];
+	uint sum = 0;
+
 }
