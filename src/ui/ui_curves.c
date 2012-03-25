@@ -121,6 +121,7 @@ ui_curves_show_dialog(GtkWidget* widget, gpointer data)
 	g_signal_connect(G_OBJECT(scale), "value-changed",
 			 G_CALLBACK(ui_curves_scale_cb), obj);
 	gtk_box_pack_start(GTK_BOX(box), scale, FALSE, FALSE, 5);
+	gtk_scale_add_mark(GTK_SCALE(scale), 0.0, GTK_POS_BOTTOM, NULL);
 	obj->scale = scale;
 
 	gtk_widget_show_all(GTK_WIDGET(box));
@@ -151,6 +152,7 @@ ui_curves_scale_cb(GtkWidget* widget, gpointer data)
 		//curves_apply_lut8(sys_get_current_buffer(), sys_get_draw_buffer(), obj->disp_lut);
 		curves_apply_brightness(sys_get_current_buffer(), sys_get_draw_buffer(), (int) value);
 	} else if( g_strcmp0(box_id, "gamma") == 0) {
+		curves_get_gamma_lut8(value, obj->disp_lut);
 		curves_apply_gamma(sys_get_current_buffer(), sys_get_draw_buffer(), value);
 	} else if( g_strcmp0(box_id, "contrast") == 0 ) {
 		curves_get_contrast_lut8((int) value, obj->disp_lut);
@@ -173,16 +175,19 @@ ui_curves_combobox_changed_cb(GtkWidget* widget, gpointer data)
 		gtk_range_set_range(GTK_RANGE(obj->scale), -255.0f, 255.0f);
 		gtk_range_set_increments(GTK_RANGE(obj->scale), 1.0f, 10.0f);
 		gtk_range_set_value(GTK_RANGE(obj->scale), 0.0f);
+		gtk_scale_add_mark(GTK_SCALE(obj->scale), 0.0, GTK_POS_BOTTOM,NULL);
 		gtk_scale_set_digits(GTK_SCALE(obj->scale), 0);
 	} else if( g_strcmp0(box_id, "gamma") == 0) {
 		gtk_range_set_range(GTK_RANGE(obj->scale), 0.01f, 10.0f);
 		gtk_range_set_increments(GTK_RANGE(obj->scale), 0.01f, 0.5f);
 		gtk_range_set_value(GTK_RANGE(obj->scale), 1.0f);
+		gtk_scale_add_mark(GTK_SCALE(obj->scale), 1.0, GTK_POS_BOTTOM,NULL);
 		gtk_scale_set_digits(GTK_SCALE(obj->scale), 2);
 	} else if( g_strcmp0(box_id, "contrast") == 0 ) {
 		gtk_range_set_range(GTK_RANGE(obj->scale), -255.0f, 255.0f);
 		gtk_range_set_increments(GTK_RANGE(obj->scale), 1.0f, 10.0f);
 		gtk_range_set_value(GTK_RANGE(obj->scale), 0.0f);
+		gtk_scale_add_mark(GTK_SCALE(obj->scale), 1.0, GTK_POS_BOTTOM,NULL);
 		gtk_scale_set_digits(GTK_SCALE(obj->scale), 0);
 	}
 

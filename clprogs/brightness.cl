@@ -1,4 +1,5 @@
-__kernel void
+__kernel __attribute__((vec_type_hint(float3)))
+void
 main (__global const float *src, __global float *dst, float factor, int size)
 {
 	int idx = get_global_id(0);

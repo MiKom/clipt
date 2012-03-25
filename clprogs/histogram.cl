@@ -2,9 +2,10 @@
 #define LOG2_WARP_SIZE 5
 #define BIN_COUNT 256
 #define WARP_COUNT 6
+#define HISTOGRAM_WORK_GROUP_SIZE (WARP_COUNT * WARP_SIZE)
 
 
-__kernel void
+__kernel void __attribute__((reqd_work_group_size(HISTOGRAM_WORK_GROUP_SIZE, 1, 1)))
 histogram256 (
 	__global const float *src,
 	__global uint *partial_histograms,

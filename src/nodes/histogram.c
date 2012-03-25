@@ -89,7 +89,7 @@ histogram_calculate_256(
 	if( err == CL_SUCCESS ) {
 		clWaitForEvents(1, &event);
 	} else {
-		g_warning("curves_apply_lut8: Couldn't launch curves kernel");
+		g_warning("curves_apply_lut8: Couldn't launch histogram kernel");
 	}
 
 	err = clEnqueueReleaseGLObjects(queue, 1 , &src->cl_object, 0, NULL, &event);
