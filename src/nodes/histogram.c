@@ -80,7 +80,7 @@ histogram_calculate_256(
 	if(err == CL_SUCCESS) {
 		clWaitForEvents(1, &event);
 	} else {
-		g_error("curves_apply_lut8: Couldn't aquire CL objects");
+		g_error("%s: Couldn't aquire CL objects",__func__);
 	}
 
 	err = clEnqueueNDRangeKernel(queue, histogram_kernel.kernel, 1, 0,
@@ -89,13 +89,26 @@ histogram_calculate_256(
 	if( err == CL_SUCCESS ) {
 		clWaitForEvents(1, &event);
 	} else {
-		g_warning("curves_apply_lut8: Couldn't launch histogram kernel");
+		g_warning("%s: Couldn't launch histogram kernel", __func__);
 	}
-
+#if 0
+	size_t data_size = PARTIAL_HISTOGRAM_COUNT * BIN_COUNT * sizeof(cl_uint);
+	cl_uint *histograms = malloc(data_size);
+	err = clEnqueueReadBuffer(queue, partial_histograms_d, CL_TRUE, 0, data_size,
+				  histograms, 0, NULL, NULL);
+	for(i=0; i<PARTIAL_HISTOGRAM_COUNT; i++) {
+		int j;
+		printf("[ ");
+		for(j = 0; j<BIN_COUNT; j++) {
+			printf("%u, ",histograms[256*i + j]);
+		}
+		printf("]\n");
+	}
+#endif
 	err = clEnqueueReleaseGLObjects(queue, 1 , &src->cl_object, 0, NULL, &event);
 	if( err == CL_SUCCESS ) {
 		clWaitForEvents(1, &event);
 	} else {
-		g_warning("curves_apply_lut8: Couldn't release CL objects");
+		g_warning("%s: Couldn't release CL objects",__func__);
 	}
 }
