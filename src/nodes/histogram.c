@@ -175,7 +175,6 @@ histogram_equalize(
 	for(i=0; i<256; i++) {
 		histogram[i] = (unsigned int) ((double) histogram[i] / (double) histogram[255] * 255.0);
 	}
-	fflush(stdout);
 	curves_init();
 	curves_apply_lut8(src, dst, histogram);
 }
