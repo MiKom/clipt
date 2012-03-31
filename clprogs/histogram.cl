@@ -38,23 +38,23 @@ void histogram256 (
 	for(uint i = 0; i < (BIN_COUNT / WARP_SIZE); i++) {
 		l_hist[i * (WARP_COUNT * WARP_SIZE) + get_local_id(0)] = 0;
 	}
-	barrier(CLK_LOCAL_MEM_FENCE);
 
 	const uint tag = get_local_id(0) << (32 - LOG2_WARP_SIZE);
 
-
+	barrier(CLK_LOCAL_MEM_FENCE);
 	for(uint pos = get_global_id(0); pos < size; pos += get_global_size(0)) {
 		uint data;
 		if(offset == -1) { //histogram of value, average channels
 			data = (uint) round(
-			       (src[pos*3] + src[pos*3+1] + src[pos*3+2]) * 0.33333f
-			       * 255.0f);
+			       (src[pos*3] + src[pos*3+1] + src[pos*3+2])
+			       * 0.333333333f * 255.0f);
 		} else {
 			data = (uint) round(src[pos * 3 + offset] * 255.0f);
 		}
 		add_data256(l_warp_hist, data, tag);
 	}
 
+	barrier(CLK_LOCAL_MEM_FENCE);
 	for(uint i=get_local_id(0); i<BIN_COUNT; i+= HISTOGRAM_WORKGROUP_SIZE) {
 		uint sum = 0;
 		for(uint warp=0; warp<WARP_COUNT; warp++) {
@@ -72,18 +72,18 @@ void merge_histogram256(
 {
 	__local uint l_data[MERGE_WORKGROUP_SIZE];
 	uint sum = 0;
-	for(uint i = get_local_id(0); i<histogram_count; i++) {
+	for(uint i = get_local_id(0); i<histogram_count; i += MERGE_WORKGROUP_SIZE) {
 		sum += d_partial_histograms[get_group_id(0) + i * MERGE_WORKGROUP_SIZE];
 	}
 	l_data[get_local_id(0)] = sum;
 
+#pragma UNROLL
 	for(uint i = 1; i <= LOG2_MERGE_WORKGROUP_SIZE;  i++){
 		barrier(CLK_LOCAL_MEM_FENCE);
 		if(get_local_id(0) < (MERGE_WORKGROUP_SIZE >> i)) {
 			l_data[get_local_id(0)] += l_data[get_local_id(0) + (MERGE_WORKGROUP_SIZE >> i)];
 		}
 	}
-
 
 	if(get_local_id(0) == 0) {
 		d_histogram[get_group_id(0)] = l_data[0];

@@ -18,4 +18,12 @@ histogram_calculate_256(
 		histogram_type_t type,
 		unsigned int *hist);
 
+/**
+  Equalize histogram on all channels
+**/
+void
+histogram_equalize(
+		device_buffer_t *src,
+		device_buffer_t *dst);
+
 #endif

@@ -10,7 +10,7 @@
 #include <io.h>
 #include <ui/ui.h>
 #include <ui/window.h>
-#include <ui/histogram_dialog.h>
+#include <ui/ui_histogram.h>
 #include <ui/ui_curves.h>
 #include <ui/ui_convolutions.h>
 

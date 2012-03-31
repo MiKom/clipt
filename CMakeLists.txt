@@ -38,7 +38,7 @@ SET( clit_SOURCES
         
         src/ui/common.c
         src/ui/window.c
-        src/ui/histogram_dialog.c
+        src/ui/ui_histogram.c
         src/ui/ui_curves.c
 	src/ui/ui_convolutions.c
 
@@ -66,7 +66,7 @@ SET( clit_HEADERS
         
         include/ui/ui.h
         include/ui/window.h
-        include/ui/histogram_dialog.h
+        include/ui/ui_histogram.h
 	include/ui/ui_curves.h
 	include/ui/ui_convolutions.h
 

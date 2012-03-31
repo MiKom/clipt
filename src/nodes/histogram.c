@@ -3,7 +3,8 @@
 #include<device.h>
 #include<string.h>
 #include<stdio.h>
-#include<nodes/histogram.h>
+#include"nodes/histogram.h"
+#include"nodes/curves.h"
 
 static const unsigned int PARTIAL_HISTOGRAM_COUNT = 240;
 static const unsigned int BIN_COUNT = 256;
@@ -85,7 +86,7 @@ launch_histogram256_kernel(device_buffer_t *src, cl_int offset, cl_mem d_partial
 	cl_event event;
 	cl_command_queue queue = sys_get_state()->context->queue;
 	cl_int err;
-	int len = src->rbuf.width * src->rbuf.height;
+	cl_uint len = src->rbuf.width * src->rbuf.height;
 
 	cl_uint i = 0;
 	err = clSetKernelArg(histogram_kernel.kernel, i++,
@@ -153,5 +154,28 @@ launch_merge256_kernel(cl_mem d_partial, cl_mem d_final, unsigned int *hist)
 	} else {
 		g_warning("%s: Couldn't launch histogram merge kernel", __func__);
 	}
+}
+void
+histogram_equalize(
+		device_buffer_t *src,
+		device_buffer_t *dst)
+{
+	int i;
+	unsigned int maxval;
+	unsigned int histogram[256];
 
+	histogram_calculate_256(src, HISTOGRAM_VALUE, histogram);
+
+	//calculating cumulative histogram
+	maxval = histogram[0];
+	for(i=1; i<256; i++) {
+		histogram[i] += histogram[i-1];
+	}
+	//normalizing lut to [0..255]
+	for(i=0; i<256; i++) {
+		histogram[i] = (unsigned int) ((double) histogram[i] / (double) histogram[255] * 255.0);
+	}
+	fflush(stdout);
+	curves_init();
+	curves_apply_lut8(src, dst, histogram);
 }
