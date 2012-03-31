@@ -126,23 +126,16 @@ static void ui_show_histogram_action_cb(GtkWidget* widget, gpointer data)
 
 static void ui_histogram_redraw_cb(GtkWidget* widget, gpointer data)
 {
-        ui_histogram_t *obj = (ui_histogram_t*) data;
-        g_debug("Recalculating histogram");
+	ui_histogram_t *obj = (ui_histogram_t*) data;
+	gtk_widget_queue_draw(obj->drawing_area);
 }
 
 static void
 ui_histogram_surface_draw_cb (GtkWidget* widget, cairo_t* cr, gpointer data)
 {
 	ui_histogram_t *obj = (ui_histogram_t*) data;
-//FOR TESTING
-	unsigned int histogram[256];
-	srand(1);
 	int i;
-	for(i=0; i<256; i++) {
-		histogram[i] = rand() % 256;
-	}
-	histogram[0] = histogram[255] = 255;
-//END
+	unsigned int histogram[256];
 
 	const gchar* text = gtk_combo_box_get_active_id(GTK_COMBO_BOX(obj->combobox));
 	if(g_strcmp0(text, "value") == 0) {

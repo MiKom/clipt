@@ -115,21 +115,6 @@ launch_histogram256_kernel(device_buffer_t *src, cl_int offset, cl_mem d_partial
 	} else {
 		g_warning("%s: Couldn't launch histogram kernel", __func__);
 	}
-#if 0
-	size_t data_size = PARTIAL_HISTOGRAM_COUNT * BIN_COUNT * sizeof(cl_uint);
-	cl_uint *histograms = malloc(data_size);
-	err = clEnqueueReadBuffer(queue, d_partial, CL_TRUE, 0, data_size,
-				  histograms, 0, NULL, NULL);
-	for(i=0; i<PARTIAL_HISTOGRAM_COUNT; i++) {
-		int j;
-		printf("[ ");
-		for(j = 0; j<BIN_COUNT; j++) {
-			printf("%u, ",histograms[256*i + j]);
-		}
-		printf("]\n");
-	}
-	fflush(stdout);
-#endif
 
 	err = clEnqueueReleaseGLObjects(queue, 1 , &src->cl_object, 0, NULL, &event);
 	if( err == CL_SUCCESS ) {
@@ -158,7 +143,10 @@ launch_merge256_kernel(cl_mem d_partial, cl_mem d_final, unsigned int *hist)
 
 	err |= clEnqueueNDRangeKernel(queue, merge_kernel.kernel, 1, 0,
 				       &global_work_size, &local_work_size,
-				       0, 0, &event);
+				       0, 0, NULL);
+	err |= clEnqueueReadBuffer(queue, d_final, CL_TRUE, 0,
+				   BIN_COUNT*sizeof(cl_uint), hist, 0, NULL,
+				   &event);
 
 	if( err == CL_SUCCESS ){
 		clWaitForEvents(1, &event);

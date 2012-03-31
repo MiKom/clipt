@@ -4,6 +4,7 @@
 #include <ui/window.h>
 
 #include <nodes/curves.h>
+#include <nodes/histogram.h>
 
 #define LEFT_PIXEL_OFFSET 2.0
 
@@ -159,6 +160,8 @@ ui_curves_scale_cb(GtkWidget* widget, gpointer data)
 		curves_apply_lut8(sys_get_current_buffer(), sys_get_draw_buffer(), obj->disp_lut);
 	}
 
+	ui_window_force_redraw();
+
 	gtk_widget_queue_draw(obj->drawing_area);
 
 	ui_window_force_redraw();
@@ -198,16 +201,10 @@ ui_curves_drawing_area_redraw_cb(GtkWidget* widget, cairo_t *cr, gpointer data)
 {
 	ui_curves_dialog_t *obj = (ui_curves_dialog_t*) data;
 	int* lut = obj->disp_lut;
-
-//FOR TESTING
 	unsigned int histogram[256];
-	srand(1);
 	int i;
-	for(i=0; i<256; i++) {
-		histogram[i] = rand() % 256;
-	}
-//END
 
+	histogram_calculate_256(sys_get_current_buffer(), HISTOGRAM_VALUE, histogram);
 	unsigned int maxval = histogram[0];
 	for(i=1; i<256; i++) {
 		if(histogram[i] > maxval) {

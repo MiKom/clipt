@@ -5,6 +5,7 @@
 #define HISTOGRAM_WORKGROUP_SIZE (WARP_COUNT * WARP_SIZE)
 
 #define MERGE_WORKGROUP_SIZE 256
+#define LOG2_MERGE_WORKGROUP_SIZE 8
 
 
 #define COUNT_MASK ((1U << (32 - LOG2_WARP_SIZE)) - 1U)
@@ -71,5 +72,20 @@ void merge_histogram256(
 {
 	__local uint l_data[MERGE_WORKGROUP_SIZE];
 	uint sum = 0;
+	for(uint i = get_local_id(0); i<histogram_count; i++) {
+		sum += d_partial_histograms[get_group_id(0) + i * MERGE_WORKGROUP_SIZE];
+	}
+	l_data[get_local_id(0)] = sum;
 
+	for(uint i = 1; i <= LOG2_MERGE_WORKGROUP_SIZE;  i++){
+		barrier(CLK_LOCAL_MEM_FENCE);
+		if(get_local_id(0) < (MERGE_WORKGROUP_SIZE >> i)) {
+			l_data[get_local_id(0)] += l_data[get_local_id(0) + (MERGE_WORKGROUP_SIZE >> i)];
+		}
+	}
+
+
+	if(get_local_id(0) == 0) {
+		d_histogram[get_group_id(0)] = l_data[0];
+	}
 }

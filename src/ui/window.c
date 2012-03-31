@@ -278,7 +278,7 @@ void ui_drawing_area_init(GtkWidget* widget, gpointer data)
 void
 ui_window_force_redraw(void)
 {
-        ui_window_image_changed_cb(NULL, NULL);
+	g_signal_emit(ui_window, ui_new_image_signal, 0);
 }
 
 void ui_drawing_area_draw_cb(GtkWidget* widget, cairo_t* cr, gpointer data)
