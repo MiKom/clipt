@@ -27,23 +27,25 @@ ADD_SUBDIRECTORY(plugins)
 
 FILE(COPY clprogs DESTINATION ${PROJECT_BINARY_DIR})
 SET( clit_SOURCES
-        src/main.c
-        src/core.c
-        src/system.c
-        src/render.c
-        src/plugin.c
-        src/device.c
+	src/main.c
+	src/core.c
+	src/system.c
+	src/render.c
+	src/plugin.c
+	src/device.c
 	src/io.c
-        src/image.c
-        
-        src/ui/common.c
-        src/ui/window.c
-        src/ui/ui_histogram.c
-        src/ui/ui_curves.c
-	src/ui/ui_convolutions.c
+	src/image.c
 
-        src/nodes/histogram.c
-        src/nodes/curves.c
+	src/ui/common.c
+	src/ui/window.c
+	src/ui/ui_histogram.c
+	src/ui/ui_curves.c
+	src/ui/ui_convolutions.c
+	src/ui/ui_binarization.c
+
+	src/nodes/histogram.c
+	src/nodes/curves.c
+	src/nodes/binarization.c
 )
 
 SET( clit_CLPROGS
@@ -54,24 +56,26 @@ SET( clit_CLPROGS
 )
 
 SET( clit_HEADERS
-        include/clit.h
-        include/config.h
-        include/core.h
-        include/image.h
-        include/plugin.h
-        include/render.h
-        include/system.h
-        include/device.h
+	include/clit.h
+	include/config.h
+	include/core.h
+	include/image.h
+	include/plugin.h
+	include/render.h
+	include/system.h
+	include/device.h
 	include/io.h
-        
-        include/ui/ui.h
-        include/ui/window.h
-        include/ui/ui_histogram.h
+
+	include/ui/ui.h
+	include/ui/window.h
+	include/ui/ui_histogram.h
 	include/ui/ui_curves.h
 	include/ui/ui_convolutions.h
+	include/ui/ui_binarization.h
 
-        include/nodes/histogram.h
-        include/nodes/curves.h
+	include/nodes/histogram.h
+	include/nodes/curves.h
+	include/nodes/binarization.h
 )
 
 SET(COMMON_LIBRARIES m dl)
