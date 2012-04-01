@@ -26,4 +26,13 @@ histogram_equalize(
 		device_buffer_t *src,
 		device_buffer_t *dst);
 
+/**
+  Stretch hisotgram on all channels
+  \param src source image buffer
+  \param dst image with stretched histogram will be written to this buffer
+**/
+void
+histogram_stretch(
+		device_buffer_t *src,
+		device_buffer_t *dst);
 #endif

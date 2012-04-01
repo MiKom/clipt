@@ -178,3 +178,50 @@ histogram_equalize(
 	curves_init();
 	curves_apply_lut8(src, dst, histogram);
 }
+
+void
+histogram_stretch(
+		device_buffer_t *src,
+		device_buffer_t *dst)
+{
+	int i;
+	int min = 0;
+	int max = 255;
+	int *histogram;
+	int *lut;
+	int tmp;
+
+	histogram = malloc(sizeof(int)*256);
+	histogram_calculate_256(src, HISTOGRAM_VALUE, histogram);
+	int num_pixels = src->rbuf.width * src->rbuf.height;
+
+	//finding 5th-percentile
+	int sum = 0;
+	for (i = 0; i<256; i++) {
+		sum += histogram[i];
+		if( ((float)sum / (float) num_pixels) >= 0.05f) {
+			min = i;
+			break;
+		}
+	}
+
+	//finding 95-th percentile
+	sum = 0;
+	for (i = 0; i<256; i++) {
+		sum += histogram[i];
+		if( ((float)sum / (float) num_pixels) >= 0.95f) {
+			max = i;
+			break;
+		}
+	}
+	free(histogram);
+
+	lut = malloc(sizeof(int)*256);
+	for(i=0; i<256; i++) {
+		tmp = (int) ((float)(i - min) * 255.0f / ((float)max - (float)min));
+		lut[i] = CLAMP(tmp,0,255);
+	}
+	curves_init();
+	curves_apply_lut8(src,dst,lut);
+	free(lut);
+}

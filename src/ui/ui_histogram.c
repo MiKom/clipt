@@ -199,4 +199,8 @@ static void
 ui_stretch_histogram_action_cb(GtkWidget* widget, gpointer data)
 {
 	g_debug("Stretch histogram action");
+	histogram_init();
+	histogram_stretch(sys_get_current_buffer(), sys_get_draw_buffer());
+	sys_commit_buffer(sys_get_draw_buffer());
+	ui_window_force_redraw();
 }
