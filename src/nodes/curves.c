@@ -132,6 +132,7 @@ curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst, int *lut)
 	err = clSetKernelArg(lut_kernel.kernel, i++,
 		       sizeof(len), (void*) &len);
 
+	//TODO: move to common functions
 	size_t global_work_size;
 	int r = len % BLOCK_SIZE;
 	if( r == 0 ) {

@@ -1,18 +1,19 @@
 #include <stdlib.h>
 
-#include <config.h>
-#include <image.h>
-#include <system.h>
-#include <core.h>
-#include <render.h>
-#include <plugin.h>
-#include <device.h>
-#include <io.h>
-#include <ui/ui.h>
-#include <ui/window.h>
-#include <ui/ui_histogram.h>
-#include <ui/ui_curves.h>
-#include <ui/ui_convolutions.h>
+#include "config.h"
+#include "image.h"
+#include "system.h"
+#include "core.h"
+#include "render.h"
+#include "plugin.h"
+#include "device.h"
+#include "io.h"
+#include "ui/ui.h"
+#include "ui/window.h"
+#include "ui/ui_histogram.h"
+#include "ui/ui_curves.h"
+#include "ui/ui_convolutions.h"
+#include "ui/ui_binarization.h"
 
 static GtkWidget* ui_window;
 static GtkWidget* ui_vbox;
@@ -172,6 +173,11 @@ ui_window_init(ui_widget_t** widget)
 	ui_convolutions_add_action_entries(ui_action_group, ui_window);
 	if( ui_convolutions_add_ui_string(ui_manager) != CLIT_OK ) {
 		g_warning("Adding convolutions menu failed");
+	}
+
+	ui_binarization_add_action_entries(ui_action_group, ui_window);
+	if( ui_binarization_add_ui_string(ui_manager) != CLIT_OK ) {
+		g_warning("Adding binarization menu failed");
 	}
 
 	gtk_ui_manager_insert_action_group(ui_manager, ui_action_group, 0);

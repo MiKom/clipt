@@ -53,6 +53,7 @@ SET( clit_CLPROGS
 	clprogs/gamma.cl
 	clprogs/brightness.cl
 	clprogs/histogram.cl
+	clprogs/binarization.cl
 )
 
 SET( clit_HEADERS
