@@ -10,10 +10,26 @@ enum pnm_data_type_e {
 };
 typedef enum pnm_data_type_e pnm_data_type_t;
 
+enum pnm_palette_e {
+	PNM_BITMAP,
+	PNM_GRAYSCALE,
+	PNM_RGB24
+};
+typedef enum pnm_palette_e pnm_palette_t;
+
 sys_result_t pnm_plugin_load();
 sys_result_t pnm_plugin_unload();
 
 sys_result_t load_pnm(const char *path, image_data_t **image);
+
+sys_result_t
+save_pnm(char *path, image_data_t* src, pnm_data_type_t type);
+
+sys_result_t
+save_binary_pnm(char *path, image_data_t* src);
+
+sys_result_t
+save_ascii_pnm(char *path, image_data_t* src);
 
 int can_open(const char* path);
 
@@ -22,9 +38,10 @@ static char *filters[] = {
 };
 static size_t nfilters = G_N_ELEMENTS(filters);
 
-static plugin_load_handler_t pnm_handler;
+static plugin_load_handler_t pnm_load_handler;
 
-static plugin_load_handler_t *handlers;
+static plugin_save_handler_t pnm_save_binary_handler;
+static plugin_save_handler_t pnm_save_ascii_handler;
 
 static plugin_t base_desc =
 {
@@ -44,16 +61,35 @@ plugin_t* clit_plugin_info()
 	plugin_fileio_t *ret = malloc(sizeof(plugin_fileio_t));
 
 	ret->base = base_desc;
+
+	//Load Handlers
 	ret->n_load_handlers = 1;
-	ret->load_handlers = malloc(sizeof(plugin_load_handler_t *) * 1);
+	ret->load_handlers = malloc(sizeof(plugin_load_handler_t *) * ret->n_load_handlers);
 
-	pnm_handler.nfilters = nfilters;
-	pnm_handler.filters = filters;
-	pnm_handler.desc = "Portable Anymap (.ppm, .pgm, .pbm, .pnm)";
-	pnm_handler.function = load_pnm;
-	pnm_handler.can_open = can_open;
+	pnm_load_handler.nfilters = nfilters;
+	pnm_load_handler.filters = filters;
+	pnm_load_handler.desc = "Portable Anymap (.ppm, .pgm, .pbm, .pnm)";
+	pnm_load_handler.function = load_pnm;
+	pnm_load_handler.can_open = can_open;
 
-	ret->load_handlers[0] = &pnm_handler;
+	ret->load_handlers[0] = &pnm_load_handler;
+
+	//Save handlers
+	ret->n_save_handlers = 2;
+	ret->save_handlers = malloc(sizeof(plugin_save_handler_t *) * ret->n_save_handlers);
+
+	pnm_save_ascii_handler.nfilters = nfilters;
+	pnm_save_ascii_handler.filters = filters;
+	pnm_save_ascii_handler.desc = "Portable Anymap (ASCII) (.ppm, .pgm, .pbm, .pnm)";
+	pnm_save_ascii_handler.function = save_ascii_pnm;
+	ret->save_handlers[0] = &pnm_save_ascii_handler;
+
+	pnm_save_binary_handler.nfilters = nfilters;
+	pnm_save_binary_handler.filters = filters;
+	pnm_save_binary_handler.desc = "Portable Anymap (Raw) (.ppm, .pgm, .pbm, .pnm)";
+	pnm_save_binary_handler.function = save_binary_pnm;
+	ret->save_handlers[1] = &pnm_save_binary_handler;
+
 	return (plugin_t*) ret;
 }
 
@@ -96,6 +132,18 @@ int can_open(const char* path)
 		return 0;
 	}
 
+}
+
+sys_result_t
+save_binary_pnm(char *path, image_data_t* src)
+{
+	return save_pnm(path, src, PNM_BINARY);
+}
+
+sys_result_t
+save_ascii_pnm(char *path, image_data_t* src)
+{
+	return save_pnm(path, src, PNM_ASCII);
 }
 
 /**
@@ -294,3 +342,89 @@ sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, in
 	}
 	return CLIT_OK;
 }
+
+static sys_result_t
+save_pnm_data(FILE* fd, unsigned char data, pnm_data_type_t type, pnm_palette_t palette)
+{
+	static unsigned char _bits_buffer[2]; // thread unsafe. will go into loader context object in the future.
+	unsigned char byte = data;
+
+	if(type == PNM_ASCII)
+		fprintf(fd, "%d", data);
+	else {
+		if(palette == PNM_BITMAP) {
+		  if(!data) _bits_buffer[0] += 1 << (7 - _bits_buffer[1]);
+			if(++_bits_buffer[1] == 8) {
+				byte = _bits_buffer[0];
+				memset(_bits_buffer, 0, sizeof(_bits_buffer));
+				fwrite(&byte, sizeof(unsigned char), 1, fd);
+			}
+		}
+		else
+			fwrite(&byte, sizeof(unsigned char), 1, fd);
+	}
+	return CLIT_OK;
+}
+
+sys_result_t
+save_pnm(char *path, image_data_t* src, pnm_data_type_t type)
+{
+	static char* _pnm_magic[]   = { "P1", "P2", "P3", "P4", "P5", "P6" };
+
+	size_t ix, iy;
+	unsigned char* ptr = src->data;
+	unsigned char data[3];
+
+	pnm_palette_t palette;
+	switch(src->bpp) {
+	case 1:
+		palette = PNM_BITMAP;
+		break;
+	case 8:
+		palette = PNM_GRAYSCALE;
+		break;
+	case 24:
+	default:
+		palette = PNM_RGB24;
+		break;
+	}
+
+	FILE* fd = fopen(path, "w");
+	if(fd == NULL) {
+		return CLIT_ERROR;
+	}
+
+	fprintf(fd, "%s\n%d %d\n", _pnm_magic[palette + 3*type], src->width, src->height);
+	if(palette != PNM_BITMAP) fprintf(fd, "%d\n", 0xFF);
+
+	for(iy=0; iy<src->height; iy++) {
+		for(ix=0; ix<src->width; ix++) {
+			switch(palette) {
+			case PNM_BITMAP:
+				data[0] = *ptr?1:0;
+				break;
+			case PNM_GRAYSCALE:
+				data[0] = *ptr;
+				break;
+			case PNM_RGB24:
+				data[0] = *(ptr+2);
+				data[1] = *(ptr+1);
+				data[2] = *(ptr+0);
+				break;
+			}
+			ptr += 4;
+
+			save_pnm_data(fd, data[0], type, palette);
+			if(palette == PNM_RGB24) {
+				save_pnm_data(fd, data[1], type, palette);
+				save_pnm_data(fd, data[2], type, palette);
+			}
+			if(type == PNM_ASCII && ix+1 < src->width)
+				fputc(' ', fd);
+		}
+		if(type == PNM_ASCII) fputc('\n', fd);
+	}
+	fclose(fd);
+	return CLIT_OK;
+}
+

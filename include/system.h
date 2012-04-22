@@ -14,6 +14,7 @@ enum sys_result_e
 	CLIT_ERESOURCES,
 	CLIT_ENOTFOUND,
 	CLIT_EACCESS,
+	CLIT_EFORMAT,
 	CLIT_ERROR
 };
 typedef enum sys_result_e sys_result_t;
