@@ -168,7 +168,9 @@ sys_result_t load_pnm(const char *path, image_data_t **image)
 	ret->height = height;
 
 	if(magic[1] == '1' || magic[1] == '2' || magic[1] == '4' || magic[1] == '5') {
-		ret->channels = 1;
+		//Channels are always set to 3 because whole application works
+		//only with rgb buffers
+		ret->channels = 3;
 	} else {
 		ret->channels = 3;
 	}
@@ -224,6 +226,8 @@ sys_result_t load_bitmap(FILE* fp, image_data_t* dst)
 		for(j=7; j>=0; j--) {
 			single_pixel = (1 - ((c >> j) & 0x01)) * 255;
 			dst->data[data_idx++] = BYTE_TO_FLOAT(single_pixel);
+			dst->data[data_idx++] = BYTE_TO_FLOAT(single_pixel);
+			dst->data[data_idx++] = BYTE_TO_FLOAT(single_pixel);
 		}
 
 	}
@@ -260,6 +264,8 @@ sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, in
 				lum = (int) (getc(fd) - '0');
 				lum = 1 - lum;
 				dst->data[dest_idx++] = (float) lum;
+				dst->data[dest_idx++] = (float) lum;
+				dst->data[dest_idx++] = (float) lum;
 				break;
 			case 8:
 				if(type == PNM_ASCII) {
@@ -268,6 +274,8 @@ sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, in
 					lum = getc(fd);
 				}
 				unsigned char value = (unsigned char) normalize(lum, maxval);
+				dst->data[dest_idx++] = BYTE_TO_FLOAT(value);
+				dst->data[dest_idx++] = BYTE_TO_FLOAT(value);
 				dst->data[dest_idx++] = BYTE_TO_FLOAT(value);
 				break;
 			case 24:
