@@ -14,6 +14,7 @@
 #include "ui/ui_curves.h"
 #include "ui/ui_convolutions.h"
 #include "ui/ui_binarization.h"
+#include "ui/ui_colorspaces.h"
 
 static GtkWidget* ui_window;
 static GtkWidget* ui_vbox;
@@ -178,6 +179,11 @@ ui_window_init(ui_widget_t** widget)
 	ui_binarization_add_action_entries(ui_action_group, ui_window);
 	if( ui_binarization_add_ui_string(ui_manager) != CLIT_OK ) {
 		g_warning("Adding binarization menu failed");
+	}
+
+	ui_colorspaces_add_action_entries(ui_action_group, ui_window);
+	if( ui_colorspaces_add_ui_string(ui_manager) != CLIT_OK ) {
+		g_warning("Adding colorspaces menu entries failed");
 	}
 
 	gtk_ui_manager_insert_action_group(ui_manager, ui_action_group, 0);
