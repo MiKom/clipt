@@ -72,6 +72,7 @@ ui_curves_show_dialog(GtkWidget* widget, gpointer data)
 
 	gint response;
 
+	histogram_init();
 	curves_init();
 
 	curves_get_neutral_lut8(obj->disp_lut);

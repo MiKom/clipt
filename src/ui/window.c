@@ -216,7 +216,7 @@ ui_window_init(ui_widget_t** widget)
 	//signal emitted when image gets changed somehow
 	ui_new_image_signal = g_signal_new("image-changed",
 					   G_TYPE_OBJECT, G_SIGNAL_RUN_FIRST,
-                                           0, NULL, NULL, g_cclosure_marshal_VOID__VOID,
+					   0, NULL, NULL, g_cclosure_marshal_VOID__VOID,
 					   G_TYPE_NONE, 0);
 
 	g_signal_connect(G_OBJECT(ui_window), "image-changed",
@@ -414,7 +414,6 @@ void ui_save_file_cb(GtkWidget* widget, gpointer data)
 	if(gtk_dialog_run(GTK_DIALOG(filedialog)) == GTK_RESPONSE_ACCEPT) {
 
 	}
-	g_signal_emit(ui_window, ui_new_image_signal, 0);
 	gtk_widget_destroy(GTK_WIDGET(filedialog));
 }
 
