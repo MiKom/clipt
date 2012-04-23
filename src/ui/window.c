@@ -338,11 +338,11 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 						    NULL);
 
 
-	GList *formats = io_get_load_handler_descriptions();
+	GList *formats = io_get_handler_descriptions(IO_LOAD_HANDLER);
 	GList *iter;
 	for(iter = g_list_first(formats); iter; iter = g_list_next(iter)) {
-		io_load_handler_desc_t *format =
-				(io_load_handler_desc_t *) iter->data;
+		io_handler_desc_t *format =
+				(io_handler_desc_t *) iter->data;
 
 		ui_filefilter = gtk_file_filter_new();
 		gtk_file_filter_set_name(GTK_FILE_FILTER(ui_filefilter),
@@ -380,8 +380,42 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 
 void ui_save_file_cb(GtkWidget* widget, gpointer data)
 {
-	printf("Save action\n");
-	fflush(stdout);
+	GtkWidget *filedialog;
+	GtkFileFilter *filefilter;
+
+	filedialog = gtk_file_chooser_dialog_new("Save...",
+						 GTK_WINDOW(ui_window),
+						 GTK_FILE_CHOOSER_ACTION_SAVE,
+						 GTK_STOCK_CANCEL,
+						 GTK_RESPONSE_CANCEL,
+						 GTK_STOCK_OPEN,
+						 GTK_RESPONSE_ACCEPT,
+						 NULL);
+
+	GList *formats = io_get_handler_descriptions(IO_SAVE_HANDLER);
+	GList *iter;
+
+	for(iter = g_list_first(formats); iter; iter = g_list_next(iter)) {
+		io_handler_desc_t *format = (io_handler_desc_t *) iter->data;
+
+		filefilter = gtk_file_filter_new();
+		gtk_file_filter_set_name(GTK_FILE_FILTER(filefilter),
+					  format->desc);
+		GList *f_it;
+		for(f_it = g_list_first(format->filters); f_it; f_it = g_list_next(f_it)){
+			gtk_file_filter_add_pattern(GTK_FILE_FILTER(filefilter),
+						    (char*) f_it->data);
+		}
+		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(filedialog),
+					    filefilter);
+	}
+	g_list_free_full(formats, free);
+
+	if(gtk_dialog_run(GTK_DIALOG(filedialog)) == GTK_RESPONSE_ACCEPT) {
+
+	}
+	g_signal_emit(ui_window, ui_new_image_signal, 0);
+	gtk_widget_destroy(GTK_WIDGET(filedialog));
 }
 
 void ui_undo_cb(GtkWidget* widget, gpointer data)

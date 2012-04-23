@@ -71,6 +71,7 @@ core_device_start(void)
 static sys_result_t
 core_device_stop(void)
 {
+	sys_clear_buffers();
 	device_destroy(sys_get_state()->context);
 	g_message("Subsystem [DEVICE]: Stopped");
 	return CLIT_OK;

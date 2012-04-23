@@ -5,28 +5,61 @@
 #include <image.h>
 #include <system.h>
 
-GList *
-io_get_load_handler_descriptions(void)
+static io_handler_desc_t*
+io_get_load_handler_description(plugin_load_handler_t *handler)
 {
-	int i,j;
+	io_handler_desc_t *desc = malloc(sizeof(io_handler_desc_t));
+	desc->type = IO_LOAD_HANDLER;
+	desc->desc = handler->desc;
+	desc->filters = NULL;
+
+	int i;
+	for(i=0; i < (int) handler->nfilters; i++) {
+		desc->filters = g_list_append(desc->filters,
+					      handler->filters[i]);
+	}
+	return desc;
+}
+
+static io_handler_desc_t*
+io_get_save_handler_description(plugin_save_handler_t *handler)
+{
+	io_handler_desc_t *desc = malloc(sizeof(io_handler_desc_t));
+	desc->type = IO_SAVE_HANDLER;
+	desc->desc = handler->desc;
+	desc->filters = NULL;
+
+	int i;
+	for(i=0; i < (int) handler->nfilters; i++) {
+		desc->filters = g_list_append(desc->filters,
+					      handler->filters[i]);
+	}
+	return desc;
+}
+
+GList *
+io_get_handler_descriptions(io_handler_type_t type)
+{
 	GList *ret = NULL;
 
 	GList *io_plugins = plugin_get_by_type(PLUGIN_FILEIO);
 	GList *iter;
 	for(iter = g_list_first(io_plugins); iter; iter = g_list_next(iter)) {
 		plugin_fileio_t *plugin = (plugin_fileio_t*) iter->data;
-		for(i=0; i < (int) plugin->n_load_handlers; i++) {
-			plugin_load_handler_t *load_handler = plugin->load_handlers[i];
-			io_load_handler_desc_t *desc =
-					malloc(sizeof(io_load_handler_desc_t));
-			desc->filters = NULL;
-			desc->desc = load_handler->desc;
-
-			for(j=0; j < (int) load_handler->nfilters; j++) {
-				desc->filters = g_list_append(desc->filters,
-							      load_handler->filters[j]);
+		int i;
+		switch(type) {
+		case IO_LOAD_HANDLER:
+			for(i=0; i < (int) plugin->n_load_handlers; i++) {
+				io_handler_desc_t *desc = io_get_load_handler_description(plugin->load_handlers[i]);
+				ret = g_list_append(ret, desc);
 			}
-			ret = g_list_append(ret, desc);
+			break;
+		case IO_SAVE_HANDLER:
+			for(i=0; i < (int) plugin->n_save_handlers; i++) {
+				io_handler_desc_t *desc = io_get_save_handler_description(plugin->save_handlers[i]);
+				ret = g_list_append(ret, desc);
+			}
+			break;
 		}
 	}
 	g_list_free(io_plugins);
