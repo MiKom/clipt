@@ -15,7 +15,7 @@ ui_threshold_scale_cb(GtkWidget *widget, gpointer data);
 static char ui_def[] =
 "<ui>"
 "  <menubar name='MainMenu'>"
-"    <menu name='FiltersMenu' action='FiltersMenuAction'>"
+"    <menu name='ColourMenu' action='ColourMenuAction'>"
 "      <menu name='BinarizationMenu' action='BinarizationMenuAction'>"
 "        <menuitem action='ThresholdAction' />"
 "        <menuitem action='OtsuAction' />"

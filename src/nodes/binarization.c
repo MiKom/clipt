@@ -41,6 +41,13 @@ threshold_binarization(device_buffer_t *src, device_buffer_t *dst,
 
 	cl_float threshold_frac = (cl_float) threshold / 255.0f;
 
+	//Treating 0 differently so when threshold is 0, everything is white,
+	//otherwise, completely black pixels would pass as black, because
+	//comparison with threshold in kernel is 'lesser or equal' ( <= )
+	if(threshold_frac == 0.0f) {
+		threshold_frac = -1.0f;
+	}
+
 	err = clSetKernelArg(threshold_kernel.kernel, i++, sizeof(src->cl_object),
 			     (void *) &src->cl_object);
 	err = clSetKernelArg(threshold_kernel.kernel, i++, sizeof(dst->cl_object),
