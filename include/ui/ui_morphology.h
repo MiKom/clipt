@@ -8,7 +8,7 @@ struct ui_morphology_s
 {
 	GtkWidget* dialog;
 	GtkWidget* drawing_area;
-	gboolean custom_element[7];
+	unsigned int custom_element[7];
 	GtkWidget* combobox;
 	guint cb_handler;
 };
