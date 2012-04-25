@@ -43,11 +43,13 @@ SET( clit_SOURCES
 	src/ui/ui_convolutions.c
 	src/ui/ui_binarization.c
 	src/ui/ui_colorspaces.c
+	src/ui/ui_morphology.c
 
 	src/nodes/histogram.c
 	src/nodes/curves.c
 	src/nodes/binarization.c
 	src/nodes/colorspaces.c
+	src/nodes/morphology.c
 )
 
 SET( clit_CLPROGS
@@ -57,6 +59,7 @@ SET( clit_CLPROGS
 	clprogs/histogram.cl
 	clprogs/binarization.cl
 	clprogs/colorspaces.cl
+	clprogs/morphology.cl
 )
 
 SET( clit_HEADERS
@@ -77,11 +80,13 @@ SET( clit_HEADERS
 	include/ui/ui_convolutions.h
 	include/ui/ui_binarization.h
 	include/ui/ui_colorspaces.h
+	include/ui/ui_morphology.h
 
 	include/nodes/histogram.h
 	include/nodes/curves.h
 	include/nodes/binarization.h
 	include/nodes/colorspaces.h
+	include/nodes/morphology.h
 )
 
 SET(COMMON_LIBRARIES m dl)
