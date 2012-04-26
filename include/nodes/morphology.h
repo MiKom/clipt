@@ -13,6 +13,9 @@ sys_result_t
 morphology_init();
 
 sys_result_t
+morphology_release();
+
+sys_result_t
 morphology_apply(
 		device_buffer_t *src,
 		device_buffer_t *dst,

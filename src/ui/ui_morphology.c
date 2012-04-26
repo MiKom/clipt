@@ -130,11 +130,12 @@ ui_morphology_show_dialog(GtkWidget *widget, gpointer data)
 
 	gtk_widget_show_all(obj->dialog);
 	ui_morphology_do(obj);
+
 	gint response = gtk_dialog_run(obj->dialog);
-	if(response == GTK_RESPONSE_ACCEPT) {
-
-	} else {
-
+	if( response == GTK_RESPONSE_APPLY ) {
+		sys_commit_buffer(sys_get_draw_buffer());
+	} else if ( response == GTK_RESPONSE_CANCEL ) {
+		sys_draw_current_buffer();
 	}
 	gtk_widget_destroy(obj->dialog);
 	free(obj);
