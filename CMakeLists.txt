@@ -50,6 +50,7 @@ SET( clit_SOURCES
 	src/nodes/binarization.c
 	src/nodes/colorspaces.c
 	src/nodes/morphology.c
+        src/nodes/convolution.c
 )
 
 SET( clit_CLPROGS
@@ -87,6 +88,7 @@ SET( clit_HEADERS
 	include/nodes/binarization.h
 	include/nodes/colorspaces.h
 	include/nodes/morphology.h
+        include/nodes/convolution.h
 )
 
 SET(COMMON_LIBRARIES m dl)
