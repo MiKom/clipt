@@ -13,6 +13,17 @@ convolution_init()
 
 int  convolution_from_string(const char* str, convolution_t* conv)
 {
+        size_t buflen = strlen(str)+1;
+        char *parse_data = malloc(buflen);
+        char *linectx, *line;
+
+        memcpy(parse_data, str, buflen);
+        line = strtok_r(parse_data, '\n', &linectx);
+        while(line) {
+                
+                line = strtok_r(NULL, '\n', &linectx);
+        }
+        free(parse_data);
         return 0;
 }
 
