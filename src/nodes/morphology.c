@@ -6,12 +6,30 @@
 #include<stdio.h>
 
 static const char filename[] = "morphology.cl";
-static device_kernel_t morphology_kernel;
+static device_kernel_t erosion_kernel;
+static device_kernel_t dilation_kernel;
 
 sys_result_t
 morphology_init()
 {
+	//TODO: Move to some common function
+	char *progdir = sys_get_config()->dir_clprogs;
 
+	size_t path_len = strlen(progdir) + strlen(filename) + 1;
+	char *progpath = malloc(sizeof(char) * path_len);
+	sprintf(progpath, "%s/%s",progdir, filename);
+	g_debug("binarization_init: %s", progpath);
+	device_result_t err = device_kernel_create(sys_get_state()->context,
+						   progpath, "erode",
+						   &dilation_kernel);
+	err |= device_kernel_create(sys_get_state()->context,
+				    progpath, "dilate",
+				    &erosion_kernel);
+	free(progpath);
+
+	if( err != DEVICE_OK ) {
+		g_error("Error while creating binarization kernels");
+	}
 }
 
 sys_result_t

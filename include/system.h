@@ -94,6 +94,12 @@ sys_result_t
 sys_undo();
 
 /**
+  Reverts all user changes to the image
+*/
+sys_result_t
+sys_reset();
+
+/**
   Copies current buffer to draw buffer. Use it when you finished working with
   e.g. previews and user canceled action. Will restore last commited state.
 */

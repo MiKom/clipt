@@ -452,13 +452,10 @@ void ui_reset_cb(GtkWidget* widget, gpointer data)
 	gint response = gtk_dialog_run(GTK_DIALOG(dialog));
 
 	if(response == GTK_RESPONSE_YES) {
-		printf("User chose to reset\n");
-	} else {
-		printf("User chose not to reset\n");
+		sys_reset();
 	}
-
 	gtk_widget_destroy(dialog);
-	fflush(stdout);
+	ui_window_force_redraw();
 }
 
 ui_widget_t* ui_window_getdrawable(void)

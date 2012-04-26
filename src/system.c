@@ -123,6 +123,18 @@ sys_undo()
 }
 
 sys_result_t
+sys_reset()
+{
+	device_result_t err;
+	err = device_buffer_copy(sys_get_state()->source, sys_get_current_buffer());
+	err |= device_buffer_copy(sys_get_state()->source, sys_get_draw_buffer());
+	if( err != DEVICE_OK ) {
+		return CLIT_EINVALID;
+	} else {
+		return CLIT_OK;
+	}
+}
+sys_result_t
 sys_draw_current_buffer()
 {
 	device_result_t err;
