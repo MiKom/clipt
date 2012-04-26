@@ -5,9 +5,19 @@
 
 #include<stdio.h>
 
+static const char filename[] = "morphology.cl";
+static device_kernel_t morphology_kernel;
+
 sys_result_t
-morphology_init() {
-	g_debug("morphology init");
+morphology_init()
+{
+
+}
+
+sys_result_t
+morphology_release()
+{
+
 }
 
 sys_result_t
