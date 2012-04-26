@@ -81,7 +81,7 @@ ui_curves_show_dialog(GtkWidget* widget, gpointer data)
 	gtk_window_set_title(GTK_WINDOW(dialog), "Curves");
 	gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(parent));
 	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
-	gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
+	gtk_window_set_modal(GTK_WINDOW(dialog), FALSE);
 	gtk_dialog_add_buttons(GTK_DIALOG(dialog),
 			       "Cancel",
 			       GTK_RESPONSE_CANCEL,

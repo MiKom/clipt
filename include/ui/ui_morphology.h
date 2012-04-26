@@ -4,11 +4,13 @@
 #include <system.h>
 #include <ui/ui.h>
 
+#define STRUCTURAL_ELEMENT_SIZE 7
+
 struct ui_morphology_s
 {
 	GtkWidget* dialog;
 	GtkWidget* drawing_area;
-	unsigned int custom_element[7];
+	unsigned int custom_element[STRUCTURAL_ELEMENT_SIZE * STRUCTURAL_ELEMENT_SIZE];
 	GtkWidget* combobox;
 	guint cb_handler;
 };
