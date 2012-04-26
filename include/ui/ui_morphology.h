@@ -3,14 +3,17 @@
 
 #include <system.h>
 #include <ui/ui.h>
+#include <nodes/morphology.h>
 
 #define STRUCTURAL_ELEMENT_SIZE 7
-
+#define ELEMENT_ARRAY_SIZE STRUCTURAL_ELEMENT_SIZE * STRUCTURAL_ELEMENT_SIZE
 struct ui_morphology_s
 {
 	GtkWidget* dialog;
 	GtkWidget* drawing_area;
-	unsigned int custom_element[STRUCTURAL_ELEMENT_SIZE * STRUCTURAL_ELEMENT_SIZE];
+	morphology_operation_t op;
+	unsigned int *current_element;
+	unsigned int custom_element[ELEMENT_ARRAY_SIZE];
 	GtkWidget* combobox;
 	guint cb_handler;
 };
