@@ -94,7 +94,7 @@ io_fill_buffers(image_data_t *data)
 
 	//creating new previous buffer
 	device_buffer_create(sys_get_state()->context,
-			     DEVICE_BUFFER_HARDWARE,
+			     DEVICE_BUFFER_SOFTWARE,
 			     data->width,
 			     data->height,
 			     data->channels,
