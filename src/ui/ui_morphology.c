@@ -126,6 +126,7 @@ static void
 ui_morphology_show_dialog(GtkWidget *widget, gpointer data)
 {
 	morphology_init();
+	morphology_allocate_temp(sys_get_current_buffer());
 	ui_morphology_t* obj = ui_morphology_dialog_new((GtkWidget*) data);
 
 	gtk_widget_show_all(obj->dialog);
@@ -138,6 +139,7 @@ ui_morphology_show_dialog(GtkWidget *widget, gpointer data)
 		sys_draw_current_buffer();
 	}
 	gtk_widget_destroy(obj->dialog);
+	morphology_deallocate_temp();
 	free(obj);
 }
 
