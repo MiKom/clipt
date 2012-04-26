@@ -292,18 +292,21 @@ ui_morphology_button_press(
 		GdkEventButton *event,
 		gpointer data)
 {
-	ui_morphology_t* obj = (ui_morphology_t*)(data);
-	unsigned int *element = obj->custom_element;
-	int x = (int) (event->x / PIXEL_SIZE);
-	int y = (int) (event->y / PIXEL_SIZE);
-	int idx = y*STRUCTURAL_ELEMENT_SIZE + x;
-	g_debug("button pressed: x: %d, y: %d, setting to %d", x, y, (element[idx] + 1) % 2);
-	element[idx] = (element[idx] + 1) % 2;
-	gtk_widget_queue_draw(widget);
-	if(obj->current_element == obj->custom_element) {
-		ui_morphology_do(obj);
+	if(event->type == GDK_BUTTON_PRESS) {
+		ui_morphology_t* obj = (ui_morphology_t*)(data);
+		unsigned int *element = obj->custom_element;
+		int x = (int) (event->x / PIXEL_SIZE);
+		int y = (int) (event->y / PIXEL_SIZE);
+		int idx = y*STRUCTURAL_ELEMENT_SIZE + x;
+		element[idx] = (element[idx] + 1) % 2;
+		gtk_widget_queue_draw(widget);
+		if(obj->current_element == obj->custom_element) {
+			ui_morphology_do(obj);
+		}
+		return TRUE;
+	} else {
+		return FALSE;
 	}
-	return TRUE;
 }
 
 static void
