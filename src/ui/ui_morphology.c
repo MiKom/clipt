@@ -225,8 +225,9 @@ ui_morphology_draw_structural_element(
 	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
 	cairo_paint(cr);
 	cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
-	for(int i=0; i<STRUCTURAL_ELEMENT_SIZE; i++) {
-		for(int j=0; j<STRUCTURAL_ELEMENT_SIZE; j++) {
+	int i,j;
+	for(i=0; i<STRUCTURAL_ELEMENT_SIZE; i++) {
+		for(j=0; j<STRUCTURAL_ELEMENT_SIZE; j++) {
 			if(element[i*STRUCTURAL_ELEMENT_SIZE + j] == 0 ) {
 				continue;
 			} else {
