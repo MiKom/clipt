@@ -1,5 +1,6 @@
 #include"config.h"
 #include"device.h"
+#include"nodes/histogram.h"
 #include"nodes/binarization.h"
 
 #include<stdio.h>
@@ -94,4 +95,73 @@ threshold_binarization(device_buffer_t *src, device_buffer_t *dst,
 	} else {
 		g_warning("threshold_binarization: Couldn't release CL objects");
 	}
+}
+
+void
+binarization_otsu(device_buffer_t *src, device_buffer_t *dst)
+{
+	unsigned int histogram[256];
+	histogram_calculate_256(src, HISTOGRAM_VALUE, &histogram);
+	double prob[256];
+	double sum = 0.0;
+	int i;
+	for(i=1; i<256; i++) {
+		sum += (double) histogram[i];
+	}
+	for(i=0; i<256; i++) {
+		prob[i] = (double) histogram[i] / sum;
+	}
+
+	//computing global mean and variance
+	double gmean = 0.0;
+	for(i=0; i<256; i++) {
+		gmean += prob[i] * ((double) i / 255.0);
+	}
+
+	double gvar = 0.0;
+	for(i=0; i<256; i++) {
+		gvar += pow(((double) i / 255.0) - gmean, 2.0) * prob[i];
+	}
+
+	double var_best = -1.0;
+	int best_idx = 1;
+	for(i=1; i<255; i++) {
+		int j;
+		double fgprob = 0.0;
+		for(j=0; j<i; j++) {
+			fgprob += prob[j];
+		}
+		double bgprob = 0.0;
+		for(j=i; j<256; j++) {
+			bgprob += prob[j];
+		}
+
+		double fgmean = 0.0;
+		for(j=0; j<i; j++) {
+			fgmean += ((double) j / 255.0) * prob[j] / fgprob;
+		}
+
+		double bgmean = 0.0;
+		for(j=i; j<256; j++) {
+			bgmean += ((double) j / 255.0) * prob[j] / bgprob;
+		}
+
+		double fgvar = 0.0;
+		for(j=0; j<i; j++) {
+			fgvar = pow(((double)j / 255.0) - fgmean, 2.0) * prob[j] / fgprob;
+		}
+
+		double bgvar = 0.0;
+		for(j=i; j<256; j++) {
+			bgvar = pow(((double)j / 255.0) - bgmean, 2.0) * prob[j] / bgprob;
+		}
+		double var = fgprob * bgprob * pow(fgmean - bgmean, 2.0);
+		if(var_best < var ) {
+			var_best = var;
+			best_idx = i;
+		}
+	}
+	threshold_binarization(src, dst, best_idx);
+	g_debug("selected threshold %d", best_idx);
+
 }
