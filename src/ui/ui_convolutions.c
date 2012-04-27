@@ -51,6 +51,8 @@ ui_convolutions_apply(ui_convolutions_t* ui_conv)
         conv.bias = (float)gtk_spin_button_get_value(ui_conv->bias);
         conv.divisor = (float)gtk_spin_button_get_value(ui_conv->divisor);
 
+        conv.bias /= 255.0f; // normalize
+
         convolution_apply(sys_get_current_buffer(), sys_get_draw_buffer(), &conv);
         return 0;
 }
@@ -60,6 +62,7 @@ ui_convolutions_preview_clicked_cb(GtkButton *button, gpointer data)
 {
         ui_convolutions_t* conv = (ui_convolutions_t*)data;
         ui_convolutions_apply(conv);
+        ui_window_force_redraw();
 }
 
 static void
@@ -106,7 +109,7 @@ ui_convolutions_dialog_new(GtkWidget *parent)
 			       "Cancel",
 			       GTK_RESPONSE_CANCEL,
 			       "Apply",
-			       GTK_RESPONSE_APPLY,
+			       GTK_RESPONSE_ACCEPT,
 			       NULL);
 
         GtkWidget *box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));

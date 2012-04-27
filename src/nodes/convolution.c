@@ -39,19 +39,28 @@ convolution_apply(device_buffer_t* src, device_buffer_t* dst,
         cl_mem conv_buffer;
         cl_int cl_error;
 
+        size_t local_work_size[] = { conv->w, conv->h };
+        size_t global_work_size[2];
+        device_buffer_getprop(src, &global_work_size[0], &global_work_size[1], NULL);
+
+        int conv_size[] = { (int)conv->w, (int)conv->h };
+        int image_size[] = { (int)global_work_size[0], (int)global_work_size[1] };
+
         conv_buffer = clCreateBuffer(ctx->context, CL_MEM_READ_ONLY,
                                      sizeof(float)*conv->w*conv->h,
                                      NULL, &cl_error);
         clEnqueueWriteBuffer(ctx->queue, conv_buffer, CL_TRUE,
                              0, sizeof(float)*conv->w*conv->h, conv->matrix, 0, NULL, NULL);
-        
+
         clSetKernelArg(kernel.kernel, 0, sizeof(src->cl_object), (void*)&src->cl_object);
         clSetKernelArg(kernel.kernel, 1, sizeof(dst->cl_object), (void*)&dst->cl_object);
-        clSetKernelArg(kernel.kernel, 2, sizeof(size_t), (void*)&conv->w);
-        clSetKernelArg(kernel.kernel, 3, sizeof(size_t), (void*)&conv->h);
-        clSetKernelArg(kernel.kernel, 4, sizeof(conv_buffer), (void*)&conv_buffer);
-        clSetKernelArg(kernel.kernel, 5, sizeof(float), (void*)&conv->bias);
-        clSetKernelArg(kernel.kernel, 6, sizeof(float), (void*)&conv->divisor);
+        clSetKernelArg(kernel.kernel, 2, sizeof(int), (void*)&image_size[0]);
+        clSetKernelArg(kernel.kernel, 3, sizeof(int), (void*)&image_size[1]);
+        clSetKernelArg(kernel.kernel, 4, sizeof(int), (void*)&conv_size[0]);
+        clSetKernelArg(kernel.kernel, 5, sizeof(int), (void*)&conv_size[1]);
+        clSetKernelArg(kernel.kernel, 6, sizeof(conv_buffer), (void*)&conv_buffer);
+        clSetKernelArg(kernel.kernel, 7, sizeof(float), (void*)&conv->bias);
+        clSetKernelArg(kernel.kernel, 8, sizeof(float), (void*)&conv->divisor);
 
 	cl_mem buffers[2];
 	buffers[0] = src->cl_object;
@@ -61,10 +70,6 @@ convolution_apply(device_buffer_t* src, device_buffer_t* dst,
 	if(cl_error != CL_SUCCESS) {
 		g_error("convolution_apply: Couldn't aquire CL objects");
 	}
-
-        size_t local_work_size[] = { conv->w, conv->h };
-        size_t global_work_size[2];
-        device_buffer_getprop(src, &global_work_size[0], &global_work_size[1], NULL);
 
         int i=0, r;
         for(i=0; i<2; i++) {
@@ -88,6 +93,8 @@ convolution_apply(device_buffer_t* src, device_buffer_t* dst,
 	if(cl_error != CL_SUCCESS ) {
 		g_warning("convolution_apply: Couldn't release CL objects");
 	}
+        
+        clReleaseMemObject(conv_buffer);
 }
 
 int  convolution_from_string(const char* str, convolution_t* conv)
