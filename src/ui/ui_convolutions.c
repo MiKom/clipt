@@ -3,6 +3,8 @@
 #include <ui/ui_convolutions.h>
 #include <ui/window.h>
 
+#include <nodes/convolution.h>
+
 static void
 ui_convolutions_show_dialog(GtkWidget *widget, gpointer data);
 
@@ -23,11 +25,41 @@ static GtkActionEntry actions[] = {
 };
 static guint n_actions = G_N_ELEMENTS(actions);
 
+static int
+ui_convolutions_apply(ui_convolutions_t* ui_conv)
+{
+        GtkTextIter iter_start, iter_end;
+        
+        convolution_t conv;
+        gchar* conv_text;
+
+        gtk_text_buffer_get_start_iter(ui_conv->buffer, &iter_start);
+        gtk_text_buffer_get_end_iter(ui_conv->buffer, &iter_end);
+        conv_text = gtk_text_buffer_get_text(ui_conv->buffer, &iter_start, &iter_end, FALSE);
+        
+        if(convolution_from_string(conv_text, &conv) != 0) {
+                GtkWidget *err_dialog;
+                err_dialog = gtk_message_dialog_new(ui_conv->dialog,
+                                                    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                    GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                                                    "ui_convolutions_apply: Failed to parse convolution matrix");
+                gtk_dialog_run(err_dialog);
+                gtk_widget_destroy(err_dialog);
+                return 1;
+        }
+
+        conv.bias = (float)gtk_spin_button_get_value(ui_conv->bias);
+        conv.divisor = (float)gtk_spin_button_get_value(ui_conv->divisor);
+
+        convolution_apply(sys_get_current_buffer(), sys_get_draw_buffer(), &conv);
+        return 0;
+}
+
 static void
 ui_convolutions_preview_clicked_cb(GtkButton *button, gpointer data)
 {
         ui_convolutions_t* conv = (ui_convolutions_t*)data;
-        
+        ui_convolutions_apply(conv);
 }
 
 static void
@@ -130,15 +162,22 @@ ui_convolutions_dialog_new(GtkWidget *parent)
 static void
 ui_convolutions_show_dialog(GtkWidget *widget, gpointer data)
 {
-        ui_convolutions_t* obj = ui_convolutions_dialog_new((GtkWidget*)data);
+        ui_convolutions_t* obj;
+
+        convolution_init();
         
+        obj = ui_convolutions_dialog_new((GtkWidget*)data);
+       
 	gtk_widget_show_all(obj->dialog);
 	gint response = gtk_dialog_run(GTK_DIALOG(obj->dialog));
 	if(response == GTK_RESPONSE_ACCEPT) {
-
+                if(ui_convolutions_apply(obj) == 0) {
+                        sys_commit_buffer(sys_get_draw_buffer());
+                }
 	} else {
-
+                sys_draw_current_buffer();
 	}
 	gtk_widget_destroy(obj->dialog);
+        ui_window_force_redraw();
 	free(obj);
 }

@@ -61,6 +61,7 @@ SET( clit_CLPROGS
 	clprogs/binarization.cl
 	clprogs/colorspaces.cl
 	clprogs/morphology.cl
+        clprogs/convolution.cl
 )
 
 SET( clit_HEADERS

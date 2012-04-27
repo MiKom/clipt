@@ -32,7 +32,7 @@ histogram_init()
 	if(!initialized) {
 		char *progdir = sys_get_config()->dir_clprogs;
 
-		size_t path_len = strlen(progdir) + strlen(histogram_filename) + 1;
+		size_t path_len = strlen(progdir) + strlen(histogram_filename) + 2 * sizeof(char);
 		char *progpath = malloc(sizeof(char) * path_len);
 		sprintf(progpath, "%s/%s",progdir, histogram_filename);
 		g_debug("histogram_init: %s", progpath);

@@ -20,6 +20,7 @@ static void parse_arguments(int argc, char** argv, sys_config_t* config)
 	GOptionEntry entries[] = {
 		{ "version", 'v', 0, G_OPTION_ARG_NONE,     &flag_version,   "Print version information and exit", NULL },
 		{ "input",   'i', 0, G_OPTION_ARG_FILENAME, config->project, "Input project filename", NULL },
+                { NULL },
 	};
 
 	GError* error = NULL;

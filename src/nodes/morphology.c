@@ -26,7 +26,7 @@ morphology_init()
 	//TODO: Move to some common function
 	char *progdir = sys_get_config()->dir_clprogs;
 
-	size_t path_len = strlen(progdir) + strlen(filename) + 1;
+	size_t path_len = strlen(progdir) + strlen(filename) + 2 * sizeof(char);
 	char *progpath = malloc(sizeof(char) * path_len);
 	sprintf(progpath, "%s/%s",progdir, filename);
 	g_debug("binarization_init: %s", progpath);

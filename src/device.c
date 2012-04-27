@@ -151,6 +151,7 @@ device_result_t device_kernel_create(device_context_t* context,
                 if(cl_error == CL_BUILD_PROGRAM_FAILURE)
                         device_print_log(kernel->program, filename, stderr);
                 clReleaseProgram(kernel->program);
+                g_error("KERNEL COMPILATION FAILURE");
                 return DEVICE_ERROR;
         }
 	kernel->kernel = clCreateKernel(kernel->program, func_name, &cl_error);
