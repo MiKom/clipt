@@ -154,6 +154,7 @@ save_ascii_pnm(char *path, image_data_t* src)
 #define normalize(x,max) (unsigned int)(((float)x*255.0f)/(float)max + 0.5f)
 
 #define BYTE_TO_FLOAT(x) (float) x / 255.0f
+#define FLOAT_TO_BYTE(x) (unsigned char) (x * 255.0f)
 
 char* read_next_non_comment(FILE* fd) {
 
@@ -350,7 +351,7 @@ save_pnm_data(FILE* fd, unsigned char data, pnm_data_type_t type, pnm_palette_t 
 	unsigned char byte = data;
 
 	if(type == PNM_ASCII)
-		fprintf(fd, "%d", data);
+		fprintf(fd, "%d ", data);
 	else {
 		if(palette == PNM_BITMAP) {
 		  if(!data) _bits_buffer[0] += 1 << (7 - _bits_buffer[1]);
@@ -372,7 +373,7 @@ save_pnm(char *path, image_data_t* src, pnm_data_type_t type)
 	static char* _pnm_magic[]   = { "P1", "P2", "P3", "P4", "P5", "P6" };
 
 	size_t ix, iy;
-	unsigned char* ptr = src->data;
+	float* ptr = src->data;
 	unsigned char data[3];
 
 	pnm_palette_t palette;
@@ -401,18 +402,18 @@ save_pnm(char *path, image_data_t* src, pnm_data_type_t type)
 		for(ix=0; ix<src->width; ix++) {
 			switch(palette) {
 			case PNM_BITMAP:
-				data[0] = *ptr?1:0;
+				data[0] = FLOAT_TO_BYTE(*ptr)?1:0;
 				break;
 			case PNM_GRAYSCALE:
-				data[0] = *ptr;
+				data[0] = FLOAT_TO_BYTE(*ptr);
 				break;
 			case PNM_RGB24:
-				data[0] = *(ptr+2);
-				data[1] = *(ptr+1);
-				data[2] = *(ptr+0);
+				data[0] = FLOAT_TO_BYTE(*(ptr+0));
+				data[1] = FLOAT_TO_BYTE(*(ptr+1));
+				data[2] = FLOAT_TO_BYTE(*(ptr+2));
 				break;
 			}
-			ptr += 4;
+			ptr += 3;
 
 			save_pnm_data(fd, data[0], type, palette);
 			if(palette == PNM_RGB24) {
