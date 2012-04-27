@@ -10,6 +10,22 @@
 static char kernel_filename[] = "convolution.cl";
 static device_kernel_t kernel;
 
+static convolution_preset_t conv_presets[] = {
+        { "Identity", 0.0f, 1.0f, "0 0 0\n0 1 0\n0 0 0" },
+        { "Laplace", 0.0f, 1.0f, "-1 -1 -1\n-1 8 -1\n-1 -1 -1" },
+        { "Sharpen", 0.0f, 1.0f, "-1 -1 -1\n-1 9 -1\n-1 -1 -1" },
+        { "Gaussian Blur", 0.0f, 1.0f,
+          "0.00000067 0.00002292 0.00019117 0.00038771 0.00019117 0.00002292 0.00000067\n"
+          "0.00002292 0.00078633 0.00655965 0.01330373 0.00655965 0.00078633 0.00002292\n"
+          "0.00019117 0.00655965 0.05472157 0.11098164 0.05472157 0.00655965 0.00019117\n"
+          "0.00038771 0.01330373 0.11098164 0.22508352 0.11098164 0.01330373 0.00038771\n"
+          "0.00019117 0.00655965 0.05472157 0.11098164 0.05472157 0.00655965 0.00019117\n"
+          "0.00002292 0.00078633 0.00655965 0.01330373 0.00655965 0.00078633 0.00002292\n"
+          "0.00000067 0.00002292 0.00019117 0.00038771 0.00019117 0.00002292 0.00000067\n" },
+          
+        { "", 0.0f, 0.0f, "" },
+};
+
 void
 convolution_init()
 {
@@ -138,3 +154,17 @@ int  convolution_from_string(const char* str, convolution_t* conv)
         return retcode;
 }
 
+convolution_preset_t* convolution_get_preset_table(void)
+{
+        return conv_presets;
+}
+
+convolution_preset_t*  convolution_get_preset(const char* name)
+{
+        convolution_preset_t* ptr = conv_presets;
+        while(ptr->name[0] != 0) {
+                if(strcmp(ptr->name, name) == 0)
+                        return ptr;
+                ptr++;
+        }
+}

@@ -69,7 +69,19 @@ static void
 ui_convolutions_convocombo_changed_cb(GtkComboBox *widget, gpointer data)
 {
         ui_convolutions_t* conv = (ui_convolutions_t*)data;
+        gchar* id = gtk_combo_box_get_active_id(GTK_COMBO_BOX(widget));
         
+        if(strcmp(id, "Custom") == 0) {
+                gtk_text_buffer_set_text(conv->buffer, "", -1);
+                gtk_spin_button_set_value(conv->bias, 0.0);
+                gtk_spin_button_set_value(conv->divisor, 1.0);
+        }
+        else {
+                convolution_preset_t* preset = convolution_get_preset(id);
+                gtk_text_buffer_set_text(conv->buffer, preset->matrix, -1);
+                gtk_spin_button_set_value(conv->bias, preset->bias);
+                gtk_spin_button_set_value(conv->divisor, preset->divisor);
+        }
 }
 
 sys_result_t
@@ -119,7 +131,14 @@ ui_convolutions_dialog_new(GtkWidget *parent)
 
         GtkWidget* label_combo = gtk_label_new("Type: ");
         GtkWidget* convocombo = gtk_combo_box_text_new();
-        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(convocombo), "custom", "Custom");
+
+        convolution_preset_t* presets = convolution_get_preset_table();
+        while(presets->name[0] != 0) {
+                gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(convocombo), presets->name, presets->name);
+                presets++;
+        }
+        
+        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(convocombo), "Custom", "Custom");
         gtk_combo_box_set_active(GTK_COMBO_BOX(convocombo), 0);
 
         GtkWidget* matrix_view = gtk_text_view_new();
@@ -154,6 +173,9 @@ ui_convolutions_dialog_new(GtkWidget *parent)
         ret->buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(matrix_view));
         ret->bias = bias;
         ret->divisor = divisor;
+
+        gtk_text_buffer_set_text(ret->buffer,
+                                 convolution_get_preset_table()->matrix, -1);
 
         g_signal_connect(G_OBJECT(preview), "clicked",
                          G_CALLBACK(ui_convolutions_preview_clicked_cb), ret);
