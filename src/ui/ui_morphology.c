@@ -318,7 +318,6 @@ static void
 ui_morphology_combobox_changed(GtkWidget *widget, gpointer data)
 {
 	gchar *id = gtk_combo_box_get_active_id(GTK_COMBO_BOX(widget));
-	g_print("id: %s", id);
 	ui_morphology_t *obj = (ui_morphology_t*) data;
 	if(g_strcmp0(id, ERODE_ID) == 0) {
 		obj->op = MORPHOLOGY_ERODE;
