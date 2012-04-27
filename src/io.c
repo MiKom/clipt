@@ -1,9 +1,10 @@
 #include <config.h>
-#include <io.h>
+#include <system.h>
 #include <plugin.h>
 #include <device.h>
 #include <image.h>
-#include <system.h>
+
+#include <io.h>
 
 static io_handler_desc_t*
 io_get_load_handler_description(plugin_load_handler_t *handler)
@@ -63,6 +64,23 @@ io_get_handler_descriptions(io_handler_type_t type)
 		}
 	}
 	g_list_free(io_plugins);
+	return ret;
+}
+
+GList*
+io_get_save_handlers()
+{
+	GList *ret = NULL;
+
+	GList *io_plugins = plugin_get_by_type(PLUGIN_FILEIO);
+	GList *iter;
+	for(iter = g_list_first(io_plugins); iter; iter = g_list_next(iter)) {
+		plugin_fileio_t *plugin = (plugin_fileio_t*) iter->data;
+		int i;
+		for(i=0; i< (int) plugin->n_save_handlers; i++) {
+			ret = g_list_append(ret, plugin->save_handlers[i]);
+		}
+	}
 	return ret;
 }
 
@@ -137,4 +155,11 @@ io_load_image(const char *path)
 		free(data);
 		return CLIT_EINVALID;
 	}
+}
+
+sys_result_t
+io_save_image(const char *path, plugin_save_handler_t *handler)
+{
+	g_debug("saving to: %s, with plugin: %s", path, handler->desc);
+	return CLIT_OK;
 }

@@ -394,31 +394,35 @@ void ui_save_file_cb(GtkWidget* widget, gpointer data)
 						 GTK_FILE_CHOOSER_ACTION_SAVE,
 						 GTK_STOCK_CANCEL,
 						 GTK_RESPONSE_CANCEL,
-						 GTK_STOCK_OPEN,
+						 GTK_STOCK_SAVE,
 						 GTK_RESPONSE_ACCEPT,
 						 NULL);
 
-	GList *formats = io_get_handler_descriptions(IO_SAVE_HANDLER);
+	GList *handlers = io_get_save_handlers();
 	GList *iter;
 
-	for(iter = g_list_first(formats); iter; iter = g_list_next(iter)) {
-		io_handler_desc_t *format = (io_handler_desc_t *) iter->data;
+	for(iter = g_list_first(handlers); iter; iter = g_list_next(iter)) {
+		plugin_save_handler_t *handler = (plugin_save_handler_t *) iter->data;
 
 		filefilter = gtk_file_filter_new();
 		gtk_file_filter_set_name(GTK_FILE_FILTER(filefilter),
-					  format->desc);
-		GList *f_it;
-		for(f_it = g_list_first(format->filters); f_it; f_it = g_list_next(f_it)){
+					  handler->desc);
+		int i;
+		for(i=0; i<handler->nfilters; i++){
 			gtk_file_filter_add_pattern(GTK_FILE_FILTER(filefilter),
-						    (char*) f_it->data);
+						    (char*) handler->filters[i]);
 		}
 		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(filedialog),
 					    filefilter);
+		g_object_set_data(G_OBJECT(filefilter), "handler", (gpointer) handler);
 	}
-	g_list_free_full(formats, free);
+	g_list_free(handlers);
 
 	if(gtk_dialog_run(GTK_DIALOG(filedialog)) == GTK_RESPONSE_ACCEPT) {
-
+		GtkWidget* filter = gtk_file_chooser_get_filter(GTK_FILE_CHOOSER(filedialog));
+		plugin_save_handler_t *handler = g_object_get_data(G_OBJECT(filter), "handler");
+		gchar *path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(filedialog));
+		io_save_image(path, handler);
 	}
 	gtk_widget_destroy(GTK_WIDGET(filedialog));
 }

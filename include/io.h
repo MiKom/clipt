@@ -27,7 +27,13 @@ typedef struct io_handler_desc_s io_handler_desc_t;
 GList *
 io_get_handler_descriptions(io_handler_type_t type);
 
+GList*
+io_get_save_handlers();
+
 sys_result_t
 io_load_image(const char *path);
+
+sys_result_t
+io_save_image(const char *path, plugin_save_handler_t *handler);
 
 #endif
