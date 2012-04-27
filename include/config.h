@@ -1,5 +1,5 @@
-#ifndef __CLIT_CONFIG_H
-#define __CLIT_CONFIG_H
+#ifndef __CLIPT_CONFIG_H
+#define __CLIPT_CONFIG_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -16,14 +16,14 @@
 #include <CL/cl_gl.h>
 #endif
 
-#define CLIT_VERSION_MAJOR 0
-#define CLIT_VERSION_MINOR 1
+#define CLIPT_VERSION_MAJOR 0
+#define CLIPT_VERSION_MINOR 1
 
-#define CLIT_NAME_STRING    "CLIT: OpenCL Image Toolkit"
-#define CLIT_VERSION_STRING "0.1.0"
-#define CLIT_PROGRAM_NAME   "clit"
+#define CLIPT_NAME_STRING    "CLIPT: OpenCL Image Processing Toolkit"
+#define CLIPT_VERSION_STRING "0.1.0"
+#define CLIPT_PROGRAM_NAME   "clipt"
 
-#define CLIT_DEFAULT_CONFIG "clitrc.ini"
-#define CLIT_DEFAULT_SYMBOL "clit_plugin_info"
+#define CLIPT_DEFAULT_CONFIG "cliptrc.ini"
+#define CLIPT_DEFAULT_SYMBOL "clipt_plugin_info"
 
 #endif

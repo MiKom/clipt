@@ -1,5 +1,5 @@
-#ifndef __CLIT_UI_MORPHOLOGY_H
-#define __CLIT_UI_MORPHOLOGY_H
+#ifndef __CLIPT_UI_MORPHOLOGY_H
+#define __CLIPT_UI_MORPHOLOGY_H
 
 #include <system.h>
 #include <ui/ui.h>

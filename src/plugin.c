@@ -16,17 +16,17 @@ plugin_load(const char* path, plugin_handle_t* handle)
 
 	handle->library = dlopen(path, RTLD_NOW);
 	if(!handle->library)
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 
-	symbol.object = dlsym(handle->library, CLIT_DEFAULT_SYMBOL);
+	symbol.object = dlsym(handle->library, CLIPT_DEFAULT_SYMBOL);
 	if(!symbol.object) {
 		dlclose(handle->library);
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	}
 
 	handle->plugin = ((plugin_t* (*)(void))(symbol.func))();
 	init_result = handle->plugin->plugin_load();
-	if(init_result != CLIT_OK)
+	if(init_result != CLIPT_OK)
 		dlclose(handle->library);
 
 	return init_result;
@@ -38,7 +38,7 @@ plugin_unload(plugin_handle_t* handle, gpointer placeholder)
 	sys_result_t deinit_result;
 	g_debug("Unloading plugin %s", handle->plugin->name);
 	deinit_result = handle->plugin->plugin_unload();
-	if(deinit_result != CLIT_OK) {
+	if(deinit_result != CLIPT_OK) {
 		g_warning("Unloading plugin \"%s\" failed", handle->plugin->name);
 	}
 	dlclose(handle->library);
@@ -86,21 +86,21 @@ sys_result_t plugin_load_all()
 	int num_entries = scandir(config->dir_plugins, &match_entries,
 				  filter_f, alphasort);
 	if(num_entries == -1) {
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	}
 
 	while(num_entries--) {
 		plugin_handle_t *handle = g_malloc(sizeof(plugin_handle_t));
 		if(handle == NULL) {
 			g_critical("Out of memory");
-			return CLIT_ERESOURCES;
+			return CLIPT_ERESOURCES;
 		}
 
 		char *plugin_path = calloc(PATH_MAX, sizeof(char));
 		if(plugin_path == NULL) {
 			g_critical("Out of memory");
 			g_free(handle);
-			return CLIT_ERESOURCES;
+			return CLIPT_ERESOURCES;
 		}
 
 		strcat(plugin_path, config->dir_plugins);
@@ -108,7 +108,7 @@ sys_result_t plugin_load_all()
 		strcat(plugin_path, match_entries[num_entries]->d_name);
 
 		sys_result_t err = plugin_load(plugin_path, handle);
-		if(err != CLIT_OK) {
+		if(err != CLIPT_OK) {
 			g_warning("Cannot load plugin from: %s", plugin_path);
 			g_free(handle);
 		} else {
@@ -121,10 +121,10 @@ sys_result_t plugin_load_all()
 		free(plugin_path);
 	}
 	free(match_entries);
-	return CLIT_OK;
+	return CLIPT_OK;
 #else
 	g_warning("No plugin system available");
-	return CLIT_ENOTIMPLEMENTED;
+	return CLIPT_ENOTIMPLEMENTED;
 #endif
 }
 
@@ -132,5 +132,5 @@ sys_result_t plugin_unload_all()
 {
 	sys_state_t* state = sys_get_state();
 	g_list_foreach(state->plugin_handles, (GFunc) plugin_unload, NULL);
-	return CLIT_OK;
+	return CLIPT_OK;
 }

@@ -1,5 +1,5 @@
-#ifndef __CLIT_NODES_COLORSPACES_H
-#define __CLIT_NODES_COLORSPACES_H
+#ifndef __CLIPT_NODES_COLORSPACES_H
+#define __CLIPT_NODES_COLORSPACES_H
 
 void
 colorspaces_init();

@@ -1,5 +1,5 @@
-#ifndef __CLIT_RENDER_H
-#define __CLIT_RENDER_H
+#ifndef __CLIPT_RENDER_H
+#define __CLIPT_RENDER_H
 
 #include <X11/Xlib.h>
 #include <system.h>

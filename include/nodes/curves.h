@@ -1,5 +1,5 @@
-#ifndef __CLIT_NODES_CURVES_H
-#define __CLIT_NODES_CURVES_H
+#ifndef __CLIPT_NODES_CURVES_H
+#define __CLIPT_NODES_CURVES_H
 
 
 void

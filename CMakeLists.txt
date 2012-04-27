@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(CLIT)
+PROJECT(CLIPT)
 SET(CMAKE_C_FLAGS "-ggdb -fPIC -pipe")
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/plugins)
 
@@ -12,7 +12,7 @@ FIND_PACKAGE(PkgConfig)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
 
-INCLUDE_DIRECTORIES( ${GTK3_INCLUDE_DIRS} ${CLIT_SOURCE_DIR}/include)
+INCLUDE_DIRECTORIES( ${GTK3_INCLUDE_DIRS} ${CLIPT_SOURCE_DIR}/include)
 
 FIND_PACKAGE(OpenGL)
 INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
@@ -26,7 +26,10 @@ INCLUDE_DIRECTORIES( ${OPENCL_INCLUDE_DIRS} )
 ADD_SUBDIRECTORY(plugins)
 
 FILE(COPY clprogs DESTINATION ${PROJECT_BINARY_DIR})
-SET( clit_SOURCES
+FILE(COPY images DESTINATION ${PROJECT_BINARY_DIR})
+FILE(COPY .cliptrc.ini DESTINATION ${PROJECT_BINARY_DIR})
+
+SET( clipt_SOURCES
 	src/main.c
 	src/core.c
 	src/system.c
@@ -53,7 +56,7 @@ SET( clit_SOURCES
         src/nodes/convolution.c
 )
 
-SET( clit_CLPROGS
+SET( clipt_CLPROGS
 	clprogs/lut.cl
 	clprogs/gamma.cl
 	clprogs/brightness.cl
@@ -64,8 +67,8 @@ SET( clit_CLPROGS
         clprogs/convolution.cl
 )
 
-SET( clit_HEADERS
-	include/clit.h
+SET( clipt_HEADERS
+	include/clipt.h
 	include/config.h
 	include/core.h
 	include/image.h
@@ -94,5 +97,5 @@ SET( clit_HEADERS
 
 SET(COMMON_LIBRARIES m dl)
 
-ADD_EXECUTABLE(clit ${clit_SOURCES} ${clit_HEADERS} ${clit_CLPROGS})
-TARGET_LINK_LIBRARIES(clit ${COMMON_LIBRARIES} ${GTK3_LIBRARIES} ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} ${OPENCL_LIBRARIES} )
+ADD_EXECUTABLE(clipt ${clipt_SOURCES} ${clipt_HEADERS} ${clipt_CLPROGS})
+TARGET_LINK_LIBRARIES(clipt ${COMMON_LIBRARIES} ${GTK3_LIBRARIES} ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} ${OPENCL_LIBRARIES} )

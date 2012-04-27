@@ -5,12 +5,12 @@
 sys_result_t image_bind(device_buffer_t* buffer, image_t* image)
 {
         if(buffer->storage == DEVICE_BUFFER_INVALID)
-                return CLIT_EINVALID;
+                return CLIPT_EINVALID;
         
         device_buffer_getprop(buffer, &image->width, &image->height, &image->channels);
         image->buffer = buffer;
         image->data   = NULL;
-        return CLIT_OK;
+        return CLIPT_OK;
 }
 
 float* image_lock(image_t* image, sys_access_t access)

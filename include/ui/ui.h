@@ -1,5 +1,5 @@
-#ifndef __CLIT_UI_H
-#define __CLIT_UI_H
+#ifndef __CLIPT_UI_H
+#define __CLIPT_UI_H
 
 #include <X11/Xlib.h>
 #include <gtk/gtk.h>

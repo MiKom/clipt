@@ -9,7 +9,7 @@
 
 static void show_version(void)
 {
-	fprintf(stderr, "%s, version %s\n", CLIT_NAME_STRING, CLIT_VERSION_STRING);
+	fprintf(stderr, "%s, version %s\n", CLIPT_NAME_STRING, CLIPT_VERSION_STRING);
 	fprintf(stderr, "(c) 2011 Michał Siejak, Miłosz Kosobucki\n");
 }
 
@@ -26,7 +26,7 @@ static void parse_arguments(int argc, char** argv, sys_config_t* config)
 	g_snprintf(config->project, PATH_MAX, "%s", "images/lenna.pnm");
 
 	GError* error = NULL;
-	GOptionContext* context = g_option_context_new(" - "CLIT_NAME_STRING);
+	GOptionContext* context = g_option_context_new(" - "CLIPT_NAME_STRING);
 	g_option_context_add_main_entries(context, entries, NULL);
 	g_option_context_add_group(context, gtk_get_option_group(TRUE));
 
@@ -46,8 +46,8 @@ static int parse_config(const gchar* filename, const gchar* group,
 			sys_config_t* config)
 {
 	gchar* rcfile_keys[] = {
-		"plugin-dir", "/usr/lib/clit", config->dir_plugins,
-		"clprog-dir", "/usr/lib/clit/cl", config->dir_clprogs,
+		"plugin-dir", "/usr/lib/clipt", config->dir_plugins,
+		"clprog-dir", "/usr/lib/clipt/cl", config->dir_clprogs,
 		NULL,
 	};
 	
@@ -63,10 +63,10 @@ static int parse_config(const gchar* filename, const gchar* group,
 	else {
 		gchar* confdir = getenv("XDG_CONFIG_HOME");
 		if(confdir)
-			sprintf(config_file, "%s/%s", confdir, CLIT_DEFAULT_CONFIG);
+			sprintf(config_file, "%s/%s", confdir, CLIPT_DEFAULT_CONFIG);
 		else {
 			g_warning("No XDG_CONFIG_HOME environment variable set");
-			sprintf(config_file, "./.%s", CLIT_DEFAULT_CONFIG);
+			sprintf(config_file, "./.%s", CLIPT_DEFAULT_CONFIG);
 		}
 	}
 
@@ -81,12 +81,12 @@ static int parse_config(const gchar* filename, const gchar* group,
 		g_warning("Configuration parse error: %s", error->message);
 		g_error_free(error);
 		g_key_file_free(keyfile);
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	}
 	if(!g_key_file_has_group(keyfile, group)) {
 		g_warning("Configuration file skipped. No [%s] group found.", group);
 		g_key_file_free(keyfile);
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	}
 	g_message("Configuration file: %s", config_file);
 
@@ -99,17 +99,17 @@ static int parse_config(const gchar* filename, const gchar* group,
 	}
 	
 	g_key_file_free(keyfile);
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 int main(int argc, char** argv)
 {
-	int retvalue = CLIT_OK;
+	int retvalue = CLIPT_OK;
 	sys_config_t* sys_config = sys_get_config();
 
 	parse_arguments(argc, argv, sys_config);
-	g_message("%s is starting ...", CLIT_NAME_STRING);
-	parse_config(NULL, "clit", sys_config);
+	g_message("%s is starting ...", CLIPT_NAME_STRING);
+	parse_config(NULL, "clipt", sys_config);
 	
 	retvalue = core_main();
 	

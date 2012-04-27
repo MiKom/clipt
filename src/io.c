@@ -138,7 +138,7 @@ io_load_image(const char *path)
 			if(plugin->load_handlers[i]->can_open(path)) {
 				plugin_io_load_func_t load_fun =
 						plugin->load_handlers[i]->function;
-				if( load_fun(path, &data) == CLIT_OK ) {
+				if( load_fun(path, &data) == CLIPT_OK ) {
 					loaded = TRUE;
 					break;
 				}
@@ -150,10 +150,9 @@ io_load_image(const char *path)
 
 	if( loaded ) {
 		io_fill_buffers(data);
-		return CLIT_OK;
+		return CLIPT_OK;
 	} else {
-		free(data);
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	}
 }
 
@@ -162,10 +161,10 @@ io_save_image(const char *path, plugin_save_handler_t *handler)
 {
 	g_debug("saving to: %s, with plugin: %s", path, handler->desc);
 	image_t image;
-	if( image_bind(sys_get_current_buffer(), &image)  != CLIT_OK ) {
-		return CLIT_ERROR;
+	if( image_bind(sys_get_current_buffer(), &image)  != CLIPT_OK ) {
+		return CLIPT_ERROR;
 	}
-	image_lock(&image, CLIT_READ_ONLY);
+	image_lock(&image, CLIPT_READ_ONLY);
 
 	image_data_t im_data;
 	im_data.width = image.width;

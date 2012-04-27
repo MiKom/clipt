@@ -1,5 +1,5 @@
-#ifndef __CLIT_PLUGIN_H
-#define __CLIT_PLUGIN_H
+#ifndef __CLIPT_PLUGIN_H
+#define __CLIPT_PLUGIN_H
 
 
 typedef sys_result_t (*plugin_load_func_t)(void);
@@ -85,7 +85,7 @@ plugin_get_by_type(plugin_type_t type);
 
 /**
  * Loads all plugins from directory specified in config file,
- * otherwise from /usr/lib/clit
+ * otherwise from /usr/lib/clipt
  **/
 sys_result_t
 plugin_load_all();

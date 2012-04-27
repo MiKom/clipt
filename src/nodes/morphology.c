@@ -27,7 +27,7 @@ sys_result_t
 morphology_init()
 {
 	if(initialized) {
-		return CLIT_OK;
+		return CLIPT_OK;
 	}
 	//TODO: Move to some common function
 	char *progdir = sys_get_config()->dir_clprogs;
@@ -48,7 +48,7 @@ morphology_init()
 		g_error("Error while morphology binarization kernels");
 	}
 	initialized = TRUE;
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t
@@ -56,7 +56,7 @@ morphology_release()
 {
 	device_kernel_destroy(&erosion_kernel);
 	device_kernel_destroy(&dilation_kernel);
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t
@@ -66,14 +66,14 @@ morphology_allocate_temp(device_buffer_t *buf)
 	device_buffer_getprop(buf, &width, &height, &channels);
 	device_buffer_create(sys_get_state()->context, DEVICE_BUFFER_HARDWARE,
 			     width, height, channels, &tmp_buf);
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t
 morphology_deallocate_temp()
 {
 	device_buffer_destroy(sys_get_state()->context, &tmp_buf);
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t
@@ -100,7 +100,7 @@ morphology_apply(
 		morphology_launch_kernel(erosion_kernel, &tmp_buf, dst, element, element_size);
 		break;
 	}
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 static void morphology_launch_kernel(

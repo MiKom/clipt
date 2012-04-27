@@ -1,11 +1,11 @@
-#ifndef __CLIT_NODES_CONVOLUTION_H
-#define __CLIT_NODES_CONVOLUTION_H
+#ifndef __CLIPT_NODES_CONVOLUTION_H
+#define __CLIPT_NODES_CONVOLUTION_H
 
-#define CLIT_CONVMAX 128
+#define CLIPT_CONVMAX 128
 
 struct convolution_s
 {
-        float matrix[CLIT_CONVMAX*CLIT_CONVMAX];
+        float matrix[CLIPT_CONVMAX*CLIPT_CONVMAX];
         size_t w, h;
         float divisor;
         float bias;
@@ -32,4 +32,4 @@ int convolution_from_string(const char* str, convolution_t* conv);
 convolution_preset_t* convolution_get_preset_table(void);
 convolution_preset_t* convolution_get_preset(const char* name);
 
-#endif __CLIT_NODES_CONVOLUTION_H
+#endif __CLIPT_NODES_CONVOLUTION_H

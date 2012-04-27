@@ -182,7 +182,7 @@ device_result_t device_buffer_create_from_data(device_context_t* context, device
         if(result != DEVICE_OK)
                 return result;
 
-        pixels = device_buffer_map(buffer, CLIT_WRITE_ONLY);
+        pixels = device_buffer_map(buffer, CLIPT_WRITE_ONLY);
         if(!pixels) {
                 device_buffer_destroy(context, buffer);
                 return DEVICE_ERROR;
@@ -202,7 +202,7 @@ device_result_t device_buffer_create(device_context_t* context, device_buffer_st
         buffer->storage = DEVICE_BUFFER_INVALID;
         
         if(storage == DEVICE_BUFFER_HARDWARE) {
-                if(render_buffer_create(width, height, channels, &buffer->rbuf) != CLIT_OK)
+                if(render_buffer_create(width, height, channels, &buffer->rbuf) != CLIPT_OK)
                         return DEVICE_ERROR;
                 
                 buffer->cl_object = clCreateFromGLBuffer(context->context,
@@ -260,15 +260,15 @@ device_result_t device_buffer_copy(device_buffer_t* src, device_buffer_t* dst)
         device_buffer_getsize(src, &data_size);
         
         if(src->storage == DEVICE_BUFFER_HARDWARE && dst->storage == DEVICE_BUFFER_HARDWARE) {
-                if(render_buffer_copy(&src->rbuf, &dst->rbuf, 0, data_size) != CLIT_OK)
+                if(render_buffer_copy(&src->rbuf, &dst->rbuf, 0, data_size) != CLIPT_OK)
                         return DEVICE_ERROR;
         }
         else {
                 void *srcptr, *dstptr;
                 
-                if((srcptr = device_buffer_map(src, CLIT_READ_ONLY)) == NULL)
+                if((srcptr = device_buffer_map(src, CLIPT_READ_ONLY)) == NULL)
                         return DEVICE_ERROR;
-                if((dstptr = device_buffer_map(dst, CLIT_WRITE_ONLY)) == NULL) {
+                if((dstptr = device_buffer_map(dst, CLIPT_WRITE_ONLY)) == NULL) {
                         device_buffer_unmap(src);
                         return DEVICE_ERROR;
                 }
@@ -326,7 +326,7 @@ void device_buffer_unmap(device_buffer_t* buffer)
 
 device_result_t device_buffer_clear_1f(device_buffer_t* buffer, float v)
 {
-        float* ptr = device_buffer_map(buffer, CLIT_WRITE_ONLY);
+        float* ptr = device_buffer_map(buffer, CLIPT_WRITE_ONLY);
         size_t i, n = buffer->rbuf.width * buffer->rbuf.height * buffer->rbuf.channels;
 
         for(i=0; i<n; i++)
@@ -340,7 +340,7 @@ device_result_t device_buffer_clear_3f(device_buffer_t* buffer, float r, float g
         if(buffer->rbuf.channels != 3)
                 return DEVICE_EINVALID;
         
-        float* ptr  = device_buffer_map(buffer, CLIT_WRITE_ONLY);
+        float* ptr  = device_buffer_map(buffer, CLIPT_WRITE_ONLY);
         size_t i, n = buffer->rbuf.width * buffer->rbuf.height;
         
         for(i=0; i<n; i++) {

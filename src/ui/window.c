@@ -137,7 +137,7 @@ ui_window_init(ui_widget_t** widget)
 {
 	ui_widget_t *ui_widget = ui_widget_defaults(*widget,
 						    "Application Window",
-						    400, 300);
+						    800, 600);
 	ui_window = ui_widget->widget;
 	GError *error = NULL;
 	
@@ -163,32 +163,32 @@ ui_window_init(ui_widget_t** widget)
 
         //Populating menus with operations
         ui_histogram_add_action_entries(ui_action_group, ui_window);
-	if( ui_histogram_add_ui_string(ui_manager) != CLIT_OK ) {
+	if( ui_histogram_add_ui_string(ui_manager) != CLIPT_OK ) {
 		g_warning("Adding histogram menus failed");
 	}
 
 	ui_curves_add_action_entries(ui_action_group, ui_window);
-	if( ui_curves_add_ui_string(ui_manager) != CLIT_OK ) {
+	if( ui_curves_add_ui_string(ui_manager) != CLIPT_OK ) {
 		g_warning("Adding curves menus failed");
 	}
 
 	ui_convolutions_add_action_entries(ui_action_group, ui_window);
-	if( ui_convolutions_add_ui_string(ui_manager) != CLIT_OK ) {
+	if( ui_convolutions_add_ui_string(ui_manager) != CLIPT_OK ) {
 		g_warning("Adding convolutions menu failed");
 	}
 
 	ui_binarization_add_action_entries(ui_action_group, ui_window);
-	if( ui_binarization_add_ui_string(ui_manager) != CLIT_OK ) {
+	if( ui_binarization_add_ui_string(ui_manager) != CLIPT_OK ) {
 		g_warning("Adding binarization menu failed");
 	}
 
 	ui_colorspaces_add_action_entries(ui_action_group, ui_window);
-	if( ui_colorspaces_add_ui_string(ui_manager) != CLIT_OK ) {
+	if( ui_colorspaces_add_ui_string(ui_manager) != CLIPT_OK ) {
 		g_warning("Adding colorspaces menu entries failed");
 	}
 
 	ui_morphology_add_action_entries(ui_action_group, ui_window);
-	if( ui_morphology_add_ui_string(ui_manager) != CLIT_OK ) {
+	if( ui_morphology_add_ui_string(ui_manager) != CLIPT_OK ) {
 		g_warning("Adding morphology menu entry failed");
 	}
 
@@ -196,7 +196,7 @@ ui_window_init(ui_widget_t** widget)
 	if(error) {
 		g_error("Building menus failed: %s", error->message);
 		g_error_free(error);
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	}
 	ui_menu_bar = gtk_ui_manager_get_widget(ui_manager,"/MainMenu");
 	gtk_box_pack_start(GTK_BOX(ui_vbox), ui_menu_bar, FALSE, FALSE, 2);
@@ -230,15 +230,15 @@ ui_window_init(ui_widget_t** widget)
 
 	gtk_widget_show_all(ui_window);
 	ui_widget->widget = ui_window;
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 int ui_window_destroy(ui_widget_t* widget)
 {
 	if(!widget->widget)
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	ui_widget_free(widget);
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 static gboolean ui_window_delete_event_cb(GtkWidget *widget, gpointer data)
@@ -270,14 +270,14 @@ int ui_window_event(ui_widget_t* widget, unsigned long event)
 		gtk_widget_hide(widget->widget);
 		break;
 	}
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 void ui_drawing_area_after_realize_cb(GtkWidget* widget, gpointer data)
 {
 	ui_widget_t* drawing_area = (ui_widget_t*) data;
 	Window xwin;
-	if(ui_widget_getnative(drawing_area, &xwin) != CLIT_OK) {
+	if(ui_widget_getnative(drawing_area, &xwin) != CLIPT_OK) {
 		fprintf(stderr, "Cannot get native window of drawing area, aborting\n");
 		exit(1);
 	}
@@ -371,7 +371,7 @@ void ui_open_file_cb(GtkWidget* widget, gpointer data)
 		gchar* filename;
 		filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(ui_filedialog));
 
-		if( io_load_image(filename) != CLIT_OK) {
+		if( io_load_image(filename) != CLIPT_OK) {
 			GtkWidget *err_dialog;
 			err_dialog = gtk_message_dialog_new(ui_filedialog,
 							    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -490,11 +490,11 @@ static void ui_about_cb(GtkWidget* widget, gpointer data)
 			"Copyright © 2011 Miłosz Kosobucki\n";
 
 	gtk_show_about_dialog(GTK_WINDOW(ui_window),
-			      "program-name", CLIT_NAME_STRING,
+			      "program-name", CLIPT_NAME_STRING,
 			      "authors", authors,
 			      "copyright", copyrights,
-			      "version", CLIT_VERSION_STRING,
-			      "logo-icon-name", CLIT_PROGRAM_NAME,
+			      "version", CLIPT_VERSION_STRING,
+			      "logo-icon-name", CLIPT_PROGRAM_NAME,
 			      "comments", "Hardware accelerated Image Processing toolkit",
 			      "license-type", GTK_LICENSE_GPL_3_0,
 			      NULL

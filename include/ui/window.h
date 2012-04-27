@@ -1,5 +1,5 @@
-#ifndef __CLIT_UI_WINDOW_H
-#define __CLIT_UI_WINDOW_H
+#ifndef __CLIPT_UI_WINDOW_H
+#define __CLIPT_UI_WINDOW_H
 
 #include <system.h>
 #include <ui/ui.h>

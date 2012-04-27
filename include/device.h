@@ -1,5 +1,5 @@
-#ifndef __CLIT_DEVICE_H
-#define __CLIT_DEVICE_H
+#ifndef __CLIPT_DEVICE_H
+#define __CLIPT_DEVICE_H
 
 #include <system.h>
 #include <render.h>

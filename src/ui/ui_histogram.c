@@ -65,9 +65,9 @@ ui_histogram_add_ui_string(GtkUIManager* ui_manager)
 	gtk_ui_manager_add_ui_from_string(ui_manager, ui_def, -1, &error);
 	if(error) {
 		g_error_free(error);
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	}
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 void

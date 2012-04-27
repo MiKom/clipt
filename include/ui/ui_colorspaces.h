@@ -1,5 +1,5 @@
-#ifndef __CLIT_UI_COLORSPACES_H
-#define __CLIT_UI_COLORSPACES_H
+#ifndef __CLIPT_UI_COLORSPACES_H
+#define __CLIPT_UI_COLORSPACES_H
 
 #include<system.h>
 

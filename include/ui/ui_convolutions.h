@@ -1,5 +1,5 @@
-#ifndef __CLIT_UI_CONVOLUTIONS_H
-#define __CLIT_UI_CONVOLUTIONS_H
+#ifndef __CLIPT_UI_CONVOLUTIONS_H
+#define __CLIPT_UI_CONVOLUTIONS_H
 
 #include <system.h>
 #include <ui/ui.h>

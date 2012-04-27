@@ -77,9 +77,9 @@ sys_commit_buffer(device_buffer_t *buffer)
 	err |= device_buffer_copy(buffer, sys_get_current_buffer());
 
 	if( err != DEVICE_OK ) {
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	} else {
-		return CLIT_OK;
+		return CLIPT_OK;
 	}
 }
 
@@ -105,7 +105,7 @@ sys_clear_buffers()
 	if( source->storage != DEVICE_BUFFER_INVALID ) {
 		device_buffer_destroy(sys_get_state()->context, source);
 	}
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t
@@ -116,9 +116,9 @@ sys_undo()
 	err |= device_buffer_copy(sys_get_current_buffer(), sys_get_draw_buffer());
 
 	if( err != DEVICE_OK ) {
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	} else {
-		return CLIT_OK;
+		return CLIPT_OK;
 	}
 }
 
@@ -129,9 +129,9 @@ sys_reset()
 	err = device_buffer_copy(sys_get_state()->source, sys_get_current_buffer());
 	err |= device_buffer_copy(sys_get_state()->source, sys_get_draw_buffer());
 	if( err != DEVICE_OK ) {
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	} else {
-		return CLIT_OK;
+		return CLIPT_OK;
 	}
 }
 sys_result_t
@@ -141,8 +141,8 @@ sys_draw_current_buffer()
 	err = device_buffer_copy(sys_get_current_buffer(), sys_get_draw_buffer());
 
 	if( err != DEVICE_OK ) {
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	} else {
-		return CLIT_OK;
+		return CLIPT_OK;
 	}
 }

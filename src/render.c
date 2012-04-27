@@ -75,7 +75,7 @@ render_context_init(Window xwindow, GLXContext* out_ctx)
 
 	*out_ctx = ctx;
 	XSetErrorHandler(oldHandler);
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t
@@ -109,7 +109,7 @@ render_context_draw(Window xwindow, GLXContext* ctx)
 	glFlush();
 	glXSwapBuffers(disp, xwindow);
 
-        return CLIT_OK;
+        return CLIPT_OK;
 }
 
 
@@ -118,7 +118,7 @@ render_context_free(GLXContext ctx)
 {
 	glXDestroyContext(disp, ctx);
 	XCloseDisplay(disp);
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t
@@ -126,7 +126,7 @@ render_buffer_create(size_t width, size_t height, size_t channels,
                      render_buffer_t* buffer)
 {
         if(width == 0 || height == 0 || channels == 0)
-                return CLIT_EINVALID;
+                return CLIPT_EINVALID;
 
         size_t mem_size = width * height * channels * sizeof(float);
         
@@ -138,7 +138,7 @@ render_buffer_create(size_t width, size_t height, size_t channels,
         buffer->width    = width;
         buffer->height   = height;
         buffer->channels = channels;
-        return CLIT_OK;
+        return CLIPT_OK;
 }
 
 sys_result_t
@@ -146,7 +146,7 @@ render_buffer_destroy(render_buffer_t* buffer)
 {
         glDeleteBuffers(1, &buffer->gl_object);
         buffer->gl_object = 0;
-        return CLIT_OK;
+        return CLIPT_OK;
 }
 
 void
@@ -192,6 +192,6 @@ render_buffer_copy(render_buffer_t* src, render_buffer_t* dst,
         glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 
         if(gl_error != 0)
-                return CLIT_ERROR;
-        return CLIT_OK;                
+                return CLIPT_ERROR;
+        return CLIPT_OK;                
 }

@@ -48,9 +48,9 @@ ui_widget_getnative(ui_widget_t* widget, Window* xwindow)
 	GdkWindow* gdk_window = gtk_widget_get_window(widget->widget);
 	gboolean is_native = gdk_window_ensure_native(gdk_window);
 	if(!is_native)
-		return CLIT_EINVALID;
+		return CLIPT_EINVALID;
 	Window ret = gdk_x11_window_get_xid(gdk_window);
 	*xwindow = ret;
 
-	return CLIT_OK;
+	return CLIPT_OK;
 }

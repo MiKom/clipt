@@ -1,5 +1,5 @@
-#ifndef __CLIT_UI_CURVES_H
-#define __CLIT_UI_CURVES_H
+#ifndef __CLIPT_UI_CURVES_H
+#define __CLIPT_UI_CURVES_H
 
 #include <system.h>
 #include <ui/ui.h>

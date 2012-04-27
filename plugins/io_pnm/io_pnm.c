@@ -2,7 +2,7 @@
 #include <math.h>
 #include <string.h>
 
-#include <clit.h>
+#include <clipt.h>
 
 enum pnm_data_type_e {
 	PNM_ASCII = 0,
@@ -55,7 +55,7 @@ static plugin_t base_desc =
 
 static plugin_fileio_t io_plugin_desc;
 
-plugin_t* clit_plugin_info()
+plugin_t* clipt_plugin_info()
 {
 	//TODO: clean up this shit
 	plugin_fileio_t *ret = malloc(sizeof(plugin_fileio_t));
@@ -97,12 +97,12 @@ sys_result_t pnm_plugin_load()
 {
 	io_plugin_desc.base = base_desc;
 
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t pnm_plugin_unload()
 {
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 int can_open(const char* path)
@@ -182,14 +182,14 @@ sys_result_t load_pnm(const char *path, image_data_t **image)
 
 	FILE *fd = fopen(path, "r");
 	if(fd == NULL) {
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	}
 	char magic[2];
 	fread(magic, sizeof(char), 2, fd);
 
 	//Wrong magic
 	if(magic[0] != 'P') {
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	}
 	//discarding newline character
 	getc(fd);
@@ -210,7 +210,7 @@ sys_result_t load_pnm(const char *path, image_data_t **image)
 	image_data_t* ret = malloc(sizeof(image_data_t));
 
 	if(!ret) {
-		return CLIT_ERESOURCES;
+		return CLIPT_ERESOURCES;
 	}
 
 	ret->width = width;
@@ -253,13 +253,13 @@ sys_result_t load_pnm(const char *path, image_data_t **image)
 		error = load_pnm_data(fd, PNM_BINARY, ret, maxval);
 		break;
 	}
-	if(error != CLIT_OK) {
+	if(error != CLIPT_OK) {
 		free(ret->data);
 		free(ret);
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	} else {
 		*image = ret;
-		return CLIT_OK;
+		return CLIPT_OK;
 	}
 }
 
@@ -288,7 +288,7 @@ sys_result_t load_bitmap(FILE* fp, image_data_t* dst)
 		single_pixel = (1 - ((last_byte >> j) & 0x01)) * 255;
 		dst->data[data_idx++] = BYTE_TO_FLOAT(single_pixel);
 	}
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, int maxval)
@@ -341,7 +341,7 @@ sys_result_t load_pnm_data(FILE* fd, pnm_data_type_t type, image_data_t* dst, in
 			}
 		}
 	}
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 static sys_result_t
@@ -364,7 +364,7 @@ save_pnm_data(FILE* fd, unsigned char data, pnm_data_type_t type, pnm_palette_t 
 		else
 			fwrite(&byte, sizeof(unsigned char), 1, fd);
 	}
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 sys_result_t
@@ -392,7 +392,7 @@ save_pnm(char *path, image_data_t* src, pnm_data_type_t type)
 
 	FILE* fd = fopen(path, "w");
 	if(fd == NULL) {
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	}
 
 	fprintf(fd, "%s\n%d %d\n", _pnm_magic[palette + 3*type], src->width, src->height);
@@ -426,6 +426,6 @@ save_pnm(char *path, image_data_t* src, pnm_data_type_t type)
 		if(type == PNM_ASCII) fputc('\n', fd);
 	}
 	fclose(fd);
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 

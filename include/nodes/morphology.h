@@ -1,5 +1,5 @@
-#ifndef __CLIT_NODES_MORPHOLOGY_H
-#define __CLIT_NODES_MORPHOLOGY_H
+#ifndef __CLIPT_NODES_MORPHOLOGY_H
+#define __CLIPT_NODES_MORPHOLOGY_H
 
 enum morphology_operation_e {
 	MORPHOLOGY_ERODE,

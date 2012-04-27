@@ -47,9 +47,9 @@ ui_binarization_add_ui_string(GtkUIManager *ui_manager)
 					  -1, &error);
 	if(error) {
 		g_error_free(error);
-		return CLIT_ERROR;
+		return CLIPT_ERROR;
 	}
-	return CLIT_OK;
+	return CLIPT_OK;
 }
 
 void

@@ -1,5 +1,5 @@
-#ifndef __CLIT_IMAGE_H
-#define __CLIT_IMAGE_H
+#ifndef __CLIPT_IMAGE_H
+#define __CLIPT_IMAGE_H
 
 #include <system.h>
 

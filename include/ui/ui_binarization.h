@@ -1,5 +1,5 @@
-#ifndef __CLIT_UI_BINARIZATION_H
-#define __CLIT_UI_BINARIZATION_H
+#ifndef __CLIPT_UI_BINARIZATION_H
+#define __CLIPT_UI_BINARIZATION_H
 
 #include <system.h>
 

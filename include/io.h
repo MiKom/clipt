@@ -1,5 +1,5 @@
-#ifndef __CLIT_IO_H
-#define __CLIT_IO_H
+#ifndef __CLIPT_IO_H
+#define __CLIPT_IO_H
 
 #include <system.h>
 

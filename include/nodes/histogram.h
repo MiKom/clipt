@@ -1,5 +1,5 @@
-#ifndef __CLIT_NODES_HISTOGRAM_H
-#define __CLIT_NODES_HISTOGRAM_H
+#ifndef __CLIPT_NODES_HISTOGRAM_H
+#define __CLIPT_NODES_HISTOGRAM_H
 
 enum histogram_type_e {
 	HISTOGRAM_RED,

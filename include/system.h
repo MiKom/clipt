@@ -1,5 +1,5 @@
-#ifndef __CLIT_SYSTEM_H
-#define __CLIT_SYSTEM_H
+#ifndef __CLIPT_SYSTEM_H
+#define __CLIPT_SYSTEM_H
 
 typedef struct device_context_s device_context_t;
 typedef struct device_buffer_s device_buffer_t;
@@ -8,22 +8,22 @@ typedef struct image_s image_t;
 
 enum sys_result_e
 {
-	CLIT_OK = 0x00,
-	CLIT_ENOTIMPLEMENTED,
-	CLIT_EINVALID,
-	CLIT_ERESOURCES,
-	CLIT_ENOTFOUND,
-	CLIT_EACCESS,
-	CLIT_EFORMAT,
-	CLIT_ERROR
+	CLIPT_OK = 0x00,
+	CLIPT_ENOTIMPLEMENTED,
+	CLIPT_EINVALID,
+	CLIPT_ERESOURCES,
+	CLIPT_ENOTFOUND,
+	CLIPT_EACCESS,
+	CLIPT_EFORMAT,
+	CLIPT_ERROR
 };
 typedef enum sys_result_e sys_result_t;
 
 enum sys_access_e
 {
-	CLIT_READ_ONLY = 0,
-	CLIT_WRITE_ONLY,
-	CLIT_READ_WRITE
+	CLIPT_READ_ONLY = 0,
+	CLIPT_WRITE_ONLY,
+	CLIPT_READ_WRITE
 };
 typedef enum sys_access_e sys_access_t;
 
