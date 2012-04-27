@@ -99,6 +99,8 @@ io_fill_buffers(image_data_t *data)
 			     data->height,
 			     data->channels,
 			     sys_get_previous_buffer());
+	device_buffer_copy(sys_get_state()->source,
+			   sys_get_previous_buffer());
 }
 
 sys_result_t

@@ -169,6 +169,7 @@ curves_apply_lut8(device_buffer_t *src, device_buffer_t *dst, int *lut)
 	} else {
 		g_warning("curves_apply_lut8: Couldn't release CL objects");
 	}
+	clReleaseMemObject(lut_d);
 }
 
 

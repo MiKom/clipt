@@ -7,6 +7,8 @@
 
 #define BLOCK_SIZE 512
 
+static gboolean initialized = FALSE;
+
 static const char filename[] = "morphology.cl";
 static device_kernel_t erosion_kernel;
 static device_kernel_t dilation_kernel;
@@ -23,6 +25,9 @@ static void morphology_launch_kernel(
 sys_result_t
 morphology_init()
 {
+	if(initialized) {
+		return;
+	}
 	//TODO: Move to some common function
 	char *progdir = sys_get_config()->dir_clprogs;
 
@@ -32,15 +37,16 @@ morphology_init()
 	g_debug("binarization_init: %s", progpath);
 	device_result_t err = device_kernel_create(sys_get_state()->context,
 						   progpath, "erode",
-						   &dilation_kernel);
+						   &erosion_kernel);
 	err |= device_kernel_create(sys_get_state()->context,
 				    progpath, "dilate",
-				    &erosion_kernel);
+				    &dilation_kernel);
 	free(progpath);
 
 	if( err != DEVICE_OK ) {
-		g_error("Error while creating binarization kernels");
+		g_error("Error while morphology binarization kernels");
 	}
+	initialized = TRUE;
 }
 
 sys_result_t
@@ -123,7 +129,6 @@ static void morphology_launch_kernel(
 		unsigned int *element,
 		size_t element_size)
 {
-	g_debug("lol");
 	cl_uint i = 0;
 	cl_event event;
 	cl_command_queue queue = sys_get_state()->context->queue;
@@ -135,10 +140,11 @@ static void morphology_launch_kernel(
 	cl_int len = width * height;
 	size_t el_length = element_size * element_size;
 	element_d = clCreateBuffer(sys_get_state()->context->context,
-				    CL_MEM_READ_ONLY, sizeof(int)*el_length,
+				    CL_MEM_READ_ONLY, sizeof(unsigned int)*el_length,
 				    NULL, &err);
 	clEnqueueWriteBuffer(sys_get_state()->context->queue, element_d, CL_TRUE,
-			     0, sizeof(int) * el_length, element, 0, NULL, NULL);
+			     0, sizeof(unsigned int) * el_length, element, 0,
+			     NULL, NULL);
 
 	err |= clSetKernelArg(kernel.kernel, i++,
 			      sizeof(src->cl_object), (void*) &src->cl_object);
@@ -147,7 +153,7 @@ static void morphology_launch_kernel(
 	err |= clSetKernelArg(kernel.kernel, i++,
 			      sizeof(element_d), (void*) &element_d);
 	err |= clSetKernelArg(kernel.kernel, i++,
-			      sizeof(cl_int), (void*) &el_size);
+			      sizeof(el_size), (void*) &el_size);
 	err |= clSetKernelArg(kernel.kernel, i++,
 			      sizeof(width), (void*) &width);
 	err |= clSetKernelArg(kernel.kernel, i++,
@@ -190,4 +196,5 @@ static void morphology_launch_kernel(
 	} else {
 		g_warning("morphology_erode: Couldn't release CL objects");
 	}
+	clReleaseMemObject(element_d);
 }
