@@ -10,6 +10,9 @@ static void
 ui_binarization_threshold_dialog(GtkWidget *widget, gpointer data);
 
 static void
+ui_binarization_otsu(GtkWidget *widget, gpointer data);
+
+static void
 ui_threshold_scale_cb(GtkWidget *widget, gpointer data);
 
 static char ui_def[] =
@@ -31,7 +34,8 @@ static GtkActionEntry actions[] = {
 	  "Binarize by hand with scale",
 	  G_CALLBACK(ui_binarization_threshold_dialog)},
 	{ "OtsuAction", NULL, "Otsu", NULL,
-	  "Binarize with Otsu algorithm", NULL }
+	  "Binarize with Otsu algorithm",
+	  G_CALLBACK(ui_binarization_otsu)}
 };
 static guint n_actions = G_N_ELEMENTS(actions);
 
@@ -107,5 +111,15 @@ ui_threshold_scale_cb(GtkWidget *widget, gpointer data)
 
 	threshold_binarization(sys_get_current_buffer(), sys_get_draw_buffer(),
 			       (unsigned int) threshold);
+	ui_window_force_redraw();
+}
+
+static void
+ui_binarization_otsu(GtkWidget *widget, gpointer data)
+{
+	histogram_init();
+	binarization_init();
+	binarization_otsu(sys_get_current_buffer(), sys_get_draw_buffer());
+	sys_commit_buffer(sys_get_draw_buffer());
 	ui_window_force_redraw();
 }

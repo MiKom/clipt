@@ -11,4 +11,6 @@ void
 threshold_binarization(device_buffer_t *src, device_buffer_t *dst,
 			unsigned int threshold);
 
+void
+binarization_otsu(device_buffer_t *src, device_buffer_t *dst);
 #endif
