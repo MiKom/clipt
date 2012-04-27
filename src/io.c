@@ -161,5 +161,20 @@ sys_result_t
 io_save_image(const char *path, plugin_save_handler_t *handler)
 {
 	g_debug("saving to: %s, with plugin: %s", path, handler->desc);
-	return CLIT_OK;
+	image_t image;
+	if( image_bind(sys_get_current_buffer(), &image)  != CLIT_OK ) {
+		return CLIT_ERROR;
+	}
+	image_lock(&image, CLIT_READ_ONLY);
+
+	image_data_t im_data;
+	im_data.width = image.width;
+	im_data.height = image.height;
+	im_data.bpp = image.channels * 8;
+	im_data.channels = image.channels;
+	im_data.data = image.data;
+
+	sys_result_t ret = handler->function(path, &im_data);
+	image_unlock(&image);
+	return ret;
 }
