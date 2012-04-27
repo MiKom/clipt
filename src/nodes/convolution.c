@@ -5,6 +5,8 @@
 #include <string.h>
 #include <nodes/convolution.h>
 
+#define MAX_BLOCK_DIM 16
+
 static char kernel_filename[] = "convolution.cl";
 static device_kernel_t kernel;
 
@@ -60,10 +62,26 @@ convolution_apply(device_buffer_t* src, device_buffer_t* dst,
 		g_error("convolution_apply: Couldn't aquire CL objects");
 	}
 
-        // Launch kernel here
+        size_t local_work_size[] = { conv->w, conv->h };
+        size_t global_work_size[2];
+        device_buffer_getprop(src, &global_work_size[0], &global_work_size[1], NULL);
+
+        int i=0, r;
+        for(i=0; i<2; i++) {
+                if(local_work_size[i] > MAX_BLOCK_DIM)
+                        local_work_size[i] = MAX_BLOCK_DIM;
+                r = global_work_size[i] % local_work_size[i];
+                if(r != 0)
+                        global_work_size[i] += local_work_size[i] - r;
+        }
+        
+        cl_error = clEnqueueNDRangeKernel(ctx->queue, kernel.kernel, 2, NULL,
+                                          global_work_size, local_work_size,
+                                          0, NULL, NULL);
         
         if(cl_error != CL_SUCCESS ) {
-		g_warning("convolution_apply: Couldn't launch the kernel");
+		g_warning("convolution_apply: Couldn't launch the kernel: %d", cl_error);
+                
 	}
 
 	cl_error = clEnqueueReleaseGLObjects(ctx->queue, 2 , buffers, 0, NULL, NULL);
@@ -74,33 +92,42 @@ convolution_apply(device_buffer_t* src, device_buffer_t* dst,
 
 int  convolution_from_string(const char* str, convolution_t* conv)
 {
-        size_t buflen = strlen(str)+1;
-        char *parse_data = malloc(buflen);
-        char *parse_ctx, *token;
+        char *parse_data = strdup(str);
+        char *parse_ctx[2], *line;
 
         size_t i=0;
+        int retcode = 0;
         conv->w = conv->h = 0;
-
-        memcpy(parse_data, str, buflen);
         memset(conv->matrix, 0, sizeof(conv->matrix));
         
-        token = strtok_r(parse_data, "\n\t ", &parse_ctx);
-        while(token) {
-                if(strchr(token, ';')) {
-                        if(conv->h == 0) conv->w = i;
-                        else if(i != conv->w) return 1;
-                        conv->h++;
-                        i = 0;
+        line = strtok_r(parse_data, "\n", &parse_ctx[0]);
+        while(line) {
+                char* line_data = strdup(line);
+                char* token;
+
+                token = strtok_r(line_data, " \t", &parse_ctx[1]);
+                while(token) {
+                        sscanf(token, "%f", &conv->matrix[conv->w*conv->h + i++]);
+                        token = strtok_r(NULL, " \t", &parse_ctx[1]);
                 }
-                else {
-                        sscanf(token, "%f", &conv->matrix[conv->h][i++]);
-                        if(conv->h > 0 && i == conv->w)
-                                return 1;
+                free(line_data);
+
+                if(conv->h == 0)
+                        conv->w = i;
+                else if(i != conv->w) {
+                        retcode = 1;
+                        break;
                 }
                 
-                token = strtok_r(NULL, "\n\t ", &parse_ctx);
+                conv->h++;
+                i = 0;
+                
+                line = strtok_r(NULL, "\n", &parse_ctx[0]);
         }
         free(parse_data);
-        return 0;
+
+        if(conv->w < 1 || conv->h < 1)
+                return 1;
+        return retcode;
 }
 

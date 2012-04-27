@@ -5,7 +5,7 @@
 
 struct convolution_s
 {
-        float matrix[CLIT_CONVMAX][CLIT_CONVMAX];
+        float matrix[CLIT_CONVMAX*CLIT_CONVMAX];
         size_t w, h;
         float divisor;
         float bias;
