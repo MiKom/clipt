@@ -132,6 +132,7 @@ ui_morphology_show_dialog(GtkWidget *widget, gpointer data)
 	gtk_widget_show_all(obj->dialog);
 	ui_morphology_do(obj);
 
+
 	gint response = gtk_dialog_run(obj->dialog);
 	if( response == GTK_RESPONSE_APPLY ) {
 		sys_commit_buffer(sys_get_draw_buffer());
@@ -139,8 +140,10 @@ ui_morphology_show_dialog(GtkWidget *widget, gpointer data)
 		sys_draw_current_buffer();
 	}
 	gtk_widget_destroy(obj->dialog);
+
 	morphology_deallocate_temp();
 	free(obj);
+	ui_window_force_redraw();
 }
 
 static ui_morphology_t*
