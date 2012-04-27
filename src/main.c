@@ -23,6 +23,8 @@ static void parse_arguments(int argc, char** argv, sys_config_t* config)
                 { NULL },
 	};
 
+	g_snprintf(config->project, PATH_MAX, "%s", "images/lenna.pnm");
+
 	GError* error = NULL;
 	GOptionContext* context = g_option_context_new(" - "CLIT_NAME_STRING);
 	g_option_context_add_main_entries(context, entries, NULL);

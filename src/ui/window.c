@@ -289,6 +289,9 @@ void ui_drawing_area_init(GtkWidget* widget, gpointer data)
 	// GLXRenderable until it is shown on screen so we have to postpone all
 	// OpenGL and OpenCL stuff unitl window is drawn for the first time.
 	core_subsystem_start();
+	if(sys_get_config()->project != NULL) {
+		io_load_image(sys_get_config()->project);
+	}
 
 	gl_initialized = TRUE;
 }
