@@ -32,4 +32,4 @@ int convolution_from_string(const char* str, convolution_t* conv);
 convolution_preset_t* convolution_get_preset_table(void);
 convolution_preset_t* convolution_get_preset(const char* name);
 
-#endif __CLIPT_NODES_CONVOLUTION_H
+#endif

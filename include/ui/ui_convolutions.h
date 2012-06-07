@@ -14,8 +14,8 @@ struct ui_convolutions_s
 {
         GtkWidget* dialog;
         GtkTextBuffer* buffer;
-        GtkSpinButton* bias;
-        GtkSpinButton* divisor;
+	GtkSpinButton* bias;
+	GtkSpinButton* divisor;
 };
 typedef struct ui_convolutions_s ui_convolutions_t;
 

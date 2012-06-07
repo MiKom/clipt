@@ -39,11 +39,11 @@ ui_convolutions_apply(ui_convolutions_t* ui_conv)
         
         if(convolution_from_string(conv_text, &conv) != 0) {
                 GtkWidget *err_dialog;
-                err_dialog = gtk_message_dialog_new(ui_conv->dialog,
+		err_dialog = gtk_message_dialog_new(GTK_WINDOW(ui_conv->dialog),
                                                     GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                                     GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
                                                     "ui_convolutions_apply: Failed to parse convolution matrix");
-                gtk_dialog_run(err_dialog);
+		gtk_dialog_run(GTK_DIALOG(err_dialog));
                 gtk_widget_destroy(err_dialog);
                 return 1;
         }
@@ -69,7 +69,7 @@ static void
 ui_convolutions_convocombo_changed_cb(GtkComboBox *widget, gpointer data)
 {
         ui_convolutions_t* conv = (ui_convolutions_t*)data;
-        gchar* id = gtk_combo_box_get_active_id(GTK_COMBO_BOX(widget));
+	const gchar *id = gtk_combo_box_get_active_id(GTK_COMBO_BOX(widget));
         
         if(strcmp(id, "Custom") == 0) {
                 gtk_text_buffer_set_text(conv->buffer, "", -1);
@@ -77,10 +77,12 @@ ui_convolutions_convocombo_changed_cb(GtkComboBox *widget, gpointer data)
                 gtk_spin_button_set_value(conv->divisor, 1.0);
         }
         else {
-                convolution_preset_t* preset = convolution_get_preset(id);
-                gtk_text_buffer_set_text(conv->buffer, preset->matrix, -1);
-                gtk_spin_button_set_value(conv->bias, preset->bias);
-                gtk_spin_button_set_value(conv->divisor, preset->divisor);
+		convolution_preset_t* preset = convolution_get_preset(id);
+		if(preset != NULL) {
+			gtk_text_buffer_set_text(conv->buffer, preset->matrix, -1);
+			gtk_spin_button_set_value(conv->bias, preset->bias);
+			gtk_spin_button_set_value(conv->divisor, preset->divisor);
+		}
         }
 }
 
@@ -109,11 +111,10 @@ ui_convolutions_dialog_new(GtkWidget *parent)
 {
         ui_convolutions_t *ret = malloc(sizeof(ui_convolutions_t));
         
-        GtkWindow* dialog = gtk_dialog_new();
+	GtkWidget* dialog = gtk_dialog_new();
         ret->dialog = dialog;
 
-        gtk_window_set_title(dialog, "Convolutions");
-        gtk_window_set_title(dialog, "Mathematical Morphology");
+	gtk_window_set_title(GTK_WINDOW(dialog), "Convolutions");
 	gtk_window_set_transient_for(GTK_WINDOW(dialog), GTK_WINDOW(parent));
 	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
 	gtk_window_set_modal(GTK_WINDOW(dialog), FALSE);
@@ -152,10 +153,10 @@ ui_convolutions_dialog_new(GtkWidget *parent)
         GtkWidget* label_bias = gtk_label_new("Bias: ");
         GtkWidget* label_divisor = gtk_label_new("Divisor: ");
 
-        GtkSpinButton* bias = gtk_spin_button_new_with_range(0, 255, 1);
-        gtk_spin_button_set_value(bias, 0);
-        GtkSpinButton* divisor = gtk_spin_button_new_with_range(1, 255, 1);
-        gtk_spin_button_set_value(divisor, 1);
+	GtkWidget* bias = gtk_spin_button_new_with_range(0, 255, 1);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(bias), 0);
+	GtkWidget* divisor = gtk_spin_button_new_with_range(1, 255, 1);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(divisor), 1);
 
         GtkWidget* preview = gtk_button_new_with_label("Preview");
 
@@ -171,8 +172,8 @@ ui_convolutions_dialog_new(GtkWidget *parent)
         gtk_box_pack_start(GTK_BOX(box), grid, TRUE, TRUE, 0);
 
         ret->buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(matrix_view));
-        ret->bias = bias;
-        ret->divisor = divisor;
+	ret->bias = GTK_SPIN_BUTTON(bias);
+	ret->divisor = GTK_SPIN_BUTTON(divisor);
 
         gtk_text_buffer_set_text(ret->buffer,
                                  convolution_get_preset_table()->matrix, -1);

@@ -182,5 +182,6 @@ convolution_preset_t*  convolution_get_preset(const char* name)
                 if(strcmp(ptr->name, name) == 0)
                         return ptr;
                 ptr++;
-        }
+	}
+	return NULL;
 }
